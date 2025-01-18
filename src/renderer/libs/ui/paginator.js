@@ -785,9 +785,11 @@ export class Paginator extends HTMLElement {
         return this.#vertical ? (scrolled ? 'width' : 'height')
             : scrolled ? 'height' : 'width'
     }
+    //container width 
     get size() {
         return this.#container.getBoundingClientRect()[this.sideProp]
     }
+    //div 的width
     get viewSize() {
         return this.#view.element.getBoundingClientRect()[this.sideProp]
     }
