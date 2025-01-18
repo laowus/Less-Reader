@@ -1,0 +1,12 @@
+.icon-return {
+  cursor: pointer;
+}
+.center {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+*:focus {
+  outline: none;
+}
