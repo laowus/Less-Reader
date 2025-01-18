@@ -18,8 +18,9 @@
             <div id="background" part="filter"></div>
             //显示当前章节名字(左边)/书籍名字(右边)
             <div id="header"></div>
-            //iframe html文件
+            // iframe html文件
             <div id="container"></div>
+            //显示当前页码
             <div id="footer"></div>
     </div>
     `
