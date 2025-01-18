@@ -102,15 +102,19 @@ class Reader {
         menu.groups.layout.select('paginated')
     }
     async open(file) {
-
+        //创建外壳
         this.view = document.createElement('foliate-view')
         document.body.append(this.view)
+        //打开文件
         await this.view.open(file)
+        //加载数据
         this.view.addEventListener('load', this.#onLoad.bind(this))
         this.view.addEventListener('relocate', this.#onRelocate.bind(this))
 
         const { book } = this.view
+        //加载css
         this.view.renderer.setStyles?.(getCSS(this.style))
+        //执行
         this.view.renderer.next()
 
         $('#header-bar').style.visibility = 'visible'
@@ -196,7 +200,6 @@ class Reader {
     }
     //
     #onRelocate({ detail }) {
-        console.log("detail", detail)
         const { fraction, location, tocItem, pageItem } = detail
         const percent = percentFormat.format(fraction)
         const loc = pageItem

@@ -411,6 +411,7 @@ class View {
 }
 
 // NOTE: everything here assumes the so-called "negative scroll type" for RTL
+// <foliate-paginator
 export class Paginator extends HTMLElement {
     static observedAttributes = [
         'flow', 'gap', 'margin',
@@ -632,6 +633,7 @@ export class Paginator extends HTMLElement {
                 break
         }
     }
+    //把目录放入
     open(book) {
         this.bookDir = book.dir
         this.sections = book.sections
@@ -732,6 +734,7 @@ export class Paginator extends HTMLElement {
         }))
         this.#scrollToAnchor(this.#anchor)
     }
+    /** 04 */
     get scrolled() {
         return this.getAttribute('flow') === 'scrolled'
     }
@@ -974,7 +977,7 @@ export class Paginator extends HTMLElement {
     #canGoToIndex(index) {
         return index >= 0 && index <= this.sections.length - 1
     }
-    async #goTo({ index, anchor, select}) {
+    async #goTo({ index, anchor, select }) {
         if (index === this.#index) await this.#display({ index, anchor, select })
         else {
             const oldIndex = this.#index
@@ -997,6 +1000,7 @@ export class Paginator extends HTMLElement {
         const resolved = await target
         if (this.#canGoToIndex(resolved.index)) return this.#goTo(resolved)
     }
+    /** 03 */
     #scrollPrev(distance) {
         if (!this.#view) return true
         if (this.scrolled) {
@@ -1008,8 +1012,10 @@ export class Paginator extends HTMLElement {
         const page = this.page - 1
         return this.#scrollToPage(page, 'page', true).then(() => page <= 0)
     }
+    /** 03 */
     #scrollNext(distance) {
         if (!this.#view) return true
+        //判断是滚动 this.getAttribute('flow') === 'scrolled'
         if (this.scrolled) {
             if (this.viewSize - this.end > 2) return this.#scrollTo(
                 Math.min(this.viewSize, distance ? this.start + distance : this.end), null, true)
@@ -1018,6 +1024,7 @@ export class Paginator extends HTMLElement {
         if (this.atEnd) return
         const page = this.page + 1
         const pages = this.pages
+        console.log("当前页:page:", page, "总页数pages:", pages)
         return this.#scrollToPage(page, 'page', true).then(() => page >= pages - 1)
     }
     get atStart() {
@@ -1030,6 +1037,7 @@ export class Paginator extends HTMLElement {
         for (let index = this.#index + dir; this.#canGoToIndex(index); index += dir)
             if (this.sections[index]?.linear !== 'no') return index
     }
+    /** 02 */
     async #turnPage(dir, distance) {
         if (this.#locked) return
         this.#locked = true
@@ -1045,6 +1053,7 @@ export class Paginator extends HTMLElement {
     prev(distance) {
         return this.#turnPage(-1, distance)
     }
+    //* 01 */
     next(distance) {
         return this.#turnPage(1, distance)
     }

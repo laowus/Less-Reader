@@ -240,7 +240,6 @@ export class View extends HTMLElement {
             || book.isDirectory) book = await makeBook(book)
         this.book = book
         this.language = languageInfo(book.metadata?.language)
-        console.log("解析后", book);
 
         if (book.splitTOCHref && book.getTOCFragment) {
             const ids = book.sections.map(s => s.id)

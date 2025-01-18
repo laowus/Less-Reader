@@ -12,7 +12,6 @@ onMounted(() => {
         let book = result.find(item => item.key === bookKey);
         if (book.path) open(book.path).catch(e => console.error(e))
     });
-
 });
 
 const handleClose = () => {

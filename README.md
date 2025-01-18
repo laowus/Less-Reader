@@ -12,3 +12,14 @@
 ### 2. 增删改查.
 
 ### 3. top 显示当前章名, 关闭窗口,记录当前读取位置
+
+    `<div id="top">
+            //背景 改变背景颜色
+            <div id="background" part="filter"></div>
+            //显示当前章节名字(左边)/书籍名字(右边)
+            <div id="header"></div>
+            //iframe html文件
+            <div id="container"></div>
+            <div id="footer"></div>
+    </div>
+    `
