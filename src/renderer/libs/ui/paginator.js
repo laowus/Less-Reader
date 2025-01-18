@@ -1,5 +1,28 @@
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
+/**
+* 空闲控制 返回函数连续调用时，空闲时间必须大于或等于 idle，action 才会执行
+* @param idle   {number}    空闲时间，单位毫秒
+* @param action {function}  请求关联函数，实际应用需要调用的函数
+* @return {function}    返回客户调用函数
+var debounce = function(idle, action){
+  var last
+  return function(){
+    var ctx = this, args = arguments
+    clearTimeout(last)
+    last = setTimeout(function(){
+        action.apply(ctx, args)
+    }, idle)
+  }
+}
+*/
+/**
+ * 
+ * @param {*} f 要执行的函数
+ * @param {*} wait 等待时间
+ * @param {*} immediate 是否立即执行 false立即执行
+ * @returns 
+ */
 const debounce = (f, wait, immediate) => {
     let timeout
     return (...args) => {
@@ -175,9 +198,10 @@ const getDirection = doc => {
         || doc.documentElement.dir === 'rtl'
     return { vertical, rtl }
 }
-
+//获取iframe 内 html的背景色和背景图片
 const getBackground = doc => {
     const bodyStyle = doc.defaultView.getComputedStyle(doc.body)
+    console.log("bodyStyle", bodyStyle)
     return bodyStyle.backgroundColor === 'rgba(0, 0, 0, 0)'
         && bodyStyle.backgroundImage === 'none'
         ? doc.defaultView.getComputedStyle(doc.documentElement).background
@@ -196,11 +220,13 @@ const setStylesImportant = (el, styles) => {
     const { style } = el
     for (const [k, v] of Object.entries(styles)) style.setProperty(k, v, 'important')
 }
-
+// <div> <iframe>
 class View {
+    //监听变化
     #observer = new ResizeObserver(() => this.expand())
     #element = document.createElement('div')
     #iframe = document.createElement('iframe')
+    //创建一个范围html 文档
     #contentRange = document.createRange()
     #overlayer
     #vertical = false
@@ -213,6 +239,7 @@ class View {
         this.onExpand = onExpand
         this.#iframe.setAttribute('part', 'filter')
         this.#element.append(this.#iframe)
+        //<div style>
         Object.assign(this.#element.style, {
             boxSizing: 'content-box',
             position: 'relative',
@@ -223,6 +250,7 @@ class View {
             justifyContent: 'center',
             alignItems: 'center',
         })
+        //<div style><iframe style>
         Object.assign(this.#iframe.style, {
             overflow: 'hidden',
             border: '0',
@@ -231,7 +259,8 @@ class View {
         })
         // `allow-scripts` is needed for events because of WebKit bug
         // https://bugs.webkit.org/show_bug.cgi?id=218086
-        this.#iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts')
+        //this.#iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts')
+        //<div style><iframe scrolling="no"  style> 取消滚动
         this.#iframe.setAttribute('scrolling', 'no')
     }
     get element() {
@@ -240,10 +269,13 @@ class View {
     get document() {
         return this.#iframe.contentDocument
     }
+    //把html文件载入
     async load(src, afterLoad, beforeRender) {
         if (typeof src !== 'string') throw new Error(`${src} is not string`)
         return new Promise(resolve => {
+            //iframe 内容加载 自动会执行
             this.#iframe.addEventListener('load', () => {
+                //iframe 内部html内容
                 const doc = this.document
                 afterLoad?.(doc)
 
@@ -350,10 +382,13 @@ class View {
         }
     }
     expand() {
+        //iframe里面的html
         const { documentElement } = this.document
         if (this.#column) {
+            //side='width'非垂直
             const side = this.#vertical ? 'height' : 'width'
             const otherSide = this.#vertical ? 'width' : 'height'
+            //获取iframe内部html的大小
             const contentRect = this.#contentRange.getBoundingClientRect()
             const rootRect = documentElement.getBoundingClientRect()
             // offset caused by column break at the start of the page
@@ -411,7 +446,7 @@ class View {
 }
 
 // NOTE: everything here assumes the so-called "negative scroll type" for RTL
-// <foliate-paginator
+// <foliate-paginator 
 export class Paginator extends HTMLElement {
     static observedAttributes = [
         'flow', 'gap', 'margin',
@@ -734,15 +769,17 @@ export class Paginator extends HTMLElement {
         }))
         this.#scrollToAnchor(this.#anchor)
     }
-    /** 04 */
+    /** 04 默认false */
     get scrolled() {
         return this.getAttribute('flow') === 'scrolled'
     }
+    //滚动方向方向  'scrollLeft'
     get scrollProp() {
         const { scrolled } = this
         return this.#vertical ? (scrolled ? 'scrollLeft' : 'scrollTop')
             : scrolled ? 'scrollTop' : 'scrollLeft'
     }
+    // 'width'
     get sideProp() {
         const { scrolled } = this
         return this.#vertical ? (scrolled ? 'width' : 'height')

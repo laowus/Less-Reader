@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <ul>
+        <li>Vite</li>
+        <li>Vue</li>
+        <li>React</li>
+        <li>VitePress</li>
+        <li>NaiveUI</li>
+    </ul>
+</body>
+<script>
+    // 创建 Range 对象
+    const range = new Range()
+    const liDoms = document.querySelectorAll("li");
+    // Range 起始位置在 li 2
+    range.setStartBefore(liDoms[1]);
+    // Range 结束位置在 li 3
+    range.setEndAfter(liDoms[2]);
+    // 获取 selection 对象
+    const selection = window.getSelection();
+    // 添加光标选择的范围
+    selection.addRange(range);
+</script>
+
+</html>
