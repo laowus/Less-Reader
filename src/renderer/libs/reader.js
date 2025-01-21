@@ -102,12 +102,13 @@ class Reader {
         menu.groups.layout.select('paginated')
     }
     async open(file) {
-        //创建外壳
+        //调用 view.js View
         this.view = document.createElement('foliate-view')
+        //插入到body 尾部
         document.body.append(this.view)
         //打开文件
         await this.view.open(file)
-        //加载数据
+        //初始化
         this.view.addEventListener('load', this.#onLoad.bind(this))
         this.view.addEventListener('relocate', this.#onRelocate.bind(this))
 
@@ -195,7 +196,6 @@ class Reader {
     }
     //doc 为当前的html页面
     #onLoad({ detail: { doc } }) {
-        console.log("doc", doc)
         doc.addEventListener('keydown', this.#handleKeydown.bind(this))
     }
     //

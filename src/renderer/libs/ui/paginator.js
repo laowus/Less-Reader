@@ -201,7 +201,6 @@ const getDirection = doc => {
 //获取iframe 内 html的背景色和背景图片
 const getBackground = doc => {
     const bodyStyle = doc.defaultView.getComputedStyle(doc.body)
-    console.log("bodyStyle", bodyStyle)
     return bodyStyle.backgroundColor === 'rgba(0, 0, 0, 0)'
         && bodyStyle.backgroundImage === 'none'
         ? doc.defaultView.getComputedStyle(doc.documentElement).background
@@ -235,6 +234,7 @@ class View {
     #size
     #layout = {}
     constructor({ container, onExpand }) {
+        //<foliate-paginator 
         this.container = container
         this.onExpand = onExpand
         this.#iframe.setAttribute('part', 'filter')
@@ -278,7 +278,6 @@ class View {
                 //iframe 内部html内容
                 const doc = this.document
                 afterLoad?.(doc)
-
                 // it needs to be visible for Firefox to get computed style
                 this.#iframe.style.display = 'block'
                 const { vertical, rtl } = getDirection(doc)
@@ -301,6 +300,7 @@ class View {
 
                 resolve()
             }, { once: true })
+
             this.#iframe.src = src
         })
     }
@@ -328,6 +328,8 @@ class View {
         this.setImageSize()
         this.expand()
     }
+    //窗口自适应
+    // 'column-width': `${Math.trunc(columnWidth)}px`,
     columnize({ width, height, gap, columnWidth }) {
         const vertical = this.#vertical
         this.#size = vertical ? height : width
@@ -594,6 +596,7 @@ export class Paginator extends HTMLElement {
         this.addEventListener('touchstart', this.#onTouchStart.bind(this), opts)
         this.addEventListener('touchmove', this.#onTouchMove.bind(this), opts)
         this.addEventListener('touchend', this.#onTouchEnd.bind(this))
+        //**load */
         this.addEventListener('load', ({ detail: { doc } }) => {
             doc.addEventListener('touchstart', this.#onTouchStart.bind(this), opts)
             doc.addEventListener('touchmove', this.#onTouchMove.bind(this), opts)
@@ -617,6 +620,7 @@ export class Paginator extends HTMLElement {
             else if (!backward && selRange.compareBoundaryPoints(Range.END_TO_END, range) > 0)
                 this.next()
         }, 700)
+        // 
         this.addEventListener('load', ({ detail: { doc } }) => {
             let isPointerSelecting = false
             doc.addEventListener('pointerdown', () => isPointerSelecting = true)
@@ -679,6 +683,7 @@ export class Paginator extends HTMLElement {
             this.#container.removeChild(this.#view.element)
         }
         this.#view = new View({
+            //foliate-view
             container: this,
             onExpand: () => this.#scrollToAnchor(this.#anchor),
         })
@@ -767,7 +772,7 @@ export class Paginator extends HTMLElement {
             vertical: this.#vertical,
             rtl: this.#rtl,
         }))
-        this.#scrollToAnchor(this.#anchor)
+        //this.#scrollToAnchor(this.#anchor)
     }
     /** 04 默认false */
     get scrolled() {
@@ -903,9 +908,13 @@ export class Paginator extends HTMLElement {
         const offset = this.#getRectMapper()(rect).left
         return this.#scrollToPage(Math.floor(offset / this.size) + (this.#rtl ? -1 : 1), reason)
     }
+    //滚动
     async #scrollTo(offset, reason, smooth) {
+        console.log("#scrollTo", offset, reason, smooth)
         const element = this.#container
         const { scrollProp, size } = this
+        //#container['scrollLeft']
+        console.log("#container['scrollLeft']", element[scrollProp])
         if (element[scrollProp] === offset) {
             this.#scrollBounds = [offset, this.atStart ? 0 : size, this.atEnd ? 0 : size]
             this.#afterScroll(reason)
@@ -921,12 +930,21 @@ export class Paginator extends HTMLElement {
             this.#afterScroll(reason)
         })
         else {
+            console.log("element[scrollProp] ", element[scrollProp])
             element[scrollProp] = offset
             this.#scrollBounds = [offset, this.atStart ? 0 : size, this.atEnd ? 0 : size]
             this.#afterScroll(reason)
         }
     }
+    /**
+     * 
+     * @param {*} page 页码
+     * @param {*} reason 'page'标识
+     * @param {*} smooth 
+     * @returns 
+     */
     async #scrollToPage(page, reason, smooth) {
+        console.log("#scrollToPage", page, reason, smooth)
         const offset = this.size * (this.#rtl ? -page : page)
         return this.#scrollTo(offset, reason, smooth)
     }
@@ -934,6 +952,7 @@ export class Paginator extends HTMLElement {
         return this.#scrollToAnchor(anchor, select ? 'selection' : 'navigation')
     }
     async #scrollToAnchor(anchor, reason = 'anchor') {
+        console.log("#scrollToAnchor", anchor)
         this.#anchor = anchor
         const rects = uncollapse(anchor)?.getClientRects?.()
         // if anchor is an element or a range
@@ -974,6 +993,7 @@ export class Paginator extends HTMLElement {
 
         const index = this.#index
         const detail = { reason, range, index }
+        console.log("detail", detail)
         if (this.scrolled) detail.fraction = this.start / this.viewSize
         else if (this.pages > 0) {
             const { page, pages } = this
@@ -981,14 +1001,24 @@ export class Paginator extends HTMLElement {
             detail.fraction = (page - 1) / (pages - 2)
             detail.size = 1 / (pages - 2)
         }
+        //执行执行
         this.dispatchEvent(new CustomEvent('relocate', { detail }))
     }
+    //* 04 之前的操作 
+    // 获取section 每个html的index, 开始为0
+    // src , anchor无用, select为空, onLoad
     async #display(promise) {
         const { index, src, anchor, onLoad, select } = await promise
+        //存储index
         this.#index = index
         const hasFocus = this.#view?.document?.hasFocus()
         if (src) {
+            //创建view
             const view = this.#createView()
+            /**
+             * 加载后,给html文件添加样式.
+             * 
+             */
             const afterLoad = doc => {
                 if (doc.head) {
                     const $styleBefore = doc.createElement('style')
@@ -1016,13 +1046,18 @@ export class Paginator extends HTMLElement {
     #canGoToIndex(index) {
         return index >= 0 && index <= this.sections.length - 1
     }
+    // 03 
     async #goTo({ index, anchor, select }) {
         if (index === this.#index) await this.#display({ index, anchor, select })
         else {
             const oldIndex = this.#index
+            //加载函数 
             const onLoad = detail => {
+                //卸载上一页的内容
                 this.sections[oldIndex]?.unload?.()
+                //设置样式
                 this.setStyles(this.#styles)
+                //直接执行 load 
                 this.dispatchEvent(new CustomEvent('load', { detail }))
             }
             await this.#display(Promise.resolve(this.sections[index].load())
@@ -1039,7 +1074,7 @@ export class Paginator extends HTMLElement {
         const resolved = await target
         if (this.#canGoToIndex(resolved.index)) return this.#goTo(resolved)
     }
-    /** 03 */
+
     #scrollPrev(distance) {
         if (!this.#view) return true
         if (this.scrolled) {
@@ -1051,7 +1086,7 @@ export class Paginator extends HTMLElement {
         const page = this.page - 1
         return this.#scrollToPage(page, 'page', true).then(() => page <= 0)
     }
-    /** 03 */
+    //翻到下一页
     #scrollNext(distance) {
         if (!this.#view) return true
         //判断是滚动 this.getAttribute('flow') === 'scrolled'
@@ -1063,7 +1098,6 @@ export class Paginator extends HTMLElement {
         if (this.atEnd) return
         const page = this.page + 1
         const pages = this.pages
-        console.log("当前页:page:", page, "总页数pages:", pages)
         return this.#scrollToPage(page, 'page', true).then(() => page >= pages - 1)
     }
     get atStart() {
@@ -1072,16 +1106,24 @@ export class Paginator extends HTMLElement {
     get atEnd() {
         return this.#adjacentIndex(1) == null && this.page >= this.pages - 2
     }
+    //校正index 
     #adjacentIndex(dir) {
-        for (let index = this.#index + dir; this.#canGoToIndex(index); index += dir)
+        //index=0 let index=0, index <= this.sections.length - 1 ;index+1
+        //  index >= 0 && index <= this.sections.length - 1 
+        for (let index = this.#index + dir; this.#canGoToIndex(index); index += dir) {
             if (this.sections[index]?.linear !== 'no') return index
+        }
+
     }
-    /** 02 */
+    /** 02  dir=1*/
     async #turnPage(dir, distance) {
         if (this.#locked) return
         this.#locked = true
         const prev = dir === -1
         const shouldGo = await (prev ? this.#scrollPrev(distance) : this.#scrollNext(distance))
+        //true
+        // index : 0; index= this.#index+1
+        // {index:0,anchor:0}
         if (shouldGo) await this.#goTo({
             index: this.#adjacentIndex(dir),
             anchor: prev ? () => 1 : () => 0,

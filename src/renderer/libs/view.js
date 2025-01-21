@@ -217,6 +217,8 @@ const languageInfo = lang => {
 }
 
 export class View extends HTMLElement {
+    //样式隔离
+    //禁止外部访问Shadow DOM，增强了封装性。
     #root = this.attachShadow({ mode: 'closed' })
     #sectionProgress
     #tocProgress
@@ -239,6 +241,7 @@ export class View extends HTMLElement {
             || typeof book.arrayBuffer === 'function'
             || book.isDirectory) book = await makeBook(book)
         this.book = book
+        console.log(book)
         this.language = languageInfo(book.metadata?.language)
 
         if (book.splitTOCHref && book.getTOCFragment) {

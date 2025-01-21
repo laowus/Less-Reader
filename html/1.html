@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow DOM Example</title>
+</head>
+
+<body>
+    <my-custom-element></my-custom-element>
+    <script>
+        class MyCustomElement extends HTMLElement {
+            constructor() {
+                super();
+                // 附加Shadow DOM
+                this.attachShadow({ mode: 'open' });
+                // 设置Shadow DOM内容
+                this.shadowRoot.innerHTML = `
+                    <style>
+                        p { color: red; }
+                    </style>
+                    <p>This is Shadow DOM content.</p>
+                `;
+            }
+        }
+        // 注册自定义元素
+        customElements.define('my-custom-element', MyCustomElement);
+    </script>
+</body>
+
+</html>
