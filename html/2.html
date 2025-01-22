@@ -6,20 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+<style>
+    .container {
+        width: 200px;
+        height: 200px;
+        overflow: hidden;
+        position: relative;
+        /* 确保绝对定位是相对于这个容器的 */
+    }
+
+    .content {
+        position: absolute;
+        top: 50px;
+        /* 偏移量 */
+        left: 50px;
+        /* 偏移量 */
+    }
+</style>
 
 <body>
-    <button class="btn">测试dispatchEvent()方法</button>
-
-    <script>
-        let btn = document.querySelector('.btn');
-
-        btn.addEventListener('click', function () {
-            alert('点击了');
-        });
-        //直接执行了 不需要点击
-        let clickEvent = new Event('click');
-        btn.dispatchEvent(clickEvent);
-    </script>
+    <div class="container">
+        <div class="content">确保绝对定位是相对于这个容器的 确保绝对定位是相对于这个容器的 确保绝对定位是相对于这个容器的 确保绝对定位是相对于这个容器的 确保绝对定位是相对于这个容器的 确保绝对定位是相对于这个容器的 确保绝对定位是相对于这个容器的 确保绝对定位是相对于这个容器的 确保绝对定位是相对于这个容器的 确保绝对定位是相对于这个容器的 </div>
+    </div>
 </body>
 
 </html>

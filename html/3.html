@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            align-items: center;
+            justify-items: center;
+        }
+
+        .parent {
+            width: 200px;
+            height: 100px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .child {
+            position: absolute;
+            left: 0;
+            width: 600px;
+            height: 100%;
+            background-color: lightblue;
+            display: block;
+        }
+
+        #bottom {
+            display: flex;
+            justify-content: space-between;
+            width: 200px;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="parent">
+        <div class="child">而帖子中举的例子，也是以浏览器最外层的滚动条为例子，进行讲解，基本上都是如下的效果图</div>
+    </div>
+    <div id="bottom">
+        <input id="prev" type="button" value="<" onclick="go(-1)"> <input id="next" type="button" value=">" onclick="go(1)">
+    </div>
+</body>
+<script>
+    const $ = document.querySelector.bind(document)
+    const parent = $('.parent');
+    const child = $('.child');
+    const prev = $('#prev');
+    const next = $('#next');
+    // 假设你想要根据scrollLeft的值来显示子元素的一部分
+    let scrollLeftValue = 100; // 根据需要设置初始scrollLeft值
+    init(scrollLeftValue);
+    const go = (flag) => {
+        if (flag === -1) {
+            init(scrollLeftValue - 100);
+        } else {
+            init(scrollLeftValue + 100);
+        }
+    }
+    const init = (scrollLeftValue) => {
+        parent.scrollLeft = scrollLeftValue;
+    }
+
+</script>
+
+</html>
