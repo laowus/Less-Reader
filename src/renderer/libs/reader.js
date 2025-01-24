@@ -111,7 +111,6 @@ class Reader {
         //初始化
         this.view.addEventListener('load', this.#onLoad.bind(this))
         this.view.addEventListener('relocate', this.#onRelocate.bind(this))
-
         const { book } = this.view
         //加载css
         this.view.renderer.setStyles?.(getCSS(this.style))
@@ -134,7 +133,6 @@ class Reader {
         }
         //键盘监听
         document.addEventListener('keydown', this.#handleKeydown.bind(this))
-
         const title = formatLanguageMap(book.metadata?.title) || 'Untitled Book'
         document.title = title
         /**左边目录 */
@@ -206,7 +204,7 @@ class Reader {
             ? `Page ${pageItem.label}`
             : `Loc ${location.current}`
         const slider = $('#progress-slider')
-        slider.style.visibility = 'visible'
+        // slider.style.visibility = 'visible'
         slider.value = fraction
         slider.title = `${percent} · ${loc}`
         if (tocItem?.label) $('#chapter-title').innerText = tocItem?.label

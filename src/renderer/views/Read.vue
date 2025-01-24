@@ -54,22 +54,24 @@ const handleClose = () => {
         </div>
     </div>
     <div id="nav-bar" class="toolbar">
-        <!-- 上一页切换 -->
-        <button id="left-button" aria-label="Go left">
+        <!-- 进度条 -->
+        <input id="progress-slider" type="range" min="0" max="1" step="any" list="tick-marks">
+        <datalist id="tick-marks"></datalist>
+
+    </div>
+    <div id="center">
+        <button id="left-button" class="leftBtn" aria-label="Go left">
             <svg class="icon" width="24" height="24" aria-hidden="true">
                 <path d="M 15 6 L 9 12 L 15 18" />
             </svg>
         </button>
-        <!-- 进度条 -->
-        <input id="progress-slider" type="range" min="0" max="1" step="any" list="tick-marks">
-        <datalist id="tick-marks"></datalist>
-        <!-- 下一页切换 -->
-        <button id="right-button" aria-label="Go right">
+        <button id="right-button" class="rightBtn" aria-label="Go right">
             <svg class="icon" width="24" height="24" aria-hidden="true">
                 <path d="M 9 6 L 15 12 L 9 18" />
             </svg>
         </button>
     </div>
+
 </template>
 
 <style>
@@ -97,11 +99,56 @@ body {
 }
 
 .icon {
-    display: block;
     fill: none;
     stroke: currentcolor;
-    stroke-width: 2px;
+    stroke-width: 3px;
 }
+
+.rightBtn {
+    margin-right: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    opacity: 0.2;
+    border: none;
+    color: white;
+    background-color: rgba(75, 75, 75, 1);
+}
+
+.rightBtn:hover {
+    background-color: rgba(75, 75, 75, 0.5);
+    opacity: 1;
+}
+
+.leftBtn {
+    margin-left: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    opacity: 0.2;
+    border: none;
+    color: white;
+    background-color: rgba(75, 75, 75, 1);
+}
+
+.leftBtn:hover {
+    opacity: 1;
+}
+
+#center {
+    z-index: 4;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+}
+
 
 .empty-state-icon {
     margin: auto;
@@ -110,7 +157,7 @@ body {
 .toolbar {
     box-sizing: border-box;
     position: absolute;
-    z-index: 1;
+    z-index: 5;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -169,7 +216,7 @@ body {
     visibility: hidden;
     box-sizing: border-box;
     position: absolute;
-    z-index: 2;
+    z-index: 20;
     top: 0;
     left: 0;
     height: 100%;
@@ -192,7 +239,7 @@ body {
 #dimming-overlay {
     visibility: hidden;
     position: fixed;
-    z-index: 2;
+    z-index: 20;
     top: 0;
     left: 0;
     width: 100%;

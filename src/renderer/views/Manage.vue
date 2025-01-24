@@ -17,17 +17,11 @@ import 'element-plus/dist/index.css';
                     </el-icon>
                     <template #title>书架</template>
                 </el-menu-item>
-                <el-menu-item index="/book">
+                <el-menu-item index="/note">
                     <el-icon>
                         <Shop />
                     </el-icon>
                     <template #title>笔记</template>
-                </el-menu-item>
-                <el-menu-item index="/config">
-                    <el-icon>
-                        <Setting />
-                    </el-icon>
-                    <template #title>我的书架</template>
                 </el-menu-item>
             </el-menu>
         </el-aside>
