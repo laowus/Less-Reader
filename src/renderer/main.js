@@ -1,6 +1,9 @@
 // main.js 或者 main.ts
 import { createApp } from 'vue'
 import App from './App.vue'
+import "./assets/styles/reset.css";
+import "./assets/styles/global.css";
+import "./assets/styles/style.css";
 
 //Router
 import { router } from './route/router';
@@ -8,6 +11,7 @@ import { router } from './route/router';
 import VueLazyLoad from 'vue3-lazyload';
 import ElementPlus from 'element-plus'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import 'element-plus/dist/index.css';
 
 
 const app = createApp(App)

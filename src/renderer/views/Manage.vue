@@ -1,10 +1,5 @@
 <script setup>
 import TitleBar from '../components/TitleBar.vue';
-import "../assets/styles/reset.css";
-import "../assets/styles/global.css";
-import "../assets/styles/style.css";
-import 'element-plus/dist/index.css';
-
 </script>
 <template>
     <el-container>

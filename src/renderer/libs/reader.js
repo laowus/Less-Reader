@@ -93,7 +93,6 @@ const clickPart = e => {
 
 const partAction = ["prev", "menu", "next", "prev", "menu", "next", "prev", "menu", "next"]
 
-
 class Reader {
     #tocView
     style = {
