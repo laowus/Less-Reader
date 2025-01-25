@@ -297,7 +297,6 @@ class View {
         this.expand()
     }
     columnize({ width, height, gap, columnWidth }) {
-        console.log(" view columnize")
         const vertical = this.#vertical
         this.#size = vertical ? height : width
 
@@ -351,7 +350,6 @@ class View {
         }
     }
     expand() {
-        console.log("view expand")
         const { documentElement } = this.document
         if (this.#column) {
             const side = this.#vertical ? 'height' : 'width'

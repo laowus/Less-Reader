@@ -60,6 +60,40 @@ const formatContributor = contributor => Array.isArray(contributor)
     ? listFormat.format(contributor.map(formatOneContributor))
     : formatOneContributor(contributor)
 
+const clickPart = e => {
+    const x = e.clientX / window.innerWidth
+    const y = e.clientY / window.innerHeight
+
+    if (x < 0.33) {
+        if (y < 0.33) {
+            return 0;
+        } else if (y < 0.66) {
+            return 3;
+        } else {
+            return 6;
+        }
+    } else if (x < 0.66) {
+        if (y < 0.33) {
+            return 1;
+        } else if (y < 0.66) {
+            return 4;
+        } else {
+            return 7;
+        }
+    } else {
+        if (y < 0.33) {
+            return 2;
+        } else if (y < 0.66) {
+            return 5;
+        } else {
+            return 8;
+        }
+    }
+}
+
+const partAction = ["prev", "menu", "next", "prev", "menu", "next", "prev", "menu", "next"]
+
+
 class Reader {
     #tocView
     style = {
@@ -74,10 +108,10 @@ class Reader {
         $('#side-bar').classList.remove('show')
     }
     constructor() {
-        $('#side-bar-button').addEventListener('click', () => {
-            $('#dimming-overlay').classList.add('show')
-            $('#side-bar').classList.add('show')
-        })
+        // $('#side-bar-button').addEventListener('click', () => {
+        //     $('#dimming-overlay').classList.add('show')
+        //     $('#side-bar').classList.add('show')
+        // })
         $('#dimming-overlay').addEventListener('click', () => this.closeSideBar())
 
         const menu = createMenu([
@@ -119,8 +153,19 @@ class Reader {
 
         $('#header-bar').style.visibility = 'visible'
         $('#nav-bar').style.visibility = 'visible'
-        $('#left-button').addEventListener('click', () => this.view.goLeft())
-        $('#right-button').addEventListener('click', () => this.view.goRight())
+        // $('#left-button').addEventListener('click', () => this.view.goLeft())
+        // $('#right-button').addEventListener('click', () => this.view.goRight())
+        $('#center').addEventListener('click', e => {
+            const action = partAction[clickPart(e)]
+            if (action === "prev") {
+                this.view.goLeft()
+            } else if (action === "next") {
+                this.view.goRight()
+            } else if (action === "menu") {
+                $('#dimming-overlay').classList.add('show')
+                $('#side-bar').classList.add('show')
+            }
+        })
 
         const slider = $('#progress-slider')
         slider.dir = book.dir

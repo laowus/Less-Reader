@@ -38,11 +38,11 @@ const handleClose = () => {
         <div id="toc-view"></div>
     </div>
     <div id="header-bar" class="toolbar">
-        <button id="side-bar-button" aria-label="Show sidebar">
+        <!-- <button id="side-bar-button" aria-label="Show sidebar">
             <svg class="icon" width="24" height="24" aria-hidden="true">
                 <path d="M 4 6 h 16 M 4 12 h 16 M 4 18 h 16" />
             </svg>
-        </button>
+        </button> -->
         <!-- 拖动位置 -->
         <div class="title-bar-dragger" id="chapter-title"></div>
         <div id="menu-button" class="menu-container">
@@ -60,7 +60,7 @@ const handleClose = () => {
 
     </div>
     <div id="center">
-        <button id="left-button" class="leftBtn" aria-label="Go left">
+        <!-- <button id="left-button" class="leftBtn" aria-label="Go left">
             <svg class="icon" width="24" height="24" aria-hidden="true">
                 <path d="M 15 6 L 9 12 L 15 18" />
             </svg>
@@ -69,7 +69,7 @@ const handleClose = () => {
             <svg class="icon" width="24" height="24" aria-hidden="true">
                 <path d="M 9 6 L 15 12 L 9 18" />
             </svg>
-        </button>
+        </button> -->
     </div>
 
 </template>
@@ -104,7 +104,7 @@ body {
     stroke-width: 3px;
 }
 
-.rightBtn {
+/* .rightBtn {
     margin-right: 10px;
     width: 40px;
     height: 40px;
@@ -135,7 +135,7 @@ body {
 
 .leftBtn:hover {
     opacity: 1;
-}
+} */
 
 #center {
     z-index: 4;
