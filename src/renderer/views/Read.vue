@@ -1,4 +1,5 @@
 <script setup>
+import BottomBar from '../components/BottomBar.vue';
 import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import localforage from 'localforage';
@@ -18,6 +19,8 @@ const handleClose = () => {
     ipcRenderer.send('window-close');
 }
 
+
+
 </script>
 
 <template>
@@ -34,15 +37,13 @@ const handleClose = () => {
                 <p id="side-bar-author"></p>
             </div>
         </div>
-        <!-- 目录 -->
-        <div id="toc-view"></div>
+
     </div>
+    <div id="bottom-bar">
+        <BottomBar />
+    </div>
+
     <div id="header-bar" class="toolbar">
-        <!-- <button id="side-bar-button" aria-label="Show sidebar">
-            <svg class="icon" width="24" height="24" aria-hidden="true">
-                <path d="M 4 6 h 16 M 4 12 h 16 M 4 18 h 16" />
-            </svg>
-        </button> -->
         <!-- 拖动位置 -->
         <div class="title-bar-dragger" id="chapter-title"></div>
         <div id="menu-button" class="menu-container">
@@ -60,16 +61,7 @@ const handleClose = () => {
 
     </div>
     <div id="center">
-        <!-- <button id="left-button" class="leftBtn" aria-label="Go left">
-            <svg class="icon" width="24" height="24" aria-hidden="true">
-                <path d="M 15 6 L 9 12 L 15 18" />
-            </svg>
-        </button>
-        <button id="right-button" class="rightBtn" aria-label="Go right">
-            <svg class="icon" width="24" height="24" aria-hidden="true">
-                <path d="M 9 6 L 15 12 L 9 18" />
-            </svg>
-        </button> -->
+
     </div>
 
 </template>
@@ -149,7 +141,6 @@ body {
     position: fixed;
 }
 
-
 .empty-state-icon {
     margin: auto;
 }
@@ -196,7 +187,6 @@ body {
 /* 顶部章节名字显示 */
 #chapter-title {
     font-size: 14px;
-    color: gainsboro;
     align-items: center;
     display: flex;
     justify-content: center;
@@ -235,6 +225,28 @@ body {
     transform: translateX(0);
     transition-delay: 0s;
 }
+
+#bottom-bar {
+    visibility: hidden;
+    box-sizing: border-box;
+    position: absolute;
+    z-index: 21;
+    bottom: 0;
+    width: 40%;
+    height: 60%;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    display: flex;
+    color: CanvasText;
+}
+
+#bottom-bar.show {
+    visibility: visible;
+    transform: translateY(0);
+    transition-delay: 0s;
+}
+
 
 #dimming-overlay {
     visibility: hidden;
@@ -286,66 +298,6 @@ body {
     margin: .5rem 0;
     font-size: small;
     color: GrayText;
-}
-
-#toc-view {
-    padding: .5rem;
-    overflow-y: scroll;
-}
-
-#toc-view li,
-#toc-view ol {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-#toc-view a,
-#toc-view span {
-    display: block;
-    border-radius: 6px;
-    padding: 8px;
-    margin: 2px 0;
-}
-
-#toc-view a {
-    color: CanvasText;
-    text-decoration: none;
-}
-
-#toc-view a:hover {
-    background: var(--active-bg);
-}
-
-#toc-view span {
-    color: GrayText;
-}
-
-#toc-view svg {
-    margin-inline-start: -24px;
-    padding-inline-start: 5px;
-    padding-inline-end: 6px;
-    fill: CanvasText;
-    cursor: default;
-    transition: transform .2s ease;
-    opacity: .5;
-}
-
-#toc-view svg:hover {
-    opacity: 1;
-}
-
-#toc-view [aria-current] {
-    font-weight: bold;
-    background: var(--active-bg);
-}
-
-#toc-view [aria-expanded="false"] svg {
-    transform: rotate(-90deg);
-}
-
-#toc-view [aria-expanded="false"]+[role="group"] {
-    display: none;
 }
 
 .menu-container {

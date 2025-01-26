@@ -37,7 +37,7 @@
     },
     "build": {
         "appId": "xyz.hxl.less-reader",
-        "productName": "Less Reader",
+        "productName": "Less Reader 简阅",
         "copyright": "Copyright © HXL2024",
         "directories": {
             "output": "output"

@@ -104,13 +104,9 @@ class Reader {
     annotationsByValue = new Map()
     closeSideBar() {
         $('#dimming-overlay').classList.remove('show')
-        $('#side-bar').classList.remove('show')
+        $('#bottom-bar').classList.remove('show')
     }
     constructor() {
-        // $('#side-bar-button').addEventListener('click', () => {
-        //     $('#dimming-overlay').classList.add('show')
-        //     $('#side-bar').classList.add('show')
-        // })
         $('#dimming-overlay').addEventListener('click', () => this.closeSideBar())
 
         const menu = createMenu([
@@ -152,8 +148,6 @@ class Reader {
 
         $('#header-bar').style.visibility = 'visible'
         $('#nav-bar').style.visibility = 'visible'
-        // $('#left-button').addEventListener('click', () => this.view.goLeft())
-        // $('#right-button').addEventListener('click', () => this.view.goRight())
         $('#center').addEventListener('click', e => {
             const action = partAction[clickPart(e)]
             if (action === "prev") {
@@ -162,7 +156,7 @@ class Reader {
                 this.view.goRight()
             } else if (action === "menu") {
                 $('#dimming-overlay').classList.add('show')
-                $('#side-bar').classList.add('show')
+                $('#bottom-bar').classList.add('show')
             }
         })
 
