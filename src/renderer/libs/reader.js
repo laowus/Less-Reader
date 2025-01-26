@@ -147,7 +147,7 @@ class Reader {
         this.view.renderer.next()
 
         $('#header-bar').style.visibility = 'visible'
-        $('#nav-bar').style.visibility = 'visible'
+        // $('#nav-bar').style.visibility = 'visible'
         $('#center').addEventListener('click', e => {
             const action = partAction[clickPart(e)]
             if (action === "prev") {

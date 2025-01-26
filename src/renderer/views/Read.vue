@@ -19,30 +19,13 @@ const handleClose = () => {
     ipcRenderer.send('window-close');
 }
 
-
-
 </script>
 
 <template>
     <div id="dimming-overlay" aria-hidden="true"></div>
-    <div id="side-bar">
-        <!-- 左边目录 -->
-        <div id="side-bar-header">
-            <!-- 封面 -->
-            <img id="side-bar-cover">
-            <div>
-                <!-- 书名 -->
-                <h1 id="side-bar-title"></h1>
-                <!-- 作者 -->
-                <p id="side-bar-author"></p>
-            </div>
-        </div>
-
-    </div>
     <div id="bottom-bar">
         <BottomBar />
     </div>
-
     <div id="header-bar" class="toolbar">
         <!-- 拖动位置 -->
         <div class="title-bar-dragger" id="chapter-title"></div>
@@ -54,16 +37,8 @@ const handleClose = () => {
             </button>
         </div>
     </div>
-    <div id="nav-bar" class="toolbar">
-        <!-- 进度条 -->
-        <input id="progress-slider" type="range" min="0" max="1" step="any" list="tick-marks">
-        <datalist id="tick-marks"></datalist>
-
-    </div>
     <div id="center">
-
     </div>
-
 </template>
 
 <style>
@@ -192,40 +167,6 @@ body {
     justify-content: center;
 }
 
-#nav-bar {
-    bottom: 0;
-}
-
-#progress-slider {
-    flex-grow: 1;
-    margin: 0 12px;
-    visibility: hidden;
-}
-
-#side-bar {
-    visibility: hidden;
-    box-sizing: border-box;
-    position: absolute;
-    z-index: 20;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 320px;
-    transform: translateX(-320px);
-    display: flex;
-    flex-direction: column;
-    background: Canvas;
-    color: CanvasText;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, .2), 0 0 40px rgba(0, 0, 0, .2);
-    transition: visibility 0s linear 300ms, transform 300ms ease;
-}
-
-#side-bar.show {
-    visibility: visible;
-    transform: translateX(0);
-    transition-delay: 0s;
-}
-
 #bottom-bar {
     visibility: hidden;
     box-sizing: border-box;
@@ -233,7 +174,8 @@ body {
     z-index: 21;
     bottom: 0;
     width: 40%;
-    height: 60%;
+    height: auto;
+    max-height: 80%;
     margin: 0 auto;
     left: 0;
     right: 0;
@@ -246,7 +188,6 @@ body {
     transform: translateY(0);
     transition-delay: 0s;
 }
-
 
 #dimming-overlay {
     visibility: hidden;
@@ -274,74 +215,6 @@ body {
     align-items: center;
 }
 
-#side-bar-cover {
-    height: 10vh;
-    min-height: 60px;
-    max-height: 180px;
-    border-radius: 3px;
-    border: 0;
-    background: lightgray;
-    box-shadow: 0 0 1px rgba(0, 0, 0, .1), 0 0 16px rgba(0, 0, 0, .1);
-    margin-inline-end: 1rem;
-}
-
-#side-bar-cover:not([src]) {
-    display: none;
-}
-
-#side-bar-title {
-    margin: .5rem 0;
-    font-size: inherit;
-}
-
-#side-bar-author {
-    margin: .5rem 0;
-    font-size: small;
-    color: GrayText;
-}
-
-.menu-container {
-    position: relative;
-}
-
-.menu,
-.menu ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.menu {
-    visibility: hidden;
-    position: absolute;
-    right: 0;
-    background: Canvas;
-    color: CanvasText;
-    border-radius: 6px;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, .2), 0 0 16px rgba(0, 0, 0, .1);
-    padding: 6px;
-    cursor: default;
-}
-
-.menu.show {
-    visibility: visible;
-}
-
-.menu li {
-    padding: 6px 12px;
-    padding-left: 24px;
-    border-radius: 6px;
-}
-
-.menu li:hover {
-    background: var(--active-bg);
-}
-
-.menu li[aria-checked="true"] {
-    background-position: center left;
-    background-repeat: no-repeat;
-    background-image: url('data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%223%22%2F%3E%3C%2Fsvg%3E');
-}
 
 .popover {
     background: Canvas;
