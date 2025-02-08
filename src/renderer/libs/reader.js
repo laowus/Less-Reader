@@ -251,10 +251,10 @@ class Reader {
     }
 }
 
-export const open = async file => {
+export const open = async (file, cfi) => {
     const reader = new Reader()
     globalThis.reader = reader
-    await reader.open(file)
+    await reader.open(file, cfi)
 }
 
 
