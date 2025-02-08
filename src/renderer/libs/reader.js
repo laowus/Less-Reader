@@ -130,7 +130,7 @@ class Reader {
             menu.element.classList.toggle('show'))
         menu.groups.layout.select('paginated')
     }
-    async open(file) {
+    async open(file, cfi) {
         //调用 view.js View
         this.view = document.createElement('foliate-view')
         //插入到body 尾部
@@ -144,7 +144,8 @@ class Reader {
         //加载css
         this.view.renderer.setStyles?.(getCSS(this.style))
         //执行
-        this.view.renderer.next()
+        if (!cfi) this.view.renderer.next()
+        await this.view.init({ lastLocation: cfi })
 
         $('#header-bar').style.visibility = 'visible'
         // $('#nav-bar').style.visibility = 'visible'
