@@ -237,7 +237,9 @@ class Reader {
     }
     //
     #onRelocate({ detail }) {
-        const { fraction, location, tocItem, pageItem } = detail
+        console.log(detail.cfi)
+        // const { fraction, location, tocItem, pageItem } = detail
+        const { cfi, fraction, location, tocItem, pageItem, chapterLocation } = detail
         const percent = percentFormat.format(fraction)
         const loc = pageItem
             ? `Page ${pageItem.label}`
@@ -248,6 +250,7 @@ class Reader {
         slider.title = `${percent} · ${loc}`
         if (tocItem?.label) $('#chapter-title').innerText = tocItem?.label
         if (tocItem?.href) this.#tocView?.setCurrentHref?.(tocItem.href)
+        //保存到localstorage中
     }
 }
 
