@@ -2,6 +2,7 @@ import './view.js'
 import { createTOCView } from './ui/tree.js'
 import { createMenu } from './ui/menu.js'
 import { Overlayer } from './ui/overlayer.js'
+import RecordLocation from '../utils/readUtils/recordLocation.js';
 
 const getCSS = ({ spacing, justify, hyphenate }) => `
     @namespace epub "http://www.idpf.org/2007/ops";
@@ -94,6 +95,7 @@ const clickPart = e => {
 const partAction = ["prev", "menu", "next", "prev", "menu", "next", "prev", "menu", "next"]
 
 class Reader {
+    bookKey
     #tocView
     style = {
         spacing: 1.4,
@@ -130,7 +132,8 @@ class Reader {
             menu.element.classList.toggle('show'))
         menu.groups.layout.select('paginated')
     }
-    async open(file, cfi) {
+    async open(file, bookKey, cfi) {
+        this.bookKey = bookKey
         //调用 view.js View
         this.view = document.createElement('foliate-view')
         //插入到body 尾部
@@ -251,13 +254,14 @@ class Reader {
         if (tocItem?.label) $('#chapter-title').innerText = tocItem?.label
         if (tocItem?.href) this.#tocView?.setCurrentHref?.(tocItem.href)
         //保存到localstorage中
+        console.log(this.bookKey)
     }
 }
 
-export const open = async (file, cfi) => {
+export const open = async (file, bookKey, cfi) => {
     const reader = new Reader()
     globalThis.reader = reader
-    await reader.open(file, cfi)
+    await reader.open(file, bookKey, cfi)
 }
 
 

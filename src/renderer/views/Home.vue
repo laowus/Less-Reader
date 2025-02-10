@@ -1,6 +1,6 @@
 <script setup>
 import localforage from 'localforage';
-import { ref, onMounted, toRaw, nextTick } from 'vue';
+import { ref, onMounted, toRaw } from 'vue';
 import { fetchMD5 } from '../utils/fileUtils/md5Util';
 import BookUtil from '../utils/fileUtils/bookUtils';
 import { ElMessage } from 'element-plus';

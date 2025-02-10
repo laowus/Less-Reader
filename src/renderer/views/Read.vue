@@ -1,24 +1,21 @@
 <script setup>
 import BottomBar from '../components/BottomBar.vue';
-import { onMounted, reactive } from 'vue';
+import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import localforage from 'localforage';
-import { open } from '../libs/reader.js'
-import { reactive } from 'vue';
+import RecordLocation from '../utils/readUtils/recordLocation.js';
+import { open } from '../libs/reader.js';
 const { ipcRenderer } = window.require('electron');
 const route = useRoute();
 const bookKey = route.params.key;
+let detail;
 
 onMounted(() => {
-    let json = localStorage.getItem("recordLocation");
-    let obj = JSON.parse(json || "{}");
-    obj[bookKey] = {
-        text, chapterTitle, chapterDocIndex, chapterHref, count,
-        percentage, cfi, page,
-    };
+
+    detail = RecordLocation.getCfi(bookKey)
     localforage.getItem("books").then((result) => {
         let book = result.find(item => item.key === bookKey);
-        if (book.path) open(book.path).catch(e => console.error(e))
+        if (book.path) open(book.path, bookKey).catch(e => console.error(e))
     });
 });
 
@@ -26,9 +23,7 @@ const handleClose = () => {
     ipcRenderer.send('window-close');
 }
 
-const saveReadingProgress = () => {
 
-}
 
 </script>
 

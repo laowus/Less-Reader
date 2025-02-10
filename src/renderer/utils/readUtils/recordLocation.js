@@ -27,4 +27,12 @@ class RecordLocation {
         }
     }
 
+    static getHtmlLocation(bookKey) {
+        let json = localStorage.getItem("recordLocation");
+        let obj = JSON.parse(json || "{}");
+        return obj[bookKey] || {};
+    }
+
 }
+
+export default RecordLocation
