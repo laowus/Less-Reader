@@ -15,7 +15,7 @@ onMounted(() => {
     detail = RecordLocation.getCfi(bookKey)
     localforage.getItem("books").then((result) => {
         let book = result.find(item => item.key === bookKey);
-        if (book.path) open(book.path, bookKey).catch(e => console.error(e))
+        if (book.path) open(book.path, bookKey, detail.cfi).catch(e => console.error(e))
     });
 });
 

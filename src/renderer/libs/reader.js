@@ -240,8 +240,7 @@ class Reader {
     }
     //
     #onRelocate({ detail }) {
-        console.log(detail.cfi)
-        // const { fraction, location, tocItem, pageItem } = detail
+        console.log(detail)
         const { cfi, fraction, location, tocItem, pageItem, chapterLocation } = detail
         const percent = percentFormat.format(fraction)
         const loc = pageItem
@@ -253,8 +252,9 @@ class Reader {
         slider.title = `${percent} · ${loc}`
         if (tocItem?.label) $('#chapter-title').innerText = tocItem?.label
         if (tocItem?.href) this.#tocView?.setCurrentHref?.(tocItem.href)
-        //保存到localstorage中
-        console.log(this.bookKey)
+        //保存到当前阅读记录到localstorage中
+        RecordLocation.recordHtmlLocation(this.bookKey, tocItem?.label, percent, cfi)
+
     }
 }
 
