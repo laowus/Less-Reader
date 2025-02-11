@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from 'vue'
 const activeName = ref('first')
+const fontsizeRef = ref(1.0)
+const hangRef = ref(5)
 const handleClick = (tab, event) => {
 
 }
@@ -60,7 +62,21 @@ const handleClick = (tab, event) => {
                     <span>文字</span>
                 </span>
             </template>
-            <div>文字</div>
+            <div id="styles">
+                <span style="font-size: 20px;font-weight: bolder;"> 样式</span>
+                <el-divider />
+                <div class="slider-demo-block">
+                    <span class="infoTip">字体<br />大小</span>
+                    <el-slider v-model="fontsizeRef" :min="0.5" :max="2.0" :step="0.1" show-stops />
+                </div>
+                <div class="slider-demo-block">
+                    <span class="infoTip2">行距</span>
+                    <el-slider v-model="hangRef" :min="1" :max="10" :step="1" show-stops />
+                    <span class="infoTip2">段距</span>
+                    <el-slider v-model="hangRef" :min="1" :max="10" :step="1" show-stops />
+                </div>
+            </div>
+
         </el-tab-pane>
 
     </el-tabs>
@@ -230,5 +246,50 @@ const handleClick = (tab, event) => {
 #progress-slider {
     margin: 0 12px;
     flex: 1;
+
+}
+
+#styles {
+    height: 300px;
+    width: 100%;
+    text-align: left;
+}
+
+.slider-demo-block {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.slider-demo-block .el-slider {
+    margin-top: 0;
+    margin-left: 12px;
+    flex: 1
+}
+
+.infoTip {
+    margin-left: 5px;
+    font-size: 10px;
+    height: 40px;
+    width: 40px;
+    display: inline-block;
+    border: 1px solid #000000;
+    border-radius: 50%;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.infoTip2 {
+    margin-left: 5px;
+    font-size: 12px;
+    height: 40px;
+    width: 40px;
+    display: flex;
+    border: 1px solid #000000;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    font-weight: bolder;
 }
 </style>
