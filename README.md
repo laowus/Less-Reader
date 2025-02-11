@@ -19,3 +19,4 @@
         2. 设置页面
         3. 存储读取位置cfi
         4. 设置字体/颜色
+           localstore.setItem("style")
