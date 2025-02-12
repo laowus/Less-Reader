@@ -3,8 +3,18 @@ import { createTOCView } from './ui/tree.js'
 import { createMenu } from './ui/menu.js'
 import { Overlayer } from './ui/overlayer.js'
 import RecordLocation from '../utils/readUtils/recordLocation.js';
-
-const getCSS = ({ fontSize, textIndent, paragraphSpacing, spacing, justify, hyphenate }) => `
+/**
+ * fontsize 字体大小
+ * letterSpacing 字间距
+ * textIndent 段落缩进
+ * paragraphSpacing 段落间距
+ * spacing 行距
+ * justify 是否两端对齐
+ * hyphenate 是否自动连字符
+ */
+const getCSS = ({ fontSize, fontName, fontPath, letterSpacing, spacing,
+    textIndent, paragraphSpacing, fontColor, backgroundColor, justify,
+    hyphenate }) => `
     @namespace epub "http://www.idpf.org/2007/ops";
     html {
         color-scheme: light dark;
