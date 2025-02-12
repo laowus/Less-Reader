@@ -4,18 +4,21 @@ import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import localforage from 'localforage';
 import RecordLocation from '../utils/readUtils/recordLocation.js';
+import StyleUtil from '../utils/readUtils/styleUtil.js'
 import { open } from '../libs/reader.js';
 const { ipcRenderer } = window.require('electron');
 const route = useRoute();
 const bookKey = route.params.key;
 let detail;
+let bookStyle;
+
 
 onMounted(() => {
-
-    detail = RecordLocation.getCfi(bookKey)
+    bookStyle = StyleUtil.getStyle();
+    detail = RecordLocation.getCfi(bookKey);
     localforage.getItem("books").then((result) => {
         let book = result.find(item => item.key === bookKey);
-        if (book.path) open(book.path, bookKey, detail.cfi).catch(e => console.error(e))
+        if (book.path) open(book.path, bookKey, detail.cfi, bookStyle).catch(e => console.error(e))
     });
 });
 

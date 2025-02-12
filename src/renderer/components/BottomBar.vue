@@ -3,6 +3,7 @@ import { ref } from 'vue'
 const activeName = ref('first')
 const fontsizeRef = ref(1.0)
 const hangRef = ref(5)
+const duanRef = ref()
 const handleClick = (tab, event) => {
 
 }
@@ -73,7 +74,7 @@ const handleClick = (tab, event) => {
                     <span class="infoTip2">行距</span>
                     <el-slider v-model="hangRef" :min="1" :max="10" :step="1" show-stops />
                     <span class="infoTip2">段距</span>
-                    <el-slider v-model="hangRef" :min="1" :max="10" :step="1" show-stops />
+                    <el-slider v-model="duanRef" :min="1" :max="10" :step="1" show-stops />
                 </div>
             </div>
 

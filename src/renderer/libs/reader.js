@@ -4,10 +4,11 @@ import { createMenu } from './ui/menu.js'
 import { Overlayer } from './ui/overlayer.js'
 import RecordLocation from '../utils/readUtils/recordLocation.js';
 
-const getCSS = ({ spacing, justify, hyphenate }) => `
+const getCSS = ({ fontSize, textIndent, paragraphSpacing, spacing, justify, hyphenate }) => `
     @namespace epub "http://www.idpf.org/2007/ops";
     html {
         color-scheme: light dark;
+        font-size: ${fontSize}em;
     }
     /* https://github.com/whatwg/html/issues/5426 */
     @media (prefers-color-scheme: dark) {
@@ -15,8 +16,13 @@ const getCSS = ({ spacing, justify, hyphenate }) => `
             color: lightblue;
         }
     }
-    p, li, blockquote, dd {
+
+    * {
+        line-height: ${spacing}em !important;
+    }
+    p, li, blockquote, dd, div, font  {
         line-height: ${spacing};
+        padding-bottom: ${paragraphSpacing}em !important;
         text-align: ${justify ? 'justify' : 'start'};
         -webkit-hyphens: ${hyphenate ? 'auto' : 'manual'};
         hyphens: ${hyphenate ? 'auto' : 'manual'};
@@ -25,6 +31,7 @@ const getCSS = ({ spacing, justify, hyphenate }) => `
         -webkit-hyphenate-limit-lines: 2;
         hanging-punctuation: allow-end last;
         widows: 2;
+        text-indent: ${textIndent}em !important;
     }
     /* prevent the above from overriding the align attribute */
     [align="left"] { text-align: left; }
@@ -97,7 +104,12 @@ const partAction = ["prev", "menu", "next", "prev", "menu", "next", "prev", "men
 class Reader {
     bookKey
     #tocView
+    bookStyle
     style = {
+        fontSize: 1.0,
+        textIndent: 1.8,
+        paragraphSpacing: 1.0,
+        letterSpacing: 2.0,
         spacing: 1.4,
         justify: true,
         hyphenate: true,
@@ -132,7 +144,11 @@ class Reader {
             menu.element.classList.toggle('show'))
         menu.groups.layout.select('paginated')
     }
-    async open(file, bookKey, cfi) {
+    setStyle(bookStyle) {
+        this.bookStyle = bookStyle || style
+        this.view.renderer.setStyles?.(getCSS(this.style))
+    }
+    async open(file, bookKey, cfi, bookStyle) {
         this.bookKey = bookKey
         //调用 view.js View
         this.view = document.createElement('foliate-view')
@@ -144,9 +160,10 @@ class Reader {
         this.view.addEventListener('load', this.#onLoad.bind(this))
         this.view.addEventListener('relocate', this.#onRelocate.bind(this))
         const { book } = this.view
-        //加载css
-        this.view.renderer.setStyles?.(getCSS(this.style))
-        //执行
+        //设置style
+        this.setStyle(bookStyle)
+        // this.view.renderer.setStyles?.(getCSS(this.style))
+
         if (!cfi) this.view.renderer.next()
         await this.view.init({ lastLocation: cfi })
 
@@ -258,10 +275,12 @@ class Reader {
     }
 }
 
-export const open = async (file, bookKey, cfi) => {
+export const open = async (file, bookKey, cfi, bookStyle) => {
     const reader = new Reader()
     globalThis.reader = reader
-    await reader.open(file, bookKey, cfi)
+    await reader.open(file, bookKey, cfi, bookStyle)
 }
+
+
 
 
