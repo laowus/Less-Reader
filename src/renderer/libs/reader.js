@@ -12,12 +12,12 @@ import RecordLocation from '../utils/readUtils/recordLocation.js';
  * justify 是否两端对齐
  * hyphenate 是否自动连字符
  */
-const getCSS = ({ fontSize, fontName, fontPath, letterSpacing, spacing,
-    textIndent, paragraphSpacing, fontColor, backgroundColor, justify,
-    hyphenate }) => `
+const getCSS = ({ fontSize, letterSpacing, spacing, textIndent,
+    paragraphSpacing, justify, hyphenate }) => `
     @namespace epub "http://www.idpf.org/2007/ops";
     html {
         color-scheme: light dark;
+        letter-spacing: ${letterSpacing}px;
         font-size: ${fontSize}em;
     }
     /* https://github.com/whatwg/html/issues/5426 */
@@ -111,19 +111,12 @@ const clickPart = e => {
 
 const partAction = ["prev", "menu", "next", "prev", "menu", "next", "prev", "menu", "next"]
 
+let style
+
 class Reader {
     bookKey
     #tocView
     bookStyle
-    style = {
-        fontSize: 1.0,
-        textIndent: 1.8,
-        paragraphSpacing: 1.0,
-        letterSpacing: 2.0,
-        spacing: 1.4,
-        justify: true,
-        hyphenate: true,
-    }
     annotations = new Map()
     annotationsByValue = new Map()
     closeSideBar() {
@@ -154,10 +147,7 @@ class Reader {
             menu.element.classList.toggle('show'))
         menu.groups.layout.select('paginated')
     }
-    setStyle(bookStyle) {
-        this.bookStyle = bookStyle || style
-        this.view.renderer.setStyles?.(getCSS(this.style))
-    }
+
     async open(file, bookKey, cfi, bookStyle) {
         this.bookKey = bookKey
         //调用 view.js View
@@ -171,8 +161,8 @@ class Reader {
         this.view.addEventListener('relocate', this.#onRelocate.bind(this))
         const { book } = this.view
         //设置style
-        this.setStyle(bookStyle)
-        // this.view.renderer.setStyles?.(getCSS(this.style))
+
+        this.view.renderer.setStyles?.(getCSS(style))
 
         if (!cfi) this.view.renderer.next()
         await this.view.init({ lastLocation: cfi })
@@ -286,9 +276,13 @@ class Reader {
 }
 
 export const open = async (file, bookKey, cfi, bookStyle) => {
-    const reader = new Reader()
-    globalThis.reader = reader
-    await reader.open(file, bookKey, cfi, bookStyle)
+    style = bookStyle || {
+        fontSize: 1.0, lineHeight: 1.8, letterSpacing: 2.0, wordSpacing: 2.0,
+        paragraphSpacing: 1.0, textIndent: 0, justify: true, hyphenate: true,
+    };
+    const reader = new Reader();
+    globalThis.reader = reader;
+    await reader.open(file, bookKey, cfi);
 }
 
 

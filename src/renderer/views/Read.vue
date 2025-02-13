@@ -6,15 +6,14 @@ import localforage from 'localforage';
 import RecordLocation from '../utils/readUtils/recordLocation.js';
 import StyleUtil from '../utils/readUtils/styleUtil.js'
 import { open } from '../libs/reader.js';
+import { reactive } from 'vue';
 const { ipcRenderer } = window.require('electron');
 const route = useRoute();
 const bookKey = route.params.key;
 let detail;
-let bookStyle;
-
-
+const bookStyle = reactive({});
 onMounted(() => {
-    bookStyle = StyleUtil.getStyle();
+    Object.assign(bookStyle, StyleUtil.getStyle());
     detail = RecordLocation.getCfi(bookKey);
     localforage.getItem("books").then((result) => {
         let book = result.find(item => item.key === bookKey);
@@ -26,14 +25,12 @@ const handleClose = () => {
     ipcRenderer.send('window-close');
 }
 
-
-
 </script>
 
 <template>
     <div id="dimming-overlay" aria-hidden="true"></div>
     <div id="bottom-bar">
-        <BottomBar />
+        <BottomBar :bookStyle="bookStyle" />
     </div>
     <div id="header-bar" class="toolbar">
         <!-- 拖动位置 -->

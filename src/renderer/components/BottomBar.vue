@@ -1,12 +1,22 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 const activeName = ref('first')
+
+const props = defineProps({
+    bookStyle: Object
+})
+
 const fontsizeRef = ref(1.0)
 const hangRef = ref(5)
 const duanRef = ref()
 const handleClick = (tab, event) => {
 
 }
+onMounted(() => {
+    console.log(props.bookStyle);
+})
+
+
 </script>
 <template>
     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick" tab-position="bottom" type="border-card" stretch>
