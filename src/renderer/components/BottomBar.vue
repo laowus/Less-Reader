@@ -6,9 +6,6 @@ const props = defineProps({
     bookStyle: Object
 })
 
-const fontsizeRef = ref(1.0)
-const hangRef = ref(5)
-const duanRef = ref()
 const handleClick = (tab, event) => {
 
 }
@@ -78,13 +75,13 @@ onMounted(() => {
                 <el-divider />
                 <div class="slider-demo-block">
                     <span class="infoTip">字体<br />大小</span>
-                    <el-slider v-model="fontsizeRef" :min="0.5" :max="2.0" :step="0.1" show-stops />
+                    <el-slider v-model="bookStyle.fontsize" :min="0.5" :max="2.0" :step="0.1" show-stops />
                 </div>
                 <div class="slider-demo-block">
                     <span class="infoTip2">行距</span>
-                    <el-slider v-model="hangRef" :min="1" :max="10" :step="1" show-stops />
+                    <el-slider v-model="bookStyle.lineHeight" :min="1" :max="10" :step="1" show-stops />
                     <span class="infoTip2">段距</span>
-                    <el-slider v-model="duanRef" :min="1" :max="10" :step="1" show-stops />
+                    <el-slider v-model="bookStyle.paragraphSpacing" :min="1" :max="10" :step="1" show-stops />
                 </div>
             </div>
 

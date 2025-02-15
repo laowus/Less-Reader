@@ -5,14 +5,14 @@ import { Overlayer } from './ui/overlayer.js'
 import RecordLocation from '../utils/readUtils/recordLocation.js';
 /**
  * fontsize 字体大小
+ * spacing / lineHeight 行距 
  * letterSpacing 字间距
  * textIndent 段落缩进
  * paragraphSpacing 段落间距
- * spacing 行距
  * justify 是否两端对齐
  * hyphenate 是否自动连字符
  */
-const getCSS = ({ fontSize, letterSpacing, spacing, textIndent,
+const getCSS = ({ fontSize, lineHeight, letterSpacing, textIndent,
     paragraphSpacing, justify, hyphenate }) => `
     @namespace epub "http://www.idpf.org/2007/ops";
     html {
@@ -28,10 +28,10 @@ const getCSS = ({ fontSize, letterSpacing, spacing, textIndent,
     }
 
     * {
-        line-height: ${spacing}em !important;
+        line-height: ${lineHeight}em !important;
     }
     p, li, blockquote, dd, div, font  {
-        line-height: ${spacing};
+        line-height: ${lineHeight};
         padding-bottom: ${paragraphSpacing}em !important;
         text-align: ${justify ? 'justify' : 'start'};
         -webkit-hyphens: ${hyphenate ? 'auto' : 'manual'};
