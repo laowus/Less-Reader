@@ -10,7 +10,7 @@ export default class StyleUtil {
     */
     static getStyle() {
         const defaultStyle = {
-            fontSize: 1.0, lineHeight: 1.7, letterSpacing: 2.0, textIndent: 5,
+            fontSize: 1.0, lineHeight: 1.7, letterSpacing: 2.0, textIndent: 2.5,
             paragraphSpacing: 1.0, justify: true, hyphenate: true,
         };
         let json = localStorage.getItem("style");

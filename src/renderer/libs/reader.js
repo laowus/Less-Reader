@@ -1,4 +1,5 @@
 import './view.js'
+import { FootnoteHandler } from './ui/footnotes.js'
 import { createTOCView } from './ui/tree.js'
 import { createMenu } from './ui/menu.js'
 import { Overlayer } from './ui/overlayer.js'
@@ -119,6 +120,7 @@ class Reader {
     bookStyle
     annotations = new Map()
     annotationsByValue = new Map()
+    #footnoteHandler = new FootnoteHandler()
     closeSideBar() {
         $('#dimming-overlay').classList.remove('show')
         $('#bottom-bar').classList.remove('show')
@@ -146,6 +148,12 @@ class Reader {
         $('#menu-button > button').addEventListener('click', () =>
             menu.element.classList.toggle('show'))
         menu.groups.layout.select('paginated')
+
+        this.#footnoteHandler.addEventListener('before-render', e => {
+            const { view } = e.detail
+            this.setView(view)
+            replaceFootnote(view)
+        })
     }
 
     async open(file, bookKey, cfi, bookStyle) {
