@@ -353,6 +353,7 @@ export class View extends HTMLElement {
             doc.documentElement.dir ||= this.language.direction ?? ''
 
         this.#handleLinks(doc, index)
+        this.#handleClick(doc)
         this.#cursorAutohider.cloneFor(doc.documentElement)
 
         this.#emit('load', { doc, index })
@@ -375,6 +376,27 @@ export class View extends HTMLElement {
                 .catch(e => console.error(e))
         })
     }
+
+    #handleClick(doc) {
+        doc.addEventListener('click', e => {
+            if (doc.getSelection().type === "Range")
+                return
+
+            let { clientX, clientY } = e
+            // add top margin to y, y is relative to the iframe
+            console.log(this.renderer)
+            // const topMargin = this.renderer.getAttribute('margin').match(/\d+/)[0]
+            // clientY += parseInt(topMargin)
+
+            this.renderer.scrollProp == 'scrollLeft'
+                ? clientX -= (this.renderer.start - this.renderer.size)
+                : clientY -= (this.renderer.start)
+
+            this.#emit('click-view', { cx: clientX, cy: clientY })
+        })
+    }
+
+
     async addAnnotation(annotation, remove) {
         const { value } = annotation
         if (value.startsWith(SEARCH_PREFIX)) {

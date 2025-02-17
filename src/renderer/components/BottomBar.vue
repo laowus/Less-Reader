@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-const activeName = ref('first')
+const activeName = ref("")
 
 const props = defineProps({
     bookStyle: Object

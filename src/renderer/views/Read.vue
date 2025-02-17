@@ -43,8 +43,7 @@ const handleClose = () => {
             </button>
         </div>
     </div>
-    <div id="center">
-    </div>
+
 </template>
 
 <style>

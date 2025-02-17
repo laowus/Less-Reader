@@ -79,9 +79,9 @@ const formatContributor = contributor => Array.isArray(contributor)
     ? listFormat.format(contributor.map(formatOneContributor))
     : formatOneContributor(contributor)
 
-const clickPart = e => {
-    const x = e.clientX / window.innerWidth
-    const y = e.clientY / window.innerHeight
+const clickPart = (cx, cy) => {
+    const x = cx / window.innerWidth
+    const y = cy / window.innerHeight
 
     if (x < 0.33) {
         if (y < 0.33) {
@@ -128,27 +128,6 @@ class Reader {
     constructor() {
         $('#dimming-overlay').addEventListener('click', () => this.closeSideBar())
 
-        const menu = createMenu([
-            {
-                name: 'layout',
-                label: 'Layout',
-                type: 'radio',
-                items: [
-                    ['Paginated', 'paginated'],
-                    ['Scrolled', 'scrolled'],
-                ],
-                onclick: value => {
-                    this.view?.renderer.setAttribute('flow', value)
-                },
-            },
-        ])
-        menu.element.classList.add('menu')
-
-        $('#menu-button').append(menu.element)
-        $('#menu-button > button').addEventListener('click', () =>
-            menu.element.classList.toggle('show'))
-        menu.groups.layout.select('paginated')
-
         this.#footnoteHandler.addEventListener('before-render', e => {
             const { view } = e.detail
             this.setView(view)
@@ -167,6 +146,7 @@ class Reader {
         //初始化
         this.view.addEventListener('load', this.#onLoad.bind(this))
         this.view.addEventListener('relocate', this.#onRelocate.bind(this))
+        this.view.addEventListener('click-view', this.#onClickView.bind(this))
         const { book } = this.view
         //设置style
 
@@ -177,17 +157,17 @@ class Reader {
 
         $('#header-bar').style.visibility = 'visible'
         // $('#nav-bar').style.visibility = 'visible'
-        $('#center').addEventListener('click', e => {
-            const action = partAction[clickPart(e)]
-            if (action === "prev") {
-                this.view.goLeft()
-            } else if (action === "next") {
-                this.view.goRight()
-            } else if (action === "menu") {
-                $('#dimming-overlay').classList.add('show')
-                $('#bottom-bar').classList.add('show')
-            }
-        })
+        // $('#center').addEventListener('click', e => {
+        //     const action = partAction[clickPart(e)]
+        //     if (action === "prev") {
+        //         this.view.goLeft()
+        //     } else if (action === "next") {
+        //         this.view.goRight()
+        //     } else if (action === "menu") {
+        //         $('#dimming-overlay').classList.add('show')
+        //         $('#bottom-bar').classList.add('show')
+        //     }
+        // })
 
         const slider = $('#progress-slider')
         slider.dir = book.dir
@@ -253,6 +233,19 @@ class Reader {
             })
         }
     }
+
+    #onClickView({ detail: { cx, cy } }) {
+        console.log(cx, cy)
+        const action = partAction[clickPart(cx, cy)]
+        if (action === "prev") {
+            this.view.goLeft()
+        } else if (action === "next") {
+            this.view.goRight()
+        } else if (action === "menu") {
+            $('#dimming-overlay').classList.add('show')
+            $('#bottom-bar').classList.add('show')
+        }
+    }
     //键盘处理 
     #handleKeydown(event) {
         const k = event.key
@@ -279,7 +272,6 @@ class Reader {
         if (tocItem?.href) this.#tocView?.setCurrentHref?.(tocItem.href)
         //保存到当前阅读记录到localstorage中
         RecordLocation.recordHtmlLocation(this.bookKey, tocItem?.label, percent, cfi)
-
     }
 }
 
