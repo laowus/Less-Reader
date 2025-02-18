@@ -1,12 +1,11 @@
 <script setup>
 import BottomBar from '../components/BottomBar.vue';
-import { onMounted } from 'vue';
+import { onMounted, reactive } from 'vue';
 import { useRoute } from 'vue-router';
 import localforage from 'localforage';
 import RecordLocation from '../utils/readUtils/recordLocation.js';
 import StyleUtil from '../utils/readUtils/styleUtil.js'
-import { open } from '../libs/reader.js';
-import { reactive } from 'vue';
+import { open, setStyle } from '../libs/reader.js';
 const { ipcRenderer } = window.require('electron');
 const route = useRoute();
 const bookKey = route.params.key;
@@ -30,7 +29,7 @@ const handleClose = () => {
 <template>
     <div id="dimming-overlay" aria-hidden="true"></div>
     <div id="bottom-bar">
-        <BottomBar :bookStyle="bookStyle" />
+        <BottomBar :bookStyle="bookStyle" :setStyle="setStyle" />
     </div>
     <div id="header-bar" class="toolbar">
         <!-- 拖动位置 -->

@@ -1,9 +1,9 @@
 import './view.js'
 import { FootnoteHandler } from './ui/footnotes.js'
 import { createTOCView } from './ui/tree.js'
-import { createMenu } from './ui/menu.js'
 import { Overlayer } from './ui/overlayer.js'
 import RecordLocation from '../utils/readUtils/recordLocation.js';
+import StyleUtil from '../utils/readUtils/styleUtil.js';
 /**
  * fontsize 字体大小
  * spacing / lineHeight 行距 
@@ -148,7 +148,6 @@ class Reader {
         this.view.addEventListener('relocate', this.#onRelocate.bind(this))
         this.view.addEventListener('click-view', this.#onClickView.bind(this))
         const { book } = this.view
-        //设置style
 
         this.view.renderer.setStyles?.(getCSS(style))
 
@@ -156,19 +155,6 @@ class Reader {
         await this.view.init({ lastLocation: cfi })
 
         $('#header-bar').style.visibility = 'visible'
-        // $('#nav-bar').style.visibility = 'visible'
-        // $('#center').addEventListener('click', e => {
-        //     const action = partAction[clickPart(e)]
-        //     if (action === "prev") {
-        //         this.view.goLeft()
-        //     } else if (action === "next") {
-        //         this.view.goRight()
-        //     } else if (action === "menu") {
-        //         $('#dimming-overlay').classList.add('show')
-        //         $('#bottom-bar').classList.add('show')
-        //     }
-        // })
-
         const slider = $('#progress-slider')
         slider.dir = book.dir
         slider.addEventListener('input', e =>
@@ -189,7 +175,6 @@ class Reader {
         //封面
         Promise.resolve(book.getCover?.())?.then(blob =>
             blob ? $('#side-bar-cover').src = URL.createObjectURL(blob) : null)
-        //目录
         const toc = book.toc
         if (toc) {
             this.#tocView = createTOCView(toc, href => {
@@ -283,6 +268,19 @@ export const open = async (file, bookKey, cfi, bookStyle) => {
     const reader = new Reader();
     globalThis.reader = reader;
     await reader.open(file, bookKey, cfi);
+}
+
+
+export const setStyle = (newStyle) => {
+    console.log("before_style", style, newStyle);
+    style = {
+        ...style,
+        ...newStyle
+    }
+
+    reader.view.renderer.setStyles?.(getCSS(style));
+    StyleUtil.setStyle(style);
+
 }
 
 

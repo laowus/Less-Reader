@@ -3,7 +3,8 @@ import { ref, onMounted } from 'vue'
 const activeName = ref("")
 
 const props = defineProps({
-    bookStyle: Object
+    bookStyle: Object,
+    setStyle: Function
 })
 
 const handleClick = (tab, event) => {
@@ -12,6 +13,29 @@ const handleClick = (tab, event) => {
 onMounted(() => {
     console.log(props.bookStyle);
 })
+
+const changeStyle = (e, type) => {
+    console.log(e, type);
+    switch (type) {
+        case "fontSize":
+            props.setStyle({
+                fontSize: e
+            })
+            break;
+        case "lineHeight":
+            props.setStyle({
+                lineHeight: e
+            })
+            break;
+        case "paragraphSpacing":
+            props.setStyle({
+                paragraphSpacing: e
+            })
+            break;
+    }
+}
+
+
 
 
 </script>
@@ -75,13 +99,13 @@ onMounted(() => {
                 <el-divider />
                 <div class="slider-demo-block">
                     <span class="infoTip">字体<br />大小</span>
-                    <el-slider v-model="bookStyle.fontSize" :min="0.5" :max="2.0" :step="0.1" show-stops />
+                    <el-slider v-model="bookStyle.fontSize" :min="0.5" :max="2.0" :step="0.1" show-stops @change="changeStyle($event, 'fontSize')" />
                 </div>
                 <div class="slider-demo-block">
                     <span class="infoTip2">行距</span>
-                    <el-slider v-model="bookStyle.lineHeight" :min="1.0" :max="2.0" :step="0.1" show-stops />
+                    <el-slider v-model="bookStyle.lineHeight" :min="1.0" :max="2.0" :step="0.1" show-stops @change="changeStyle($event, 'lineHeight')" />
                     <span class="infoTip2">段距</span>
-                    <el-slider v-model="bookStyle.paragraphSpacing" :min="1.0" :max="2.0" :step="0.1" show-stops />
+                    <el-slider v-model="bookStyle.paragraphSpacing" :min="1.0" :max="2.0" :step="0.1" show-stops @change="changeStyle($event, 'paragraphSpacing')" />
                 </div>
             </div>
 
