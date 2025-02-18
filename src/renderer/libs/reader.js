@@ -272,7 +272,7 @@ export const open = async (file, bookKey, cfi, bookStyle) => {
 
 
 export const setStyle = (newStyle) => {
-    console.log("before_style", style, newStyle);
+
     style = {
         ...style,
         ...newStyle
