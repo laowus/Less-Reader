@@ -27,6 +27,11 @@ const handleClose = () => {
 </script>
 
 <template>
+    <dialog id="footnote-dialog">
+        <div>
+            <main></main>
+        </div>
+    </dialog>
     <div id="dimming-overlay" aria-hidden="true"></div>
     <div id="bottom-bar">
         <BottomBar :bookStyle="bookStyle" :setStyle="setStyle" />
@@ -75,50 +80,33 @@ body {
     stroke-width: 3px;
 }
 
-/* .rightBtn {
-    margin-right: 10px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    opacity: 0.2;
-    border: none;
-    color: white;
-    background-color: rgba(75, 75, 75, 1);
+
+
+#footnote-dialog {
+    padding: 0;
+    width: auto;
+    height: auto;
+    max-width: 80vw;
+    max-height: 80vh;
+    min-width: 200px;
+    min-height: 100px;
+    border-radius: 15px;
+    border: 2px solid grey;
+    user-select: none;
 }
 
-.rightBtn:hover {
-    background-color: rgba(75, 75, 75, 0.5);
-    opacity: 1;
-}
-
-.leftBtn {
-    margin-left: 10px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    opacity: 0.2;
-    border: none;
-    color: white;
-    background-color: rgba(75, 75, 75, 1);
-}
-
-.leftBtn:hover {
-    opacity: 1;
-} */
-
-#center {
-    z-index: 4;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
+#footnote-dialog div {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: fixed;
+    flex-direction: column;
+    height: 100%;
 }
+
+#footnote-dialog main {
+    overflow: auto;
+    flex: 1;
+}
+
+
 
 .empty-state-icon {
     margin: auto;

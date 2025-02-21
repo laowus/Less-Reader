@@ -4,6 +4,8 @@ import { createTOCView } from './ui/tree.js'
 import { Overlayer } from './ui/overlayer.js'
 import RecordLocation from '../utils/readUtils/recordLocation.js';
 import StyleUtil from '../utils/readUtils/styleUtil.js';
+
+const ipcRenderer = window.require("electron").ipcRenderer;
 /**
  * fontsize 字体大小
  * spacing / lineHeight 行距 
@@ -114,6 +116,8 @@ const partAction = ["prev", "menu", "next", "prev", "menu", "next", "prev", "men
 
 let style
 
+const footnoteDialog = document.getElementById('footnote-dialog')
+
 class Reader {
     bookKey
     #tocView
@@ -128,29 +132,18 @@ class Reader {
     constructor() {
         $('#dimming-overlay').addEventListener('click', () => this.closeSideBar())
 
-        this.#footnoteHandler.addEventListener('before-render', e => {
-            const { view } = e.detail
-            this.setView(view)
-            replaceFootnote(view)
-        })
     }
 
-    async open(file, bookKey, cfi, bookStyle) {
+    async open(file, bookKey, cfi) {
         this.bookKey = bookKey
-        //调用 view.js View
         this.view = document.createElement('foliate-view')
-        //插入到body 尾部
         document.body.append(this.view)
-        //打开文件
         await this.view.open(file)
-        //初始化
         this.view.addEventListener('load', this.#onLoad.bind(this))
         this.view.addEventListener('relocate', this.#onRelocate.bind(this))
         this.view.addEventListener('click-view', this.#onClickView.bind(this))
         const { book } = this.view
-
         this.view.renderer.setStyles?.(getCSS(style))
-
         if (!cfi) this.view.renderer.next()
         await this.view.init({ lastLocation: cfi })
 
@@ -168,8 +161,6 @@ class Reader {
         document.addEventListener('keydown', this.#handleKeydown.bind(this))
         const title = formatLanguageMap(book.metadata?.title) || 'Untitled Book'
         document.title = title
-        /**左边目录 */
-        //书名 作者显示
         $('#side-bar-title').innerText = title
         $('#side-bar-author').innerText = formatContributor(book.metadata?.author)
         //封面
@@ -185,7 +176,7 @@ class Reader {
         }
 
         // load and show highlights embedded in the file by Calibre
-        //获取书签
+        console.log(book)
         const bookmarks = await book.getCalibreBookmarks?.()
         if (bookmarks) {
             const { fromCalibreHighlight } = await import('./tools/epubcfi.js')
@@ -238,9 +229,27 @@ class Reader {
         else if (k === 'ArrowRight' || k === 'l') this.view.goRight()
     }
     //doc 为当前的html页面
-    #onLoad({ detail: { doc } }) {
-        doc.addEventListener('keydown', this.#handleKeydown.bind(this))
+    // #onLoad({ detail: { doc } }) {
+    //     console.log()
+    //     doc.addEventListener('keydown', this.#handleKeydown.bind(this))
+    // }
+    #onLoad(e) {
+        const { doc, index } = e.detail
+        doc.addEventListener('pointerup', () => {
+            const sel = doc.getSelection()
+            const range = getSelectionRange(sel)
+            if (!range) return
+            doc.addEventListener('click', e => e.stopPropagation(), { capture: true, once: true })
+            const pos = getPosition(range)
+            const value = this.view.getCFI(index, range)
+            const lang = getLang(range.commonAncestorContainer)
+            const text = sel.toString()
+            console.log(text)
+        })
     }
+
+
+
     //
     #onRelocate({ detail }) {
         console.log(detail)
@@ -261,6 +270,7 @@ class Reader {
 }
 
 export const open = async (file, bookKey, cfi, bookStyle) => {
+    //初始化样式
     style = bookStyle || {
         fontSize: 1.0, lineHeight: 1.8, letterSpacing: 2.0, wordSpacing: 2.0,
         paragraphSpacing: 1.0, textIndent: 0, justify: true, hyphenate: true,
@@ -270,17 +280,13 @@ export const open = async (file, bookKey, cfi, bookStyle) => {
     await reader.open(file, bookKey, cfi);
 }
 
-
 export const setStyle = (newStyle) => {
-
     style = {
         ...style,
         ...newStyle
     }
-
     reader.view.renderer.setStyles?.(getCSS(style));
     StyleUtil.setStyle(style);
-
 }
 
 
