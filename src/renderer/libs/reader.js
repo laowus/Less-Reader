@@ -74,6 +74,60 @@ const formatLanguageMap = x => {
     return x[keys[0]]
 }
 
+const getLang = el => {
+    const lang = el.lang || el?.getAttributeNS?.('http://www.w3.org/XML/1998/namespace', 'lang');
+    if (lang) return lang;
+    if (el.parentElement) return getLang(el.parentElement);
+};
+
+const pointIsInView = ({ x, y }) =>
+    x > 0 && y > 0 && x < window.innerWidth && y < window.innerHeight;
+
+const frameRect = (frame, rect, sx = 1, sy = 1) => {
+    const left = sx * rect.left + frame.left;
+    const right = sx * rect.right + frame.left;
+    const top = sy * rect.top + frame.top;
+    const bottom = sy * rect.bottom + frame.top;
+    return { left, right, top, bottom };
+};
+
+const getPosition = target => {
+    const frameElement = (target.getRootNode?.() ?? target?.endContainer?.getRootNode?.())
+        ?.defaultView?.frameElement;
+
+    const transform = frameElement ? getComputedStyle(frameElement).transform : '';
+    const match = transform.match(/matrix\((.+)\)/);
+    const [sx, , , sy] = match?.[1]?.split(/\s*,\s*/)?.map(x => parseFloat(x)) ?? [];
+
+    const frame = frameElement?.getBoundingClientRect() ?? { top: 0, left: 0 };
+    const rects = Array.from(target.getClientRects());
+    const first = frameRect(frame, rects[0], sx, sy);
+    const last = frameRect(frame, rects.at(-1), sx, sy);
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    const start = {
+        point: { x: ((first.left + first.right) / 2) / screenWidth, y: first.top / screenHeight },
+        dir: 'up',
+    };
+    const end = {
+        point: { x: ((last.left + last.right) / 2) / screenWidth, y: last.bottom / screenHeight },
+        dir: 'down',
+    };
+    const startInView = pointIsInView(start.point);
+    const endInView = pointIsInView(end.point);
+    if (!startInView && !endInView) return { point: { x: 0, y: 0 } };
+    if (!startInView) return end;
+    if (!endInView) return start;
+    return start.point.y * screenHeight > window.innerHeight - end.point.y * screenHeight ? start : end;
+};
+
+const getSelectionRange = sel => {
+    if (!sel || !sel.rangeCount) return;
+    const range = sel?.getRangeAt(0);
+    if (range.collapsed) return;
+    return range;
+};
+
 const formatOneContributor = contributor => typeof contributor === 'string'
     ? contributor : formatLanguageMap(contributor?.name)
 
@@ -211,7 +265,6 @@ class Reader {
     }
 
     #onClickView({ detail: { cx, cy } }) {
-        console.log(cx, cy)
         const action = partAction[clickPart(cx, cy)]
         if (action === "prev") {
             this.view.goLeft()
@@ -228,11 +281,6 @@ class Reader {
         if (k === 'ArrowLeft' || k === 'h') this.view.goLeft()
         else if (k === 'ArrowRight' || k === 'l') this.view.goRight()
     }
-    //doc 为当前的html页面
-    // #onLoad({ detail: { doc } }) {
-    //     console.log()
-    //     doc.addEventListener('keydown', this.#handleKeydown.bind(this))
-    // }
     #onLoad(e) {
         const { doc, index } = e.detail
         doc.addEventListener('pointerup', () => {
@@ -244,12 +292,10 @@ class Reader {
             const value = this.view.getCFI(index, range)
             const lang = getLang(range.commonAncestorContainer)
             const text = sel.toString()
+            onSelectionEnd({ index, range, lang, cfi, pos, text })
             console.log(text)
         })
     }
-
-
-
     //
     #onRelocate({ detail }) {
         console.log(detail)

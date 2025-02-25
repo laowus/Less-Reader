@@ -1,6 +1,7 @@
 <script setup>
 import BottomBar from '../components/BottomBar.vue';
-import { onMounted, reactive } from 'vue';
+import SelectBar from '../components/SelectBar.vue';
+import { onMounted, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import localforage from 'localforage';
 import RecordLocation from '../utils/readUtils/recordLocation.js';
@@ -11,6 +12,7 @@ const route = useRoute();
 const bookKey = route.params.key;
 let detail;
 const bookStyle = reactive({});
+const showSelectMenu = ref(false);
 onMounted(() => {
     Object.assign(bookStyle, StyleUtil.getStyle());
     detail = RecordLocation.getCfi(bookKey);
@@ -32,6 +34,7 @@ const handleClose = () => {
             <main></main>
         </div>
     </dialog>
+    <SelectBar v-if="showSelectMenu" id="select-menu" />
     <div id="dimming-overlay" aria-hidden="true"></div>
     <div id="bottom-bar">
         <BottomBar :bookStyle="bookStyle" :setStyle="setStyle" />
@@ -47,7 +50,6 @@ const handleClose = () => {
             </button>
         </div>
     </div>
-
 </template>
 
 <style>
@@ -80,8 +82,6 @@ body {
     stroke-width: 3px;
 }
 
-
-
 #footnote-dialog {
     padding: 0;
     width: auto;
@@ -105,8 +105,6 @@ body {
     overflow: auto;
     flex: 1;
 }
-
-
 
 .empty-state-icon {
     margin: auto;
