@@ -1,6 +1,6 @@
 <script setup>
 import BottomBar from '../components/BottomBar.vue';
-import SelectBar from '../components/SelectBar.vue';
+import PopoversCtl from '../components/PopoversCtl.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import localforage from 'localforage';
@@ -13,6 +13,7 @@ const bookKey = route.params.key;
 let detail;
 const bookStyle = reactive({});
 const showSelectMenu = ref(false);
+const ctxMenuPosStyle = reactive({ left: -999, top: -999 })
 onMounted(() => {
     Object.assign(bookStyle, StyleUtil.getStyle());
     detail = RecordLocation.getCfi(bookKey);
@@ -34,7 +35,7 @@ const handleClose = () => {
             <main></main>
         </div>
     </dialog>
-    <SelectBar v-if="showSelectMenu" id="select-menu" />
+    <PopoversCtl></PopoversCtl>
     <div id="dimming-overlay" aria-hidden="true"></div>
     <div id="bottom-bar">
         <BottomBar :bookStyle="bookStyle" :setStyle="setStyle" />
