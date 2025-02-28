@@ -35,9 +35,6 @@ const changeStyle = (e, type) => {
     }
 }
 
-
-
-
 </script>
 <template>
     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick" tab-position="bottom" type="border-card" stretch>
@@ -98,19 +95,17 @@ const changeStyle = (e, type) => {
                 <span style="font-size: 20px;font-weight: bolder;"> 样式</span>
                 <el-divider />
                 <div class="slider-demo-block">
-                    <span class="infoTip">字体<br />大小</span>
+                    <span class="iconfont icon-font-size"></span>
                     <el-slider v-model="bookStyle.fontSize" :min="0.5" :max="2.0" :step="0.1" show-stops @change="changeStyle($event, 'fontSize')" />
                 </div>
                 <div class="slider-demo-block">
-                    <span class="infoTip2">行距</span>
+                    <span class="iconfont icon-24gl-lineSpacing"></span>
                     <el-slider v-model="bookStyle.lineHeight" :min="1.0" :max="2.0" :step="0.1" show-stops @change="changeStyle($event, 'lineHeight')" />
-                    <span class="infoTip2">段距</span>
+                    <span class="iconfont icon-duanla"></span>
                     <el-slider v-model="bookStyle.paragraphSpacing" :min="1.0" :max="2.0" :step="0.1" show-stops @change="changeStyle($event, 'paragraphSpacing')" />
                 </div>
             </div>
-
         </el-tab-pane>
-
     </el-tabs>
 </template>
 <style>
@@ -296,32 +291,7 @@ const changeStyle = (e, type) => {
 .slider-demo-block .el-slider {
     margin-top: 0;
     margin-left: 12px;
+    margin-right: 10px;
     flex: 1
-}
-
-.infoTip {
-    margin-left: 5px;
-    font-size: 10px;
-    height: 40px;
-    width: 40px;
-    display: inline-block;
-    border: 1px solid #000000;
-    border-radius: 50%;
-    text-align: center;
-    box-sizing: border-box;
-}
-
-.infoTip2 {
-    margin-left: 5px;
-    font-size: 12px;
-    height: 40px;
-    width: 40px;
-    display: flex;
-    border: 1px solid #000000;
-    border-radius: 50%;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    font-weight: bolder;
 }
 </style>

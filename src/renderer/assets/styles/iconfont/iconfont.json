@@ -1,0 +1,58 @@
+{
+  "id": "4839720",
+  "name": "myicon",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "icon集合",
+  "glyphs": [
+    {
+      "icon_id": "7596503",
+      "name": "24gl-lineSpacing",
+      "font_class": "24gl-lineSpacing",
+      "unicode": "eb05",
+      "unicode_decimal": 60165
+    },
+    {
+      "icon_id": "10149860",
+      "name": "段落",
+      "font_class": "duanla",
+      "unicode": "e60d",
+      "unicode_decimal": 58893
+    },
+    {
+      "icon_id": "4688939",
+      "name": "打钩",
+      "font_class": "dagou",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "43453747",
+      "name": "搜索",
+      "font_class": "sousuo",
+      "unicode": "e7ff",
+      "unicode_decimal": 59391
+    },
+    {
+      "icon_id": "15346606",
+      "name": "笔记",
+      "font_class": "biji",
+      "unicode": "e6a7",
+      "unicode_decimal": 59047
+    },
+    {
+      "icon_id": "25964417",
+      "name": "复制",
+      "font_class": "fuzhi",
+      "unicode": "e65f",
+      "unicode_decimal": 58975
+    },
+    {
+      "icon_id": "12579288",
+      "name": "font-size",
+      "font_class": "font-size",
+      "unicode": "e728",
+      "unicode_decimal": 59176
+    }
+  ]
+}

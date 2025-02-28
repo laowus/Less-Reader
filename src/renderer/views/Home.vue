@@ -188,7 +188,7 @@ onMounted(() => {
             <div style="position: relative;">
                 <input type="text" class="header-search-box" placeholder="搜索我的书库">
                 <span class="header-search-text">
-                    <span class="icon-search header-search-icon"></span>
+                    <span class="iconfont icon-sousuo header-search-icon"></span>
                 </span>
             </div>
 
@@ -220,18 +220,6 @@ onMounted(() => {
                     </el-button>
                 </template>
             </el-popover>
-        </div>
-    </div>
-    <div class="book-list-header">
-        <div class="booklist-manage-container"></div>
-        <div>
-            <div class="book-list-view">
-                <div class="card-list-mode">
-                    <span data-tooltip-id="my-tooltip" data-tooltip-content="卡片模式"><span class="icon-grid"></span></span>
-                </div>
-                <div class="card-list-mode" style="opacity: 0.5;"><span data-tooltip-id="my-tooltip" data-tooltip-content="列表模式"><span class="icon-menu"></span></span></div>
-                <div class="card-list-mode" style="opacity: 0.5;"><span data-tooltip-id="my-tooltip" data-tooltip-content="封面模式"><span class="icon-cover"></span></span></div>
-            </div>
         </div>
     </div>
     <div class="book-list-container-parent">
