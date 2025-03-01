@@ -4,6 +4,7 @@ import { createTOCView } from './ui/tree.js'
 import { Overlayer } from './ui/overlayer.js'
 import RecordLocation from '../utils/readUtils/recordLocation.js';
 import StyleUtil from '../utils/readUtils/styleUtil.js';
+import EventBus from '../../common/EventBus';
 
 const ipcRenderer = window.require("electron").ipcRenderer;
 /**
@@ -166,6 +167,15 @@ const clickPart = (cx, cy) => {
     }
 }
 
+const onSelectionEnd = (selection) => {
+    EventBus.emit('commonCtxMenu-show', selection);
+}
+
+const commonCtxMenuHide = () => {
+    EventBus.emit('commonCtxMenu-hide');
+}
+
+
 const partAction = ["prev", "menu", "next", "prev", "menu", "next", "prev", "menu", "next"]
 
 let style
@@ -266,6 +276,7 @@ class Reader {
 
     #onClickView({ detail: { cx, cy } }) {
         const action = partAction[clickPart(cx, cy)]
+        commonCtxMenuHide()
         if (action === "prev") {
             this.view.goLeft()
         } else if (action === "next") {
@@ -281,6 +292,7 @@ class Reader {
         if (k === 'ArrowLeft' || k === 'h') this.view.goLeft()
         else if (k === 'ArrowRight' || k === 'l') this.view.goRight()
     }
+
     #onLoad(e) {
         const { doc, index } = e.detail
         doc.addEventListener('pointerup', () => {
@@ -289,11 +301,10 @@ class Reader {
             if (!range) return
             doc.addEventListener('click', e => e.stopPropagation(), { capture: true, once: true })
             const pos = getPosition(range)
-            const value = this.view.getCFI(index, range)
+            const cfi = this.view.getCFI(index, range);
             const lang = getLang(range.commonAncestorContainer)
             const text = sel.toString()
             onSelectionEnd({ index, range, lang, cfi, pos, text })
-            console.log(text)
         })
     }
     //

@@ -1,8 +1,8 @@
 <script setup>
-import BottomBar from '../components/BottomBar.vue';
-import PopoversCtl from '../components/PopoversCtl.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import BottomBar from '../components/BottomBar.vue';
+import PopoversCtl from '../components/PopoversCtl.vue';
 import localforage from 'localforage';
 import RecordLocation from '../utils/readUtils/recordLocation.js';
 import StyleUtil from '../utils/readUtils/styleUtil.js'
