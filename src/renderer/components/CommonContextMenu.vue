@@ -1,31 +1,35 @@
 <script setup>
-import { watch } from 'vue';
+import EventBus from '../../common/EventBus';
 const props = defineProps({
     posStyle: Object
 })
-// 添加调试信息
-watch(() => props.posStyle, (newVal) => {
-    console.log("posStyle updated:", newVal);
-}, { immediate: true });
+
+const toggleUnderline = () => {
+    EventBus.emit("toggleUnderline",);
+}
+
 </script>
 
 <template>
-    <div id="popup" :style="{ top: props.posStyle.top + 'px', left: props.posStyle.left + 'px', bottom: props.posStyle.bottom && props.posStyle.bottom + 'px' }">
+    <div id="popup" :style="{ top: props.posStyle.top && props.posStyle.top + 'px', left: props.posStyle.left + 'px', bottom: props.posStyle.bottom && props.posStyle.bottom + 'px' }">
         <div class="selection-buttons">
             <button class="my-2" title="复制">
                 <span class="iconfont icon-fuzhi"></span>
             </button>
-            <button class="my-2" title="划线">
-                <span class="iconfont icon-huaxian"></span>
+            <button class="my-2" title="划线" @click="toggleUnderline">
+                <span class="iconfont icon-highlight-outlined1"></span>
             </button>
             <button class="my-2" title="笔记">
                 <span class="iconfont icon-biji"></span>
             </button>
             <button class="my-2" title="搜索">
-                <span class="iconfont icon-sousuo"></span>
+                <span class="iconfont icon-sousuo1"></span>
             </button>
         </div>
     </div>
+
+
+
 </template>
 
 <style>

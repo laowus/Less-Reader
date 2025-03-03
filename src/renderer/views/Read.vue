@@ -12,8 +12,6 @@ const route = useRoute();
 const bookKey = route.params.key;
 let detail;
 const bookStyle = reactive({});
-const showSelectMenu = ref(false);
-const ctxMenuPosStyle = reactive({ left: -999, top: -999 })
 onMounted(() => {
     Object.assign(bookStyle, StyleUtil.getStyle());
     detail = RecordLocation.getCfi(bookKey);
@@ -35,7 +33,7 @@ const handleClose = () => {
             <main></main>
         </div>
     </dialog>
-    <PopoversCtl></PopoversCtl>
+    <PopoversCtl :bookKey="bookKey"></PopoversCtl>
     <div id="dimming-overlay" aria-hidden="true"></div>
     <div id="bottom-bar">
         <BottomBar :bookStyle="bookStyle" :setStyle="setStyle" />

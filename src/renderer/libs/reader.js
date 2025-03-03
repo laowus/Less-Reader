@@ -127,7 +127,7 @@ const getSelectionRange = sel => {
     const range = sel?.getRangeAt(0);
     if (range.collapsed) return;
     return range;
-};
+}
 
 const formatOneContributor = contributor => typeof contributor === 'string'
     ? contributor : formatLanguageMap(contributor?.name)
@@ -175,7 +175,6 @@ const commonCtxMenuHide = () => {
     EventBus.emit('commonCtxMenu-hide');
 }
 
-
 const partAction = ["prev", "menu", "next", "prev", "menu", "next", "prev", "menu", "next"]
 
 let style
@@ -195,7 +194,6 @@ class Reader {
     }
     constructor() {
         $('#dimming-overlay').addEventListener('click', () => this.closeSideBar())
-
     }
 
     async open(file, bookKey, cfi) {
@@ -209,6 +207,7 @@ class Reader {
         const { book } = this.view
         this.view.renderer.setStyles?.(getCSS(style))
         if (!cfi) this.view.renderer.next()
+        this.setView(this.view)
         await this.view.init({ lastLocation: cfi })
 
         $('#header-bar').style.visibility = 'visible'
@@ -240,7 +239,6 @@ class Reader {
         }
 
         // load and show highlights embedded in the file by Calibre
-        console.log(book)
         const bookmarks = await book.getCalibreBookmarks?.()
         if (bookmarks) {
             const { fromCalibreHighlight } = await import('./tools/epubcfi.js')
@@ -274,16 +272,29 @@ class Reader {
         }
     }
 
+    setView(view) {
+        view.addEventListener('create-overlay', e => {
+            const { index } = e.detail
+            //获取当前书籍的注释
+            const list = this.annotations.get(index)
+            if (list) for (const annotation of list)
+                this.view.addAnnotation(annotation)
+        })
+    }
+
     #onClickView({ detail: { cx, cy } }) {
         const action = partAction[clickPart(cx, cy)]
-        commonCtxMenuHide()
-        if (action === "prev") {
-            this.view.goLeft()
-        } else if (action === "next") {
-            this.view.goRight()
-        } else if (action === "menu") {
-            $('#dimming-overlay').classList.add('show')
-            $('#bottom-bar').classList.add('show')
+        if ($('#popup') && $('#popup').style.display !== 'none') {
+            commonCtxMenuHide();
+        } else {
+            if (action === "prev") {
+                this.view.goLeft()
+            } else if (action === "next") {
+                this.view.goRight()
+            } else if (action === "menu") {
+                $('#dimming-overlay').classList.add('show')
+                $('#bottom-bar').classList.add('show')
+            }
         }
     }
     //键盘处理 
@@ -309,7 +320,6 @@ class Reader {
     }
     //
     #onRelocate({ detail }) {
-        console.log(detail)
         const { cfi, fraction, location, tocItem, pageItem, chapterLocation } = detail
         const percent = percentFormat.format(fraction)
         const loc = pageItem

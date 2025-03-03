@@ -6,11 +6,32 @@
   "description": "icon集合",
   "glyphs": [
     {
-      "icon_id": "42678335",
-      "name": "划线",
-      "font_class": "huaxian",
-      "unicode": "e78d",
-      "unicode_decimal": 59277
+      "icon_id": "29107113",
+      "name": "打钩",
+      "font_class": "dagou2",
+      "unicode": "e73c",
+      "unicode_decimal": 59196
+    },
+    {
+      "icon_id": "1901681",
+      "name": "搜索",
+      "font_class": "sousuo1",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "38936611",
+      "name": "highlight-outlined",
+      "font_class": "highlight-outlined1",
+      "unicode": "e6ca",
+      "unicode_decimal": 59082
+    },
+    {
+      "icon_id": "28945362",
+      "name": "删除",
+      "font_class": "shanchu",
+      "unicode": "e797",
+      "unicode_decimal": 59287
     },
     {
       "icon_id": "7596503",
@@ -32,13 +53,6 @@
       "font_class": "dagou",
       "unicode": "e600",
       "unicode_decimal": 58880
-    },
-    {
-      "icon_id": "43453747",
-      "name": "搜索",
-      "font_class": "sousuo",
-      "unicode": "e7ff",
-      "unicode_decimal": 59391
     },
     {
       "icon_id": "15346606",
