@@ -2,10 +2,11 @@
 import CommonContextMenu from './CommonContextMenu.vue';
 import Highlight from './highlight.vue';
 import EventBus from '../../common/EventBus';
-import bookNoteUtil from '../utils/fileUtils/bookNoteUtil';
 import BookNote from '../models/bookNote';
-import { ref, reactive, toRaw } from 'vue';
+import { noteRefresh } from '../libs/reader.js';
+import { ref, reactive, toRaw, onMounted } from 'vue';
 import BookNoteUtil from '../utils/fileUtils/bookNoteUtil';
+import NoteStyle from '../utils/readUtils/noteStyle';
 
 const props = defineProps({
     bookKey: String
@@ -18,7 +19,6 @@ const currentBookNote = reactive({})
 const selectionRef = reactive({})
 
 const showCommonCtxMenu = (selection) => {
-    console.log(selection);
     selectionRef.value = selection;
     commonCtxMenuShow.value = true;
     let { x, y } = selection.pos.point;
@@ -54,17 +54,18 @@ EventBus.on("commonCtxMenu-hide", () => {
 })
 
 EventBus.on("toggleUnderline", () => {
+    addNote();
     highlightShow.value = !highlightShow.value;
 })
 
-EventBus.on("addNote", (typeColor) => {
-    currentBookNote.value = new BookNote(props.bookKey, typeColor.color, selectionRef.value.text, typeColor.type, selectionRef.value.cfi);
-    BookNoteUtil.addBookNote(toRaw(currentBookNote.value));//保存
-    EventBus.emit("annotation-refresh");
 
-    // hideCommonCtxMenu();
-    // hideHighlight();
-})
+const addNote = () => {
+    const noteStyle = NoteStyle.getNoteStyle();
+    currentBookNote.value = new BookNote(props.bookKey, noteStyle.color, selectionRef.value.text, noteStyle.ty, selectionRef.value.cfi);
+    BookNoteUtil.addBookNote(toRaw(currentBookNote.value));
+    noteRefresh();
+}
+
 
 </script>
 <template>
@@ -72,7 +73,7 @@ EventBus.on("addNote", (typeColor) => {
         :posStyle="ctxMenuPosStyle">
     </CommonContextMenu>
     <Highlight v-show="highlightShow"
-        :posStyle="ctxMenuPosStyle">
+        :posStyle="ctxMenuPosStyle" :addNote="addNote">
     </Highlight>
 </template>
 <style></style>

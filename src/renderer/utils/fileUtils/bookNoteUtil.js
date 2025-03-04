@@ -20,14 +20,13 @@ class BookNoteUtil {
         })
     }
 
-    static getBookNote(bookKey) {
-        return localforage.getItem('bookNotes').then((allBookNotes) => {
-            if (!allBookNotes) {
-                return [];
-            }
-            console.log(allBookNotes);
-            return allBookNotes.filter(bookNote => bookNote.bookKey === bookKey);
-        })
+    static async getBookNote(bookKey) {
+        const allBookNotes = await localforage.getItem('bookNotes');
+        if (!allBookNotes) {
+            return [];
+        }
+        console.log(allBookNotes);
+        return allBookNotes.filter(bookNote => bookNote.bookKey === bookKey);
     }
 }
 

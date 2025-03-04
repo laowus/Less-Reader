@@ -1,23 +1,32 @@
 <script setup>
-import EventBus from '../../common/EventBus';
-import { ref } from 'vue';
+
+import { onMounted, reactive, ref } from 'vue';
+import NoteStyle from '../utils/readUtils/noteStyle';
 const props = defineProps({
-    posStyle: Object
+    posStyle: Object,
+    addNote: Function
 })
 
-const colors = ['red', 'blueviolet', 'blue', 'green', 'yellow'];
-const types = ['highlight', 'underline', 'squiggly'];
+const currentStyle = reactive(NoteStyle.getNoteStyle());
 
-const cindex = ref(-1);
-const tindex = ref(-1);
+const colors = NoteStyle.colors;
+const tys = NoteStyle.tys;
+
 const setColor = (index) => {
-    cindex.value = index;
+    currentStyle.color = colors[index];
+    console.log(currentStyle);
+    NoteStyle.setNoteStyle(currentStyle);
+    props.addNote(currentStyle.value);
 }
-const setType = (index) => {
-    tindex.value = index;
-    if (cindex.value == -1) cindex.value = 0;
-    EventBus.emit("addNote", { color: colors[cindex.value], type: types[tindex.value] });
+const setTy = (index) => {
+    currentStyle.ty = tys[index];
+    NoteStyle.setNoteStyle(currentStyle);
+    props.addNote(currentStyle.value);
 }
+
+onMounted(() => {
+    props.addNote(currentStyle.value);
+})
 
 </script>
 
@@ -25,14 +34,14 @@ const setType = (index) => {
     <div id="highlight-options"
         :style="{ top: props.posStyle.top && props.posStyle.top + 50 + 'px', left: props.posStyle.left + 'px', bottom: props.posStyle.bottom && props.posStyle.bottom + 50 + 'px' }">
         <div class="btns">
-            <button class="btn-class" @click="setType(0)">
-                <div class="astyle" :style="{ 'backgroundColor': tindex == 0 ? colors[cindex] : 'grey' }">A</div>
+            <button class="btn-class" @click="setTy(0)">
+                <div class="astyle" :style="{ 'backgroundColor': currentStyle.color }">A</div>
             </button>
-            <button class="btn-class" @click="setType(1)">
-                <div class="btn-underlined" :style="{ 'text-decoration-color': tindex == 1 ? colors[cindex] : 'grey' }">A</div>
+            <button class="btn-class" @click="setTy(1)">
+                <div class="btn-underlined" :style="{ 'text-decoration-color': currentStyle.color }">A</div>
             </button>
-            <button class="btn-class" @click="setType(2)">
-                <div class="btn-underlined1" :style="{ 'text-decoration-color': tindex == 2 ? colors[cindex] : 'grey' }">A</div>
+            <button class="btn-class" @click="setTy(2)">
+                <div class="btn-underlined1" :style="{ 'text-decoration-color': currentStyle.color }">A</div>
             </button>
         </div>
         <div class="btnsColor">
@@ -41,7 +50,7 @@ const setType = (index) => {
                 class="btn-color"
                 :style="{ backgroundColor: color }"
                 @click="setColor(index)">
-                <span v-if="index === cindex" class="iconfont icon-dagou2"></span>
+                <span v-if="colors[index] === currentStyle.color" class="iconfont icon-dagou2"></span>
             </button>
         </div>
     </div>

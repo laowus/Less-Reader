@@ -1,5 +1,7 @@
 <script setup>
 import EventBus from '../../common/EventBus';
+
+
 const props = defineProps({
     posStyle: Object
 })

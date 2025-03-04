@@ -176,9 +176,7 @@ const commonCtxMenuHide = () => {
     EventBus.emit('commonCtxMenu-hide');
 }
 
-EventBus.on("annotation-refresh", () => {
-    reader.renderAnnotation();
-});
+
 
 const partAction = ["prev", "menu", "next", "prev", "menu", "next", "prev", "menu", "next"]
 
@@ -284,7 +282,6 @@ class Reader {
         })
         view.addEventListener('draw-annotation', e => {
             const { draw, annotation } = e.detail
-            console.log(draw)
             const { color, type } = annotation
             //draw(type, { color })
             if (type === 'highlight') draw(Overlayer.highlight, { color })
@@ -395,6 +392,11 @@ export const setStyle = (newStyle) => {
     }
     reader.view.renderer.setStyles?.(getCSS(style));
     StyleUtil.setStyle(style);
+}
+
+
+export const noteRefresh = async () => {
+    await reader.renderAnnotation();
 }
 
 
