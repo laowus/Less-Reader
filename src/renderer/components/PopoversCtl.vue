@@ -59,9 +59,11 @@ EventBus.on("toggleUnderline", () => {
 
 EventBus.on("addNote", (typeColor) => {
     currentBookNote.value = new BookNote(props.bookKey, typeColor.color, selectionRef.value.text, typeColor.type, selectionRef.value.cfi);
-    BookNoteUtil.addBookNote(toRaw(currentBookNote.value));
-    hideCommonCtxMenu();
-    hideHighlight();
+    BookNoteUtil.addBookNote(toRaw(currentBookNote.value));//保存
+    EventBus.emit("annotation-refresh");
+
+    // hideCommonCtxMenu();
+    // hideHighlight();
 })
 
 </script>

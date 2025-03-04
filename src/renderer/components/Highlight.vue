@@ -6,7 +6,7 @@ const props = defineProps({
 })
 
 const colors = ['red', 'blueviolet', 'blue', 'green', 'yellow'];
-const types = ['highlight', 'underline', 'underline1'];
+const types = ['highlight', 'underline', 'squiggly'];
 
 const cindex = ref(-1);
 const tindex = ref(-1);

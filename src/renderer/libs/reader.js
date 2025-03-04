@@ -5,6 +5,7 @@ import { Overlayer } from './ui/overlayer.js'
 import RecordLocation from '../utils/readUtils/recordLocation.js';
 import StyleUtil from '../utils/readUtils/styleUtil.js';
 import EventBus from '../../common/EventBus';
+import BookNoteUtil from '../utils/fileUtils/bookNoteUtil.js';
 
 const ipcRenderer = window.require("electron").ipcRenderer;
 /**
@@ -175,6 +176,10 @@ const commonCtxMenuHide = () => {
     EventBus.emit('commonCtxMenu-hide');
 }
 
+EventBus.on("annotation-refresh", () => {
+    reader.renderAnnotation();
+});
+
 const partAction = ["prev", "menu", "next", "prev", "menu", "next", "prev", "menu", "next"]
 
 let style
@@ -195,7 +200,6 @@ class Reader {
     constructor() {
         $('#dimming-overlay').addEventListener('click', () => this.closeSideBar())
     }
-
     async open(file, bookKey, cfi) {
         this.bookKey = bookKey
         this.view = document.createElement('foliate-view')
@@ -209,7 +213,6 @@ class Reader {
         if (!cfi) this.view.renderer.next()
         this.setView(this.view)
         await this.view.init({ lastLocation: cfi })
-
         $('#header-bar').style.visibility = 'visible'
         const slider = $('#progress-slider')
         slider.dir = book.dir
@@ -220,13 +223,11 @@ class Reader {
             option.value = fraction
             $('#tick-marks').append(option)
         }
-        //键盘监听
         document.addEventListener('keydown', this.#handleKeydown.bind(this))
         const title = formatLanguageMap(book.metadata?.title) || 'Untitled Book'
         document.title = title
         $('#side-bar-title').innerText = title
         $('#side-bar-author').innerText = formatContributor(book.metadata?.author)
-        //封面
         Promise.resolve(book.getCover?.())?.then(blob =>
             blob ? $('#side-bar-cover').src = URL.createObjectURL(blob) : null)
         const toc = book.toc
@@ -273,6 +274,7 @@ class Reader {
     }
 
     setView(view) {
+
         view.addEventListener('create-overlay', e => {
             const { index } = e.detail
             //获取当前书籍的注释
@@ -280,6 +282,44 @@ class Reader {
             if (list) for (const annotation of list)
                 this.view.addAnnotation(annotation)
         })
+        view.addEventListener('draw-annotation', e => {
+            const { draw, annotation } = e.detail
+            console.log(draw)
+            const { color, type } = annotation
+            //draw(type, { color })
+            if (type === 'highlight') draw(Overlayer.highlight, { color })
+            else if (type === 'underline') draw(Overlayer.underline, { color })
+            else if (type === 'squiggly') draw(Overlayer.squiggly, { color })
+        })
+    }
+
+    async renderAnnotation() {
+        const bookmarks = await BookNoteUtil.getBookNote(this.bookKey) ?? []
+        console.log("bookmarks", bookmarks)
+        if (!Array.isArray(bookmarks)) {
+            console.error("bookmarks is not an array:", bookmarks);
+            return;
+        }
+        for (const bookmark of bookmarks) {
+            const { value, type, color, note } = bookmark
+            const annotation = {
+                value,
+                type,
+                color,
+                note
+            }
+            this.addAnnotation(annotation)
+        }
+    }
+
+    addAnnotation(annotation) {
+        const { value } = annotation
+        const spineCode = (value.split('/')[2].split('!')[0] - 2) / 2
+        const list = this.annotations.get(spineCode)
+        if (list) list.push(annotation)
+        else this.annotations.set(spineCode, [annotation])
+        this.annotationsByValue.set(value, annotation)
+        this.view.addAnnotation(annotation)
     }
 
     #onClickView({ detail: { cx, cy } }) {
@@ -345,6 +385,7 @@ export const open = async (file, bookKey, cfi, bookStyle) => {
     const reader = new Reader();
     globalThis.reader = reader;
     await reader.open(file, bookKey, cfi);
+    await reader.renderAnnotation();
 }
 
 export const setStyle = (newStyle) => {

@@ -20,8 +20,14 @@ class BookNoteUtil {
         })
     }
 
-    static isIn(bookNote) {
-
+    static getBookNote(bookKey) {
+        return localforage.getItem('bookNotes').then((allBookNotes) => {
+            if (!allBookNotes) {
+                return [];
+            }
+            console.log(allBookNotes);
+            return allBookNotes.filter(bookNote => bookNote.bookKey === bookKey);
+        })
     }
 }
 
