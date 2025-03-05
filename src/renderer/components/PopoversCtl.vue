@@ -1,6 +1,6 @@
 <script setup>
 import CommonContextMenu from './CommonContextMenu.vue';
-import Highlight from './highlight.vue';
+import Highlight from './Highlight.vue';
 import EventBus from '../../common/EventBus';
 import BookNote from '../models/bookNote';
 import { noteRefresh } from '../libs/reader.js';

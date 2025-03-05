@@ -176,13 +176,12 @@ const commonCtxMenuHide = () => {
     EventBus.emit('commonCtxMenu-hide');
 }
 
-
-
 const partAction = ["prev", "menu", "next", "prev", "menu", "next", "prev", "menu", "next"]
 
 let style
 
 const footnoteDialog = document.getElementById('footnote-dialog')
+
 
 class Reader {
     bookKey
@@ -191,6 +190,7 @@ class Reader {
     annotations = new Map()
     annotationsByValue = new Map()
     #footnoteHandler = new FootnoteHandler()
+    bookmarks
     closeSideBar() {
         $('#dimming-overlay').classList.remove('show')
         $('#bottom-bar').classList.remove('show')
@@ -290,14 +290,9 @@ class Reader {
         })
     }
 
-    async renderAnnotation() {
-        const bookmarks = await BookNoteUtil.getBookNote(this.bookKey) ?? []
-        console.log("bookmarks", bookmarks)
-        if (!Array.isArray(bookmarks)) {
-            console.error("bookmarks is not an array:", bookmarks);
-            return;
-        }
-        for (const bookmark of bookmarks) {
+    renderAnnotation() {
+        this.bookmarks = BookNoteUtil.getBookNote(this.bookKey) ?? []
+        for (const bookmark of this.bookmarks) {
             const { value, type, color, note } = bookmark
             const annotation = {
                 value,
@@ -382,7 +377,7 @@ export const open = async (file, bookKey, cfi, bookStyle) => {
     const reader = new Reader();
     globalThis.reader = reader;
     await reader.open(file, bookKey, cfi);
-    await reader.renderAnnotation();
+    reader.renderAnnotation();
 }
 
 export const setStyle = (newStyle) => {
@@ -395,9 +390,11 @@ export const setStyle = (newStyle) => {
 }
 
 
-export const noteRefresh = async () => {
-    await reader.renderAnnotation();
+export const noteRefresh = () => {
+    reader.renderAnnotation();
 }
+
+
 
 
 
