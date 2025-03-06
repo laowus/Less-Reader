@@ -1,10 +1,11 @@
 const { app, BrowserWindow, ipcMain, Menu, shell, Tray, } = require('electron')
 const { isWinOS, isDevEnv, APP_ICON } = require('./env')
+const { initDatabase } = require('./dbTool')
 const fs = require('fs');
 const path = require('path')
+
 const Store = require("electron-store");
 const store = new Store();
-
 const configDir = app.getPath("userData");
 const dirPath = path.join(configDir, "uploads");
 
@@ -38,7 +39,8 @@ const startup = () => {
 }
 
 const init = () => {
-    app.whenReady().then(() => {
+    app.whenReady().then(async () => {
+        await initDatabase()
         mainWin = createWindow()
     })
 
@@ -212,6 +214,8 @@ ipcMain.handle("open-book", (event, config) => {
     });
     event.returnValue = "success";
 });
+
+
 
 
 
