@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain, Menu, shell, Tray, } = require('electron')
 const { isWinOS, isDevEnv, APP_ICON } = require('./env')
-const { initDatabase } = require('./dbTool')
+const { initDatabase, insertBook } = require('./dbTool')
 const fs = require('fs');
 const path = require('path')
 
@@ -9,13 +9,11 @@ const store = new Store();
 const configDir = app.getPath("userData");
 const dirPath = path.join(configDir, "uploads");
 
-let FOLDER_PATH = path.join(__dirname, '../../books');
 let resourcesRoot = path.resolve(app.getAppPath());
 let publicRoot = path.join(__dirname, '../../public')
 
 if (!isDevEnv) {
     resourcesRoot = path.dirname(resourcesRoot);
-    FOLDER_PATH = path.join(resourcesRoot, "/books")
     publicRoot = path.join(__dirname, '../../dist')
 }
 
@@ -132,15 +130,12 @@ const createWindow = () => {
         },
     ])
     tray.setContextMenu(contextMenu);
-    //监听托盘双击事件
     tray.on('double-click', () => {
         mainWindow.show();
     });
-
     mainWindow.once('ready-to-show', () => {
         mainWindow.show()
     })
-
     return mainWindow
 }
 
@@ -148,7 +143,6 @@ const sendToRenderer = (channel, args) => {
     try {
         if (mainWin) mainWin.webContents.send(channel, args)
     } catch (error) {
-
     }
 }
 
@@ -215,9 +209,10 @@ ipcMain.handle("open-book", (event, config) => {
     event.returnValue = "success";
 });
 
-
-
-
+// 监听渲染进程对sqlite3的操作
+ipcMain.on('db-insert-book', (event, book) => {
+    insertBook(book, event);
+});
 
 //启动应用
 startup()

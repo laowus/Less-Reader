@@ -13,5 +13,22 @@ export default class Book {
         this.path = path;
         this.charset = charset;
     }
+
+    toMap() {
+        return {
+            key: this.key,
+            name: this.name,
+            author: this.author,
+            description: this.description,
+            md5: this.md5,
+            cover: this.cover,
+            format: this.format,
+            publisher: this.publisher,
+            size: this.size,
+            page: this.page,
+            path: this.path,
+            charset: this.charset,
+        }
+    }
 }
 

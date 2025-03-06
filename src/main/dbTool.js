@@ -11,17 +11,44 @@ const getDatabasePath = () => {
 // 创建数据库表
 const createTable = () => {
     db.run(`
-      CREATE TABLE IF NOT EXISTS items(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        content TEXT NOT NULL,
-        created_time TEXT,
-        completeTime TEXT
-      )
+        CREATE TABLE tb_books (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            key TEXT,
+            name TEXT,
+            author TEXT,
+            description TEXT,
+            md5 TEXT,
+            cover TEXT,
+            format TEXT,    
+            publisher TEXT,
+            size INTEGER,   
+            page INTEGER,
+            path TEXT,
+            charset TEXT
+        )
     `, (err) => {
         if (err) {
             console.error(err.message);
         }
-        console.log('Table created.');
+        console.log('Table tb_books created.');
+    });
+    db.run(`
+       CREATE TABLE tb_notes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            book_id INTEGER,
+            content TEXT,
+            cfi TEXT,
+            chapter TEXT,
+            type TEXT,
+            color TEXT,
+            create_time TEXT,
+            update_time TEXT
+        )
+    `, (err) => {
+        if (err) {
+            console.error(err.message);
+        }
+        console.log('Table tb_notes created.');
     });
 }
 
@@ -45,8 +72,26 @@ const initDatabase = () => {
     });
 }
 
+const insertBook = (book, event) => {
+    console.log('Insert book:', book);
+    db.run(`
+    INSERT INTO tb_books (key, name, author, description, md5, cover, format, publisher, size, page, path, charset) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [book.key, book.name, book.author, book.description, book.md5, book.cover, book.format, book.publisher, book.size, book.page, book.path, book.charset], function (err) {
+        if (err) {
+            console.error(err.message);
+            event.reply('db-insert-book-response', { success: false });
+        } else {
+            console.log('Data inserted with id:', this.lastID);
+            event.reply('db-insert-book-response', { success: true, id: this.lastID });
+        }
+    });
+
+}
+
 
 //导出
 module.exports = {
-    initDatabase
+    initDatabase,
+    insertBook
 }

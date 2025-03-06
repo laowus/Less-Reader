@@ -5,7 +5,7 @@ import { fetchMD5 } from '../utils/fileUtils/md5Util';
 import BookUtil from '../utils/fileUtils/bookUtils';
 import { ElMessage } from 'element-plus';
 import BookListItem from '../components/BookListItem.vue';
-
+const { ipcRenderer } = window.require('electron');
 const booklist = ref([]);
 const selectedBooks = ref([]);
 const filelistRef = ref([]);
@@ -123,6 +123,7 @@ const handleBook = (file, md5) => {
 const handleAddBook = (book, buffer) => {
     return new Promise((resolve, reject) => {
         BookUtil.addBook(book.key, buffer);//复制文件
+        ipcRenderer.send('db-insert-book', book);
         booklist.value.push(book);
         const books = toRaw(booklist.value);
         localforage.setItem("books", books).then(() => {
