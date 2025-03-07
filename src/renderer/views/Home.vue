@@ -93,11 +93,9 @@ const handleBook = async (file, md5) => {
         } catch (error) {
             console.log(error);
         }
-
     }
-
-
 }
+
 // 添加数据操作. 复制书籍到用户文件夹/upload/book下
 // 复制数据信息到IndexDb中
 const handleAddBook = (book) => {
@@ -125,15 +123,14 @@ const unSelectBook = (book) => {
     selectedBooks.value = selectedBooks.value.filter((item) => item !== book);
 }
 const loadContent = () => {
-    ipcRenderer.once("db-select-book-response", (items) => {
-        console.log("items", items);
-        if (items && items.length > 0) {
+    // ipcRenderer.once("db-select-book-response", (items) => {
 
-        }
-    });
-    ipcRenderer.send("db-get-books");
+    //     if (items && items.length > 0) {
+
+    //     }
+    // });
+    // ipcRenderer.send("db-get-books");
     localforage.getItem("books").then((books) => {
-        console.log("books", books);
         booklist.value = books ? books : [];
     });
 }

@@ -90,7 +90,6 @@ const initDatabase = () => {
 }
 
 const insertBook = (book, event) => {
-    console.log('Insert book:', book);
     db.run(`
     INSERT INTO tb_books (key, name, author, description, md5, cover, format, publisher, size, page, path, charset) 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

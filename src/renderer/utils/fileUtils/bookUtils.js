@@ -3,6 +3,8 @@ import { makeBook } from '../../libs/view'
 import Book from '../../models/Book';
 import { ElMessage } from 'element-plus';
 const { ipcRenderer } = window.require('electron');
+const fs = window.require('fs');
+const path = window.require('path');
 
 class BookUtil {
     static bookDir = localStorage.getItem("bookPath")
@@ -10,7 +12,7 @@ class BookUtil {
         : ipcRenderer.sendSync("get-book-path", "ping");
 
     static addBook(book) {
-        ipcRenderer.sendSync('copy-book', book.toMap());
+        ipcRenderer.send('copy-book', book.toMap());
     }
 
     static deleteAllFiles() {
@@ -67,6 +69,7 @@ class BookUtil {
     static generateBook(bookName, extension, md5, size, path, file) {
         return new Promise(async (resolve, reject) => {
             try {
+                let coverString = "";
                 let cover = "";
                 let key, name, author, publisher, description, charset, page;
                 [name, author, description, publisher, charset, page] = [
@@ -77,18 +80,21 @@ class BookUtil {
                 const book = await makeBook(file);
                 console.log("解析后的book", book);
                 meta = book.metadata;
-                [name, author, description, publisher, cover] = [
+                [name, author, description, publisher, coverString] = [
                     meta.title || bookName, meta.author || "Unknown author",
                     meta.description || "", meta.publisher || "", meta.cover || ""
                 ];
-                if (extension === "epub" && cover.indexOf("image") === -1) {
-                    cover = ""
-                }
                 let format = extension.toUpperCase();
                 key = new Date().getTime() + "";
+                if (extension === "epub" && coverString.indexOf("image") === -1) {
+                    coverString = ""
+                }
+                if (coverString) {
+                    cover = this.getCoverPath(key, name);
+                    await this.saveCoverToLocal(coverString, cover);
+                }
                 resolve(
-                    new Book(key, name, author, description, md5, cover,
-                        format, publisher, size, page, path, charset)
+                    new Book(key, name, author, description, md5, cover, format, publisher, size, page, path, charset)
                 );
             } catch (error) {
                 console.log(error);
@@ -96,6 +102,32 @@ class BookUtil {
             }
         });
 
+    }
+
+    static getCoverPath = (key, name) => {
+        // 获取保存路径，这里假设使用默认的书籍目录
+        const coverDir = localStorage.getItem("coverPath")
+            ? localStorage.getItem("coverPath")
+            : ipcRenderer.sendSync("get-cover-path", "ping");
+
+        return path.join(coverDir, key + name + ".jpg");
+    }
+
+    static saveCoverToLocal(coverData, coverPath) {
+        return new Promise((resolve, reject) => {
+            // 提取 Base64 数据部分
+            const base64Data = coverData.split(',')[1];
+            // 解码 Base64 数据
+            const fileBuffer = Buffer.from(base64Data, 'base64');
+            // 写入文件
+            fs.writeFile(coverPath, fileBuffer, (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(coverPath);
+                }
+            });
+        });
     }
 
 
