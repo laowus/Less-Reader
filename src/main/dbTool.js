@@ -1,6 +1,7 @@
 const path = require('path')
 const { app } = require('electron')
 const sqlite3 = require('sqlite3').verbose()
+const fs = require('fs');
 
 let db
 // 获取数据库文件路径
@@ -57,17 +58,33 @@ const initDatabase = () => {
     console.log('Database path:', dbPath);
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            db = new sqlite3.Database(dbPath, (err) => {
+            // 检查数据库文件是否存在
+            fs.access(dbPath, fs.constants.F_OK, (err) => {
                 if (err) {
-                    console.error(err.message);
-                    reject(err);
+                    console.log('Database file does not exist. Creating a new one.');
+                    db = new sqlite3.Database(dbPath, (err) => {
+                        if (err) {
+                            console.error(err.message);
+                            reject(err);
+                        } else {
+                            console.log('Connected to the SQLite database.');
+                            createTable();
+                            resolve();
+                        }
+                    });
                 } else {
-                    console.log('Connected to the SQLite database.');
-                    createTable();
-                    resolve();
+                    console.log('Database file already exists.');
+                    db = new sqlite3.Database(dbPath, (err) => {
+                        if (err) {
+                            console.error(err.message);
+                            reject(err);
+                        } else {
+                            console.log('Connected to the existing SQLite database.');
+                            resolve();
+                        }
+                    });
                 }
             });
-
         }, 1000); // 等待1秒
     });
 }
@@ -89,9 +106,21 @@ const insertBook = (book, event) => {
 
 }
 
+const selectAllBook = (event) => {
+    db.all(`SELECT * FROM tb_books`, (err, rows) => {
+        if (err) {
+            console.error(err.message);
+            event.reply('db-select-book-response', { success: false });
+        } else {
+            // console.log('Data selected:', rows);
+            event.reply('db-select-book-response', { success: true, data: rows });
+        }
+    })
+}
 
 //导出
 module.exports = {
     initDatabase,
-    insertBook
+    insertBook,
+    selectAllBook
 }

@@ -73,56 +73,36 @@ const getMd5WithBrowser = async (file) => {
 // 1.判断是否存在,每本书都有一个特定的md5,假如md5和文件大小一致,即为重复书籍
 // 2. 不重复, 获取书籍信息,书名/作者/封面cover(封面cover为base64的字符串)等
 // 
-const handleBook = (file, md5) => {
+const handleBook = async (file, md5) => {
     let extension = (file.name).split(".").reverse()[0].toLocaleLowerCase();
     let bookName = file.name.substr(0, file.name.length - extension.length - 1);
-    let result;
-    return new Promise((resolve, reject) => {
-        let isRepeat = false;
-        if (booklist.value.length > 0) {
-            booklist.value.forEach((item) => {
-                if (item.md5 === md5 && item.size === file.size) {
-                    isRepeat = true;
-                    ElMessage.error('<<' + bookName + '>> 已经存在!');
-                    return resolve();
-                }
-            });
-        }
-        if (!isRepeat) {
-            let reader = new FileReader();
-            reader.readAsArrayBuffer(file);
-            reader.onload = async (e) => {
-                if (!e.target) {
-                    ElMessage.error(' <<' + bookName + '>> 导入失败!');
-                    return resolve();
-                }
-                let reader = new FileReader();
-                reader.onload = async (event) => {
-                    const file_content = event.target.result;
-                    try {
-                        result = await BookUtil.generateBook(bookName, extension, md5, file.size, file.path || clickFilePath, file);
-                    } catch (error) {
-                        console.log(error);
-                        throw error;
-                    }
-                    clickFilePath = "";
-                    if (result === "get_metadata_error") {
-                        ElMessage.error('导入 <<' + bookName + '>> 失败!');
-                        return resolve();
-                    }
-                    await handleAddBook(result, file_content);
-                    return resolve();
-                }
-                reader.readAsArrayBuffer(file);
+    let isRepeat = false;
+    if (booklist.value.length > 0) {
+        booklist.value.forEach((item) => {
+            if (item.md5 === md5 && item.size === file.size) {
+                isRepeat = true;
+                ElMessage.error('<<' + bookName + '>> 已经存在!');
+                return resolve();
             }
+        });
+    }
+    if (!isRepeat) {
+        try {
+            const book = await BookUtil.generateBook(bookName, extension, md5, file.size, file.path || clickFilePath, file);
+            await handleAddBook(book);
+        } catch (error) {
+            console.log(error);
         }
-    })
+
+    }
+
+
 }
 // 添加数据操作. 复制书籍到用户文件夹/upload/book下
 // 复制数据信息到IndexDb中
-const handleAddBook = (book, buffer) => {
+const handleAddBook = (book) => {
     return new Promise((resolve, reject) => {
-        BookUtil.addBook(book.key, buffer);//复制文件
+        BookUtil.addBook(book);//复制文件
         ipcRenderer.send('db-insert-book', book);
         booklist.value.push(book);
         const books = toRaw(booklist.value);
@@ -145,7 +125,15 @@ const unSelectBook = (book) => {
     selectedBooks.value = selectedBooks.value.filter((item) => item !== book);
 }
 const loadContent = () => {
+    ipcRenderer.once("db-select-book-response", (items) => {
+        console.log("items", items);
+        if (items && items.length > 0) {
+
+        }
+    });
+    ipcRenderer.send("db-get-books");
     localforage.getItem("books").then((books) => {
+        console.log("books", books);
         booklist.value = books ? books : [];
     });
 }

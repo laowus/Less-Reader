@@ -2,41 +2,15 @@
 import { makeBook } from '../../libs/view'
 import Book from '../../models/Book';
 import { ElMessage } from 'element-plus';
+const { ipcRenderer } = window.require('electron');
 
 class BookUtil {
-    static fs = window.require("fs");
-    static path = window.require("path");
-    static dataPath = localStorage.getItem("storageLocation")
-        ? localStorage.getItem("storageLocation")
-        : window.require("electron")
-            .ipcRenderer.sendSync("storage-location", "ping");
-    static ipcRenderer = window.require("electron").ipcRenderer;
-    static bookDir = this.path.join(this.dataPath, "book");
+    static bookDir = localStorage.getItem("bookPath")
+        ? localStorage.getItem("bookPath")
+        : ipcRenderer.sendSync("get-book-path", "ping");
 
-    static addBook(key, buffer) {
-        return new Promise((resolve, reject) => {
-            var reader = new FileReader();
-            reader.readAsArrayBuffer(new Blob([buffer]));
-            reader.onload = async (event) => {
-                if (!event.target) return;
-                try {
-                    if (!this.fs.existsSync(this.bookDir)) {
-                        this.fs.mkdirSync(this.bookDir);
-                    }
-                    this.fs.writeFileSync(
-                        this.path.join(this.bookDir, key),
-                        Buffer.from(event.target.result)
-                    );
-                    resolve();
-                } catch (error) {
-                    reject();
-                    throw error;
-                }
-            }
-            reader.onerror = () => {
-                reject();
-            };
-        })
+    static addBook(book) {
+        ipcRenderer.sendSync('copy-book', book.toMap());
     }
 
     static deleteAllFiles() {
@@ -52,15 +26,15 @@ class BookUtil {
     }
 
     static deleteFolderRecursive(folderPath) {
-        if (this.fs.existsSync(folderPath)) {
-            this.fs.readdirSync(folderPath)
+        if (fs.existsSync(folderPath)) {
+            fs.readdirSync(folderPath)
                 .forEach((file, index) => {
                     var curPath = this.path.join(folderPath, file);
-                    if (this.fs.lstatSync(curPath).isDirectory()) { // recurse
+                    if (fs.lstatSync(curPath).isDirectory()) { // recurse
                         console.log("是一个文件夹");
                         this.deleteFolderRecursive(curPath);
                     } else { // delete file
-                        this.fs.unlinkSync(curPath);
+                        fs.unlinkSync(curPath);
                     }
                 });
             //this.fs.rmdirSync(folderPath);
@@ -72,11 +46,11 @@ class BookUtil {
             try {
                 const curPath = this.path.join(this.bookDir, book.key);
                 console.log(curPath);
-                if (this.fs.existsSync(curPath)) {
-                    if (this.fs.lstatSync(curPath).isDirectory()) { // recurse
+                if (fs.existsSync(curPath)) {
+                    if (fs.lstatSync(curPath).isDirectory()) { // recurse
                         this.deleteFolderRecursive(curPath);
                     } else { // delete file
-                        this.fs.unlinkSync(curPath);
+                        fs.unlinkSync(curPath);
                     }
                     resolve('文件删除成功!');
                 } else {
@@ -124,15 +98,16 @@ class BookUtil {
 
     }
 
+
     static isBookExist(key, bookPath) {
         return new Promise((resolve, reject) => {
             //获取书籍目录位置
-            const storePath = this.ipcRenderer.sendSync("storage-location", "ping");
-            let _bookPath = this.path.join(localStorage.getItem("storageLocation") ? localStorage.getItem("storageLocation")
+            const storePath = ipcRenderer.sendSync("storage-location", "ping");
+            let _bookPath = path.join(localStorage.getItem("storageLocation") ? localStorage.getItem("storageLocation")
                 : storePath, `book`, key);
             console.log(_bookPath);
-            if ((bookPath && this.fs.existsSync(bookPath)) ||
-                this.fs.existsSync(_bookPath)) {
+            if ((bookPath && fs.existsSync(bookPath)) ||
+                fs.existsSync(_bookPath)) {
                 resolve(true);
             } else {
                 resolve(false);
@@ -147,7 +122,7 @@ class BookUtil {
             return;
         }
         let ref = book.format.toLowerCase();
-        this.ipcRenderer.invoke("open-book", {
+        ipcRenderer.invoke("open-book", {
             url: `${window.location.href.split("#")[0]}#/read/${book.key}`
         });
     }

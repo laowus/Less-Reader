@@ -1,13 +1,10 @@
 const { app, BrowserWindow, ipcMain, Menu, shell, Tray, } = require('electron')
 const { isWinOS, isDevEnv, APP_ICON } = require('./env')
-const { initDatabase, insertBook } = require('./dbTool')
-const fs = require('fs');
+const { initDatabase, insertBook, selectAllBook } = require('./dbTool')
 const path = require('path')
 
 const Store = require("electron-store");
 const store = new Store();
-const configDir = app.getPath("userData");
-const dirPath = path.join(configDir, "uploads");
 
 let resourcesRoot = path.resolve(app.getAppPath());
 let publicRoot = path.join(__dirname, '../../public')
@@ -102,9 +99,7 @@ const registryGlobalListeners = () => {
 
 //创建浏览窗口
 const createWindow = () => {
-
     const mainWindow = new BrowserWindow(options);
-
     if (isDevEnv) {
         mainWindow.loadURL("http://localhost:7000/")
     } else {
@@ -172,14 +167,6 @@ const setAppWindowZoom = (value, noResize) => {
 }
 
 
-ipcMain.on("user-data", (event, arg) => {
-    event.returnValue = dirPath;
-})
-
-ipcMain.on("storage-location", (event, arg) => {
-    event.returnValue = path.join(dirPath, "data");//获取
-});
-
 ipcMain.handle("open-book", (event, config) => {
     let { url } = config;
     console.log(url)
@@ -213,6 +200,14 @@ ipcMain.handle("open-book", (event, config) => {
 ipcMain.on('db-insert-book', (event, book) => {
     insertBook(book, event);
 });
+
+ipcMain.on("db-get-books", (event, arg) => {
+    selectAllBook(event);
+});
+
+
+const fileHandle = require('./ipcHandlers/fileHandle');
+fileHandle();
 
 //启动应用
 startup()
