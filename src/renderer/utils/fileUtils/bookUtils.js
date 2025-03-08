@@ -71,6 +71,7 @@ class BookUtil {
             try {
                 let coverString = "";
                 let cover = "";
+                let frompath = path;
                 let key, name, author, publisher, description, charset, page;
                 [name, author, description, publisher, charset, page] = [
                     bookName, "Unknown author", "", "", "", 0];
@@ -84,7 +85,7 @@ class BookUtil {
                     meta.title || bookName, meta.author || "Unknown author",
                     meta.description || "", meta.publisher || "", meta.cover || ""
                 ];
-                let format = extension.toUpperCase();
+                let format = extension.toLowerCase();
                 key = new Date().getTime() + "";
                 if (extension === "epub" && coverString.indexOf("image") === -1) {
                     coverString = ""
@@ -93,8 +94,9 @@ class BookUtil {
                     cover = this.getCoverPath(key, name);
                     await this.saveCoverToLocal(coverString, cover);
                 }
+                path = this.getBookPath(key, name, format);
                 resolve(
-                    new Book(key, name, author, description, md5, cover, format, publisher, size, page, path, charset)
+                    new Book(key, name, author, description, md5, cover, format, publisher, size, page, frompath, path, charset)
                 );
             } catch (error) {
                 console.log(error);
@@ -102,6 +104,14 @@ class BookUtil {
             }
         });
 
+    }
+    static getBookPath = (key, name, format) => {
+        // 获取保存路径，这里假设使用默认的书籍目录
+        const bookDir = localStorage.getItem("bookPath")
+            ? localStorage.getItem("bookPath")
+            : ipcRenderer.sendSync("get-book-path", "ping");
+
+        return path.join(bookDir, key + name + "." + format);
     }
 
     static getCoverPath = (key, name) => {
@@ -131,13 +141,9 @@ class BookUtil {
     }
 
 
-    static isBookExist(key, bookPath) {
+    static isBookExist(bookPath) {
         return new Promise((resolve, reject) => {
             //获取书籍目录位置
-            const storePath = ipcRenderer.sendSync("storage-location", "ping");
-            let _bookPath = path.join(localStorage.getItem("storageLocation") ? localStorage.getItem("storageLocation")
-                : storePath, `book`, key);
-            console.log(_bookPath);
             if ((bookPath && fs.existsSync(bookPath)) ||
                 fs.existsSync(_bookPath)) {
                 resolve(true);
@@ -149,13 +155,12 @@ class BookUtil {
     }
 
     static async RedirectBook(book) {
-        if (!this.isBookExist(book.key, book.path)) {
+        if (!this.isBookExist(book.path)) {
             ElMessage.error('<<' + book.name + '>> 不存在,或已经删除!');
             return;
         }
-        let ref = book.format.toLowerCase();
         ipcRenderer.invoke("open-book", {
-            url: `${window.location.href.split("#")[0]}#/read/${book.key}`
+            url: `${window.location.href.split("#")[0]}#/read/${book.key}`,
         });
     }
 

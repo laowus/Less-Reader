@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import EmptyCover from './EmptyCover.vue'
 import BookUtil from '../utils/fileUtils/bookUtils'
 

@@ -123,16 +123,10 @@ const unSelectBook = (book) => {
     selectedBooks.value = selectedBooks.value.filter((item) => item !== book);
 }
 const loadContent = () => {
-    // ipcRenderer.once("db-select-book-response", (items) => {
-
-    //     if (items && items.length > 0) {
-
-    //     }
-    // });
-    // ipcRenderer.send("db-get-books");
-    localforage.getItem("books").then((books) => {
-        booklist.value = books ? books : [];
+    ipcRenderer.once("db-select-book-response", (event, items) => {
+        booklist.value = items.data.length > 0 ? items.data : [];
     });
+    ipcRenderer.send("db-get-books");
 }
 
 onMounted(() => {

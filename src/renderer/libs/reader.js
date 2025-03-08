@@ -238,37 +238,37 @@ class Reader {
         }
 
         // load and show highlights embedded in the file by Calibre
-        const bookmarks = await book.getCalibreBookmarks?.()
-        if (bookmarks) {
-            const { fromCalibreHighlight } = await import('./tools/epubcfi.js')
-            for (const obj of bookmarks) {
-                if (obj.type === 'highlight') {
-                    const value = fromCalibreHighlight(obj)
-                    const color = obj.style.which
-                    const note = obj.notes
-                    const annotation = { value, color, note }
-                    const list = this.annotations.get(obj.spine_index)
-                    if (list) list.push(annotation)
-                    else this.annotations.set(obj.spine_index, [annotation])
-                    this.annotationsByValue.set(value, annotation)
-                }
-            }
-            this.view.addEventListener('create-overlay', e => {
-                const { index } = e.detail
-                const list = this.annotations.get(index)
-                if (list) for (const annotation of list)
-                    this.view.addAnnotation(annotation)
-            })
-            this.view.addEventListener('draw-annotation', e => {
-                const { draw, annotation } = e.detail
-                const { color } = annotation
-                draw(Overlayer.highlight, { color })
-            })
-            this.view.addEventListener('show-annotation', e => {
-                const annotation = this.annotationsByValue.get(e.detail.value)
-                if (annotation.note) alert(annotation.note)
-            })
-        }
+        // const bookmarks = await book.getCalibreBookmarks?.()
+        // if (bookmarks) {
+        //     const { fromCalibreHighlight } = await import('./tools/epubcfi.js')
+        //     for (const obj of bookmarks) {
+        //         if (obj.type === 'highlight') {
+        //             const value = fromCalibreHighlight(obj)
+        //             const color = obj.style.which
+        //             const note = obj.notes
+        //             const annotation = { value, color, note }
+        //             const list = this.annotations.get(obj.spine_index)
+        //             if (list) list.push(annotation)
+        //             else this.annotations.set(obj.spine_index, [annotation])
+        //             this.annotationsByValue.set(value, annotation)
+        //         }
+        //     }
+        //     this.view.addEventListener('create-overlay', e => {
+        //         const { index } = e.detail
+        //         const list = this.annotations.get(index)
+        //         if (list) for (const annotation of list)
+        //             this.view.addAnnotation(annotation)
+        //     })
+        //     this.view.addEventListener('draw-annotation', e => {
+        //         const { draw, annotation } = e.detail
+        //         const { color } = annotation
+        //         draw(Overlayer.highlight, { color })
+        //     })
+        //     this.view.addEventListener('show-annotation', e => {
+        //         const annotation = this.annotationsByValue.get(e.detail.value)
+        //         if (annotation.note) alert(annotation.note)
+        //     })
+        // }
     }
 
     setView(view) {
@@ -364,6 +364,7 @@ class Reader {
         if (tocItem?.label) $('#chapter-title').innerText = tocItem?.label
         if (tocItem?.href) this.#tocView?.setCurrentHref?.(tocItem.href)
         //保存到当前阅读记录到localstorage中
+        EventBus.emit('updateBook', { key: this.bookKey, currentChapter: tocItem?.label, readingPercentage: percent, lastReadPosition: cfi });
         RecordLocation.recordHtmlLocation(this.bookKey, tocItem?.label, percent, cfi)
     }
 }

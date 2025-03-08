@@ -3,27 +3,33 @@ import { onMounted, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import BottomBar from '../components/BottomBar.vue';
 import PopoversCtl from '../components/PopoversCtl.vue';
-import localforage from 'localforage';
-import RecordLocation from '../utils/readUtils/recordLocation.js';
 import StyleUtil from '../utils/readUtils/styleUtil.js'
 import { open, setStyle } from '../libs/reader.js';
 const { ipcRenderer } = window.require('electron');
+import EventBus from '../../common/EventBus';
 const route = useRoute();
 const bookKey = route.params.key;
 let detail;
 const bookStyle = reactive({});
 onMounted(() => {
     Object.assign(bookStyle, StyleUtil.getStyle());
-    detail = RecordLocation.getCfi(bookKey);
-    localforage.getItem("books").then((result) => {
-        let book = result.find(item => item.key === bookKey);
-        if (book.path) open(book.path, bookKey, detail.cfi, bookStyle).catch(e => console.error(e))
+    ipcRenderer.once('db-get-book-response', (event, items) => {
+        detail = items.data[0];
+        console.log(detail);
+        if (detail.path) open(detail.path, detail.key, detail.cfi, bookStyle).catch(e => console.error(e))
     });
+    ipcRenderer.send('db-get-book', bookKey);
 });
 
 const handleClose = () => {
     ipcRenderer.send('window-close');
 }
+
+EventBus.on('updateBook', (bookRecord) => {
+    //获取当前的book
+    const newBook = { ...detail, ...bookRecord };
+    ipcRenderer.send('db-update-book', newBook);
+});
 
 </script>
 

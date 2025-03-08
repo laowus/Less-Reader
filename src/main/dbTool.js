@@ -1,12 +1,15 @@
 const path = require('path')
-const { app } = require('electron')
-const sqlite3 = require('sqlite3').verbose()
+const { app, ipcMain } = require('electron')
 const fs = require('fs');
-
+const sqlite3 = require('sqlite3').verbose()
+const bookData = path.join(app.getPath('userData'), 'bookdata');
+const { ensureDirectoryExists } = require('./common');
 let db
+
 // 获取数据库文件路径
 const getDatabasePath = () => {
-    return path.join(app.getPath('userData'), 'database.db');
+    ensureDirectoryExists(bookData);
+    return path.join(bookData, 'database.db');
 }
 
 // 创建数据库表
@@ -24,8 +27,12 @@ const createTable = () => {
             publisher TEXT,
             size INTEGER,   
             page INTEGER,
+            frompath TEXT,
             path TEXT,
-            charset TEXT
+            charset TEXT,
+            lastReadPosition TEXT,
+            readingPercentage TEXT,
+            currentChapter TEXT
         )
     `, (err) => {
         if (err) {
@@ -91,9 +98,9 @@ const initDatabase = () => {
 
 const insertBook = (book, event) => {
     db.run(`
-    INSERT INTO tb_books (key, name, author, description, md5, cover, format, publisher, size, page, path, charset) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [book.key, book.name, book.author, book.description, book.md5, book.cover, book.format, book.publisher, book.size, book.page, book.path, book.charset], function (err) {
+    INSERT INTO tb_books (key, name, author, description, md5, cover, format, publisher, size, page, frompath, path, charset) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [book.key, book.name, book.author, book.description, book.md5, book.cover, book.format, book.publisher, book.size, book.page, book.frompath, book.path, book.charset], function (err) {
         if (err) {
             console.error(err.message);
             event.reply('db-insert-book-response', { success: false });
@@ -111,15 +118,79 @@ const selectAllBook = (event) => {
             console.error(err.message);
             event.reply('db-select-book-response', { success: false });
         } else {
-            // console.log('Data selected:', rows);
+            //console.log('Data selected:', rows);
             event.reply('db-select-book-response', { success: true, data: rows });
         }
     })
 }
 
+const getBookByKey = (key, event) => {
+
+    db.all(`SELECT * FROM tb_books WHERE key = ?`, [key], (err, rows) => {
+        if (err) {
+            console.error(err.message);
+            event.reply('db-get-book-response', { success: false });
+        } else {
+            console.log('getBookByKey:', key);
+            console.log('Data selgetBookByKey:', rows);
+            event.reply('db-get-book-response', { success: true, data: rows });
+        }
+    });
+}
+
+const updateBook = (book, event) => {
+    db.run(`
+        UPDATE tb_books 
+        SET name = ?, 
+            author = ?, 
+            description = ?, 
+            md5 = ?, 
+            cover = ?, 
+            format = ?, 
+            publisher = ?, 
+            size = ?, 
+            page = ?, 
+            frompath = ?, 
+            path = ?, 
+            charset = ?, 
+            lastReadPosition = ?, 
+            readingPercentage = ? ,
+            currentChapter = ?
+            
+        WHERE key = ?
+    `, [
+        book.name,
+        book.author,
+        book.description,
+        book.md5,
+        book.cover,
+        book.format,
+        book.publisher,
+        book.size,
+        book.page,
+        book.frompath,
+        book.path,
+        book.charset,
+        book.lastReadPosition,
+        book.readingPercentage,
+        book.currentChapter,
+        book.key
+    ], function (err) {
+        if (err) {
+            console.error('Failed to update book:', err.message);
+            event.reply('db-update-book-response', { success: false, error: err.message });
+        } else {
+            console.log('Book updated with id:', this.lastID);
+            event.reply('db-update-book-response', { success: true, id: this.lastID });
+        }
+    });
+};
+
 //导出
 module.exports = {
     initDatabase,
     insertBook,
-    selectAllBook
-}
+    selectAllBook,
+    getBookByKey,
+    updateBook
+};

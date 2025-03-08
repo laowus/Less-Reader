@@ -1,10 +1,9 @@
 const { app, BrowserWindow, ipcMain, Menu, shell, Tray, } = require('electron')
 const { isWinOS, isDevEnv, APP_ICON } = require('./env')
-const { initDatabase, insertBook, selectAllBook } = require('./dbTool')
 const path = require('path')
-
 const Store = require("electron-store");
 const store = new Store();
+const { initDatabase } = require('./dbTool')
 
 let resourcesRoot = path.resolve(app.getAppPath());
 let publicRoot = path.join(__dirname, '../../public')
@@ -13,6 +12,11 @@ if (!isDevEnv) {
     resourcesRoot = path.dirname(resourcesRoot);
     publicRoot = path.join(__dirname, '../../dist')
 }
+//ipc处理
+const fileHandle = require('./ipcHandlers/fileHandle');
+const dbHandle = require('./ipcHandlers/dbHandle');
+fileHandle();
+dbHandle();
 
 let mainWin = null, readerWindow, tray = null
 let options = {
@@ -35,8 +39,12 @@ const startup = () => {
 
 const init = () => {
     app.whenReady().then(async () => {
-        await initDatabase()
-        mainWin = createWindow()
+        try {
+            await initDatabase();
+            mainWin = createWindow();
+        } catch (error) {
+            console.error('Failed to initialize database:', error);
+        }
     })
 
     app.on('activate', (event) => {
@@ -196,18 +204,6 @@ ipcMain.handle("open-book", (event, config) => {
     event.returnValue = "success";
 });
 
-// 监听渲染进程对sqlite3的操作
-ipcMain.on('db-insert-book', (event, book) => {
-    insertBook(book, event);
-});
-
-ipcMain.on("db-get-books", (event, arg) => {
-    selectAllBook(event);
-});
-
-
-const fileHandle = require('./ipcHandlers/fileHandle');
-fileHandle();
 
 //启动应用
 startup()
