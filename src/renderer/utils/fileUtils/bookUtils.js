@@ -44,31 +44,32 @@ class BookUtil {
     }
 
     static delBook(book) {
+        this.delFile(book.cover);
+        this.delFile(book.path);
+    }
+
+    static delFile(file) {
         return new Promise((resolve, reject) => {
             try {
-                const curPath = this.path.join(this.bookDir, book.key);
-                console.log(curPath);
-                if (fs.existsSync(curPath)) {
-                    if (fs.lstatSync(curPath).isDirectory()) { // recurse
-                        this.deleteFolderRecursive(curPath);
+                if (fs.existsSync(file)) {
+                    if (fs.lstatSync(file).isDirectory()) { // recurse
+                        this.deleteFolderRecursive(file);
                     } else { // delete file
-                        fs.unlinkSync(curPath);
+                        fs.unlinkSync(file);
                     }
                     resolve('文件删除成功!');
-                } else {
-                    reject("文件不存在");
                 }
             } catch (error) {
                 reject("文件删除错误");
                 throw error;
             }
         });
-
     }
 
     static generateBook(bookName, extension, md5, size, path, file) {
         return new Promise(async (resolve, reject) => {
             try {
+                let id = 0
                 let coverString = "";
                 let cover = "";
                 let frompath = path;
@@ -96,7 +97,7 @@ class BookUtil {
                 }
                 path = this.getBookPath(key, name, format);
                 resolve(
-                    new Book(key, name, author, description, md5, cover, format, publisher, size, page, frompath, path, charset)
+                    new Book(0, key, name, author, description, md5, cover, format, publisher, size, page, frompath, path, charset)
                 );
             } catch (error) {
                 console.log(error);
@@ -160,7 +161,7 @@ class BookUtil {
             return;
         }
         ipcRenderer.invoke("open-book", {
-            url: `${window.location.href.split("#")[0]}#/read/${book.key}`,
+            url: `${window.location.href.split("#")[0]}#/read/${book.id}`,
         });
     }
 

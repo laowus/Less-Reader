@@ -241,7 +241,6 @@ export class View extends HTMLElement {
             || typeof book.arrayBuffer === 'function'
             || book.isDirectory) book = await makeBook(book)
         this.book = book
-        console.log(book)
         this.language = languageInfo(book.metadata?.language)
 
         if (book.splitTOCHref && book.getTOCFragment) {
@@ -384,7 +383,6 @@ export class View extends HTMLElement {
 
             let { clientX, clientY } = e
             // add top margin to y, y is relative to the iframe
-            console.log(this.renderer)
             // const topMargin = this.renderer.getAttribute('margin').match(/\d+/)[0]
             // clientY += parseInt(topMargin)
 

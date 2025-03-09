@@ -43,14 +43,12 @@ const createTable = () => {
     db.run(`
        CREATE TABLE tb_notes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            book_id INTEGER,
+            bookId INTEGER,
             content TEXT,
-            cfi TEXT,
             chapter TEXT,
             type TEXT,
-            color TEXT,
-            create_time TEXT,
-            update_time TEXT
+            color TEXT, 
+            cfi TEXT
         )
     `, (err) => {
         if (err) {
@@ -124,14 +122,14 @@ const selectAllBook = (event) => {
     })
 }
 
-const getBookByKey = (key, event) => {
+const getBookByKey = (bookId, event) => {
 
-    db.all(`SELECT * FROM tb_books WHERE key = ?`, [key], (err, rows) => {
+    db.all(`SELECT * FROM tb_books WHERE id = ?`, [bookId], (err, rows) => {
         if (err) {
             console.error(err.message);
             event.reply('db-get-book-response', { success: false });
         } else {
-            console.log('getBookByKey:', key);
+            console.log('getbookId:', bookId);
             console.log('Data selgetBookByKey:', rows);
             event.reply('db-get-book-response', { success: true, data: rows });
         }
@@ -157,7 +155,7 @@ const updateBook = (book, event) => {
             readingPercentage = ? ,
             currentChapter = ?
             
-        WHERE key = ?
+        WHERE id = ?
     `, [
         book.name,
         book.author,
@@ -174,7 +172,7 @@ const updateBook = (book, event) => {
         book.lastReadPosition,
         book.readingPercentage,
         book.currentChapter,
-        book.key
+        book.id
     ], function (err) {
         if (err) {
             console.error('Failed to update book:', err.message);
@@ -184,7 +182,27 @@ const updateBook = (book, event) => {
             event.reply('db-update-book-response', { success: true, id: this.lastID });
         }
     });
+
+
 };
+
+const deleteBook = (id, event) => {
+    console.log("delboo", id);
+    db.run(`DELETE FROM tb_books WHERE id = ?`, [id], function (err) {
+        if (err) {
+            console.error('Failed to delete book:', err.message);
+            event.reply('db-delete-book-response', { success: false, error: err.message });
+        } else {
+            if (this.changes > 0) {
+                console.log('Book deleted with id:', id);
+                event.reply('db-delete-book-response', { success: true, id: id });
+            } else {
+                console.log('No book was deleted with id:', id);
+                event.reply('db-delete-book-response', { success: false, error: 'No book deleted' });
+            }
+        }
+    })
+}
 
 //导出
 module.exports = {
@@ -192,5 +210,6 @@ module.exports = {
     insertBook,
     selectAllBook,
     getBookByKey,
-    updateBook
+    updateBook,
+    deleteBook
 };

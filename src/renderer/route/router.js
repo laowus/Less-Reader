@@ -19,7 +19,7 @@ const routes = [
             }
         ]
     }, {
-        path: '/read/:key',
+        path: '/read/:id',
         component: Read
     }
 ]

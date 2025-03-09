@@ -184,7 +184,7 @@ const footnoteDialog = document.getElementById('footnote-dialog')
 
 
 class Reader {
-    bookKey
+    bookId
     #tocView
     bookStyle
     annotations = new Map()
@@ -198,8 +198,8 @@ class Reader {
     constructor() {
         $('#dimming-overlay').addEventListener('click', () => this.closeSideBar())
     }
-    async open(file, bookKey, cfi) {
-        this.bookKey = bookKey
+    async open(file, bookId, cfi) {
+        this.bookId = bookId
         this.view = document.createElement('foliate-view')
         document.body.append(this.view)
         await this.view.open(file)
@@ -291,7 +291,7 @@ class Reader {
     }
 
     renderAnnotation() {
-        this.bookmarks = BookNoteUtil.getBookNote(this.bookKey) ?? []
+        this.bookmarks = BookNoteUtil.getBookNote(this.bookId) ?? []
         for (const bookmark of this.bookmarks) {
             const { value, type, color, note } = bookmark
             const annotation = {
@@ -364,12 +364,12 @@ class Reader {
         if (tocItem?.label) $('#chapter-title').innerText = tocItem?.label
         if (tocItem?.href) this.#tocView?.setCurrentHref?.(tocItem.href)
         //保存到当前阅读记录到localstorage中
-        EventBus.emit('updateBook', { key: this.bookKey, currentChapter: tocItem?.label, readingPercentage: percent, lastReadPosition: cfi });
-        RecordLocation.recordHtmlLocation(this.bookKey, tocItem?.label, percent, cfi)
+        EventBus.emit('updateBook', { id: this.bookId, currentChapter: tocItem?.label, readingPercentage: percent, lastReadPosition: cfi });
+        // RecordLocation.recordHtmlLocation(this.bookKey, tocItem?.label, percent, cfi)
     }
 }
 
-export const open = async (file, bookKey, cfi, bookStyle) => {
+export const open = async (file, bookId, cfi, bookStyle) => {
     //初始化样式
     style = bookStyle || {
         fontSize: 1.0, lineHeight: 1.8, letterSpacing: 2.0, wordSpacing: 2.0,
@@ -377,7 +377,7 @@ export const open = async (file, bookKey, cfi, bookStyle) => {
     };
     const reader = new Reader();
     globalThis.reader = reader;
-    await reader.open(file, bookKey, cfi);
+    await reader.open(file, bookId, cfi);
     reader.renderAnnotation();
 }
 

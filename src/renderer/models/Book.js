@@ -1,6 +1,7 @@
 export default class Book {
-    constructor(key, name, author, description, md5, cover, format,
+    constructor(id, key, name, author, description, md5, cover, format,
         publisher, size, page, frompath, path, charset, lastReadPosition = "", readingPercentage = "0", currentChapter = "") {
+        this.id = id;
         this.key = key;
         this.name = name;
         this.author = author;
@@ -40,6 +41,7 @@ export default class Book {
 
     toMap() {
         return {
+            id: this.id,
             key: this.key,
             name: this.name,
             author: this.author,

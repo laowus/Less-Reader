@@ -1,21 +1,21 @@
 export default class BookNote {
-    constructor(id, bookKey, color, note, type, value) {
+    constructor(id, bookId, color, note, type, cfi) {
         this.id = id;
-        this.bookKey = bookKey;
+        this.bookId = bookId;
         this.color = color;
         this.note = note;
         this.type = type;
-        this.value = value;
+        this.cfi = cfi;
     }
 
     toMap() {
         return {
             id: this.id,
-            bookKey: this.bookKey,
+            bookId: this.bookId,
             color: this.color,
             note: this.note,
             type: this.type,
-            value: this.value
+            cfi: this.cfi
         }
     }
 }

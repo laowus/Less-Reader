@@ -34,20 +34,32 @@ const handleRemove = (file, uploadFiles) => {
 }
 
 //删除选中的书籍
-const delSelectBooks = () => {
+const delSelectBooks = async () => {
     if (selectedBooks.value.length > 0) {
-        selectedBooks.value.forEach((item) => {
-            return new Promise((resolve, reject) => {
-                BookUtil.delBook(item);//删除文件
-                const index = booklist.value.findIndex((book) => book.key === item.key);
-                if (index !== -1) {
-                    booklist.value.splice(index, 1);
-                    ElMessage.success('删除' + item.name + '成功!');
-                }
-            });
-        });
-        const books = toRaw(booklist.value);
-        localforage.setItem("books", books);
+        for (const item of selectedBooks.value) {
+            try {
+                await new Promise((resolve, reject) => {
+                    ipcRenderer.once("db-delete-book-response", (event, res) => {
+                        if (res.success) {
+                            ElMessage.success('删除' + item.name + '成功!');
+                            // 更新本地状态
+                            booklist.value = booklist.value.filter((book) => book.id !== item.id);
+                            resolve();
+                        } else {
+                            ElMessage.error('删除' + item.name + '失败!');
+                            reject(new Error('Delete failed'));
+                        }
+                    });
+                    ipcRenderer.send('db-delete-book', item.id);
+                });
+
+                // 删除文件
+                BookUtil.delBook(item);
+            } catch (error) {
+                console.error('Failed to delete book:', error.message);
+            }
+        }
+        // 清空选中的书籍列表
         selectedBooks.value = [];
         confirmVisible.value = false;
     }
@@ -101,16 +113,18 @@ const handleBook = async (file, md5) => {
 const handleAddBook = (book) => {
     return new Promise((resolve, reject) => {
         BookUtil.addBook(book);//复制文件
-        ipcRenderer.send('db-insert-book', book);
-        booklist.value.push(book);
-        const books = toRaw(booklist.value);
-        localforage.setItem("books", books).then(() => {
-            ElMessage.success('导入 <<' + book.name + '>> 成功!');
-            filelistRef.value = []
-            dialogFormVisible.value = false
-        }).catch(() => {
-            ElMessage.error('导入 <<' + book.name + '>> 失败!');
+        ipcRenderer.once("db-insert-book-response", (event, res) => {
+            console.log(res);
+            if (res.success) {
+                booklist.value.push(book);
+                ElMessage.success('导入 <<' + book.name + '>> 成功!');
+                filelistRef.value = []
+                dialogFormVisible.value = false
+            } else {
+                ElMessage.error('导入 <<' + book.name + '>> 失败!');
+            }
         });
+        ipcRenderer.send('db-insert-book', book);
         return resolve();
     })
 }
@@ -124,6 +138,7 @@ const unSelectBook = (book) => {
 }
 const loadContent = () => {
     ipcRenderer.once("db-select-book-response", (event, items) => {
+        console.log(items);
         booklist.value = items.data.length > 0 ? items.data : [];
     });
     ipcRenderer.send("db-get-books");

@@ -8,17 +8,18 @@ import { open, setStyle } from '../libs/reader.js';
 const { ipcRenderer } = window.require('electron');
 import EventBus from '../../common/EventBus';
 const route = useRoute();
-const bookKey = route.params.key;
+const bookId = route.params.id;
 let detail;
 const bookStyle = reactive({});
 onMounted(() => {
+    console.log('Read.vue mounted', route.params);
     Object.assign(bookStyle, StyleUtil.getStyle());
     ipcRenderer.once('db-get-book-response', (event, items) => {
         detail = items.data[0];
         console.log(detail);
-        if (detail.path) open(detail.path, detail.key, detail.cfi, bookStyle).catch(e => console.error(e))
+        if (detail.path) open(detail.path, detail.id, detail.lastReadPosition, bookStyle).catch(e => console.error(e))
     });
-    ipcRenderer.send('db-get-book', bookKey);
+    ipcRenderer.send('db-get-book', bookId);
 });
 
 const handleClose = () => {
@@ -39,7 +40,7 @@ EventBus.on('updateBook', (bookRecord) => {
             <main></main>
         </div>
     </dialog>
-    <PopoversCtl :bookKey="bookKey"></PopoversCtl>
+    <PopoversCtl :bookId="bookId"></PopoversCtl>
     <div id="dimming-overlay" aria-hidden="true"></div>
     <div id="bottom-bar">
         <BottomBar :bookStyle="bookStyle" :setStyle="setStyle" />

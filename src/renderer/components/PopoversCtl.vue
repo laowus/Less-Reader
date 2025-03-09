@@ -2,14 +2,14 @@
 import CommonContextMenu from './CommonContextMenu.vue';
 import Highlight from './Highlight.vue';
 import EventBus from '../../common/EventBus';
-import BookNote from '../models/bookNote';
+import Note from '../models/Note';
 import { noteRefresh } from '../libs/reader.js';
 import { ref, reactive, toRaw, onMounted } from 'vue';
 import BookNoteUtil from '../utils/fileUtils/bookNoteUtil';
 import NoteStyle from '../utils/readUtils/noteStyle';
 
 const props = defineProps({
-    bookKey: String
+    bookId: String
 })
 
 const commonCtxMenuShow = ref(false);
@@ -61,7 +61,7 @@ EventBus.on("toggleUnderline", () => {
 
 const addNote = () => {
     const noteStyle = NoteStyle.getNoteStyle();
-    currentBookNote.value = new BookNote(props.bookKey, noteStyle.color, selectionRef.value.text, noteStyle.ty, selectionRef.value.cfi);
+    currentBookNote.value = new Note(props.bookId, noteStyle.color, selectionRef.value.text, noteStyle.type, selectionRef.value.cfi);
     BookNoteUtil.addBookNote(toRaw(currentBookNote.value));
     noteRefresh();
 }

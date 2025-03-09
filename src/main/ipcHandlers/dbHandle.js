@@ -1,5 +1,5 @@
 const { ipcMain } = require('electron')
-const { insertBook, selectAllBook, getBookByKey, updateBook } = require('../dbTool')
+const { insertBook, selectAllBook, getBookByKey, updateBook, deleteBook } = require('../dbTool')
 
 const dbHandle = () => {
 
@@ -11,12 +11,17 @@ const dbHandle = () => {
         selectAllBook(event);
     });
 
-    ipcMain.on("db-get-book", (event, key) => {
-        getBookByKey(key, event);
+    ipcMain.on("db-get-book", (event, bookId) => {
+        console.log("db-get-book", bookId);
+        getBookByKey(bookId, event);
     });
 
     ipcMain.on("db-update-book", (event, book) => {
         updateBook(book, event);
+    });
+
+    ipcMain.on("db-delete-book", (event, id) => {
+        deleteBook(id, event);
     });
 }
 
