@@ -187,19 +187,14 @@ const updateBook = (book, event) => {
 };
 
 const deleteBook = (id, event) => {
-    console.log("delboo", id);
+
     db.run(`DELETE FROM tb_books WHERE id = ?`, [id], function (err) {
         if (err) {
             console.error('Failed to delete book:', err.message);
             event.reply('db-delete-book-response', { success: false, error: err.message });
         } else {
-            if (this.changes > 0) {
-                console.log('Book deleted with id:', id);
-                event.reply('db-delete-book-response', { success: true, id: id });
-            } else {
-                console.log('No book was deleted with id:', id);
-                event.reply('db-delete-book-response', { success: false, error: 'No book deleted' });
-            }
+            console.log('Book deleted with id:', id);
+            event.reply('db-delete-book-response', { success: true, id: id });
         }
     })
 }

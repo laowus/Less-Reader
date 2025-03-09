@@ -17,7 +17,7 @@ let clickFilePath = "";
 //上传
 const getFiles = () => {
     if (fileList.length > 0) {
-        fileList.map(async (file) => { await getMd5WithBrowser(file.raw) })
+        fileList.map(async (file) => { await getMd5WithBrowser(file.raw) });
     }
 }
 //关闭上传弹窗
@@ -34,30 +34,21 @@ const handleRemove = (file, uploadFiles) => {
 }
 
 //删除选中的书籍
-const delSelectBooks = async () => {
+const delSelectBooks = () => {
     if (selectedBooks.value.length > 0) {
+        console.log(selectedBooks.value);
         for (const item of selectedBooks.value) {
-            try {
-                await new Promise((resolve, reject) => {
-                    ipcRenderer.once("db-delete-book-response", (event, res) => {
-                        if (res.success) {
-                            ElMessage.success('删除' + item.name + '成功!');
-                            // 更新本地状态
-                            booklist.value = booklist.value.filter((book) => book.id !== item.id);
-                            resolve();
-                        } else {
-                            ElMessage.error('删除' + item.name + '失败!');
-                            reject(new Error('Delete failed'));
-                        }
-                    });
-                    ipcRenderer.send('db-delete-book', item.id);
-                });
+            ipcRenderer.once("db-delete-book-response", (event, res) => {
+                if (res.success) {
+                    booklist.value = booklist.value.filter((book) => book.id !== item.id);
+                    BookUtil.delBook(item);
+                    ElMessage.success('删除' + item.name + '成功!');
+                } else {
+                    ElMessage.error('删除' + item.name + '失败!');
 
-                // 删除文件
-                BookUtil.delBook(item);
-            } catch (error) {
-                console.error('Failed to delete book:', error.message);
-            }
+                }
+            });
+            ipcRenderer.send('db-delete-book', item.id);
         }
         // 清空选中的书籍列表
         selectedBooks.value = [];
@@ -70,14 +61,12 @@ const getMd5WithBrowser = async (file) => {
         const md5 = await fetchMD5(file);
         if (!md5) {
             ElMessage.error(' <<' + bookName + '>> md5失败!');
-            return resolve();
         } else {
             try {
                 await handleBook(file, md5);
             } catch (error) {
                 console.log(error);
             }
-            return resolve();
         }
     })
 }
@@ -110,27 +99,32 @@ const handleBook = async (file, md5) => {
 
 // 添加数据操作. 复制书籍到用户文件夹/upload/book下
 // 复制数据信息到IndexDb中
-const handleAddBook = (book) => {
-    return new Promise((resolve, reject) => {
-        BookUtil.addBook(book);//复制文件
-        ipcRenderer.once("db-insert-book-response", (event, res) => {
-            console.log(res);
-            if (res.success) {
-                booklist.value.push(book);
-                ElMessage.success('导入 <<' + book.name + '>> 成功!');
-                filelistRef.value = []
-                dialogFormVisible.value = false
-            } else {
-                ElMessage.error('导入 <<' + book.name + '>> 失败!');
-            }
-        });
-        ipcRenderer.send('db-insert-book', book);
-        return resolve();
-    })
-}
+const handleAddBook = async (book) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            ipcRenderer.once("db-insert-book-response", (event, res) => {
+                if (res.success) {
+                    BookUtil.addBook(book); // 复制文件
+                    book.id = res.id;
+                    booklist.value.push(book);
+                    ElMessage.success(`导入 <<${book.name || '未知书名'}>> 成功!`);
+                    filelistRef.value = [];
+                    dialogFormVisible.value = false;
+                } else {
+                    ElMessage.error(`导入 <<${book.name || '未知书名'}>> 失败!`);
+                }
+                resolve();
+            });
+            ipcRenderer.send('db-insert-book', book);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
 //选中 书籍
 const selectBook = (isSelected, book) => {
     isSelected ? selectedBooks.value.push(book) : unSelectBook(book);
+    console.log(selectedBooks.value);
 }
 //取消选中
 const unSelectBook = (book) => {
@@ -145,7 +139,7 @@ const loadContent = () => {
 }
 
 onMounted(() => {
-    loadContent()
+    loadContent();
 });
 </script>
 <template>
@@ -193,6 +187,12 @@ onMounted(() => {
                 <el-icon class="el-icon--right">
                     <Upload />
                 </el-icon> 导入书籍
+            </el-button>
+            <el-button type="wanning" @click="loadContent">
+
+                <el-icon>
+                    <Refresh />
+                </el-icon>
             </el-button>
             <el-popover :visible="confirmVisible" placement="top" :width="180">
                 <ul style="font-size: 12px;">
