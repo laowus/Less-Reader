@@ -69,7 +69,6 @@ class BookUtil {
     static generateBook(bookName, extension, md5, size, path, file) {
         return new Promise(async (resolve, reject) => {
             try {
-                let id = 0
                 let coverString = "";
                 let cover = "";
                 let frompath = path;
@@ -80,7 +79,6 @@ class BookUtil {
                 /**解析文件 */
                 console.log("makeBook", file);
                 const book = await makeBook(file);
-                console.log("解析后的book", book);
                 meta = book.metadata;
                 [name, author, description, publisher, coverString] = [
                     meta.title || bookName, meta.author || "Unknown author",

@@ -1,6 +1,5 @@
 <script setup>
-import localforage from 'localforage';
-import { ref, onMounted, toRaw } from 'vue';
+import { ref, onMounted, toRaw, watch } from 'vue';
 import { fetchMD5 } from '../utils/fileUtils/md5Util';
 import BookUtil from '../utils/fileUtils/bookUtils';
 import { ElMessage } from 'element-plus';
@@ -16,9 +15,14 @@ let clickFilePath = "";
 
 //上传
 const getFiles = () => {
-    if (fileList.length > 0) {
-        fileList.map(async (file) => { await getMd5WithBrowser(file.raw) });
-    }
+    Promise.all(fileList.map(async (file) => {
+        await getMd5WithBrowser(file.raw);
+    })).then(() => {
+        console.log('getFiles');
+        loadContent(); // 所有文件处理完成后更新 bookList
+    }).catch((error) => {
+        console.error('处理文件时出错:', error);
+    });
 }
 //关闭上传弹窗
 const closeUpload = () => {
@@ -57,13 +61,17 @@ const delSelectBooks = () => {
 }
 //获取书籍md5
 const getMd5WithBrowser = async (file) => {
+    console.log('getMd5WithBrowser', file);
+    const bookName = file.name.substr(0, file.name.lastIndexOf('.'));
     return new Promise(async (resolve, reject) => {
         const md5 = await fetchMD5(file);
         if (!md5) {
             ElMessage.error(' <<' + bookName + '>> md5失败!');
+            reject();
         } else {
             try {
                 await handleBook(file, md5);
+                resolve();
             } catch (error) {
                 console.log(error);
             }
@@ -106,7 +114,7 @@ const handleAddBook = async (book) => {
                 if (res.success) {
                     BookUtil.addBook(book); // 复制文件
                     book.id = res.id;
-                    booklist.value.push(book);
+                    // booklist.value.push(book);
                     ElMessage.success(`导入 <<${book.name || '未知书名'}>> 成功!`);
                     filelistRef.value = [];
                     dialogFormVisible.value = false;
@@ -141,6 +149,8 @@ const loadContent = () => {
 onMounted(() => {
     loadContent();
 });
+
+
 </script>
 <template>
     <el-dialog
@@ -188,8 +198,7 @@ onMounted(() => {
                     <Upload />
                 </el-icon> 导入书籍
             </el-button>
-            <el-button type="wanning" @click="loadContent">
-
+            <el-button type="warning" @click="loadContent">
                 <el-icon>
                     <Refresh />
                 </el-icon>
