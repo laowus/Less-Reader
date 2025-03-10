@@ -61,7 +61,6 @@ const delSelectBooks = () => {
 }
 //获取书籍md5
 const getMd5WithBrowser = async (file) => {
-    console.log('getMd5WithBrowser', file);
     const bookName = file.name.substr(0, file.name.lastIndexOf('.'));
     return new Promise(async (resolve, reject) => {
         const md5 = await fetchMD5(file);

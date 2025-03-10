@@ -7,6 +7,7 @@ import { noteRefresh } from '../libs/reader.js';
 import { ref, reactive, toRaw, onMounted } from 'vue';
 import BookNoteUtil from '../utils/fileUtils/bookNoteUtil';
 import NoteStyle from '../utils/readUtils/noteStyle';
+const { ipcRenderer } = window.require('electron');
 
 const props = defineProps({
     bookId: String
@@ -61,11 +62,19 @@ EventBus.on("toggleUnderline", () => {
 
 const addNote = () => {
     const noteStyle = NoteStyle.getNoteStyle();
-    currentBookNote.value = new Note(props.bookId, noteStyle.color, selectionRef.value.text, noteStyle.type, selectionRef.value.cfi);
+    currentBookNote.value = new Note(0, props.bookId, noteStyle.color, selectionRef.value.text, noteStyle.type, selectionRef.value.cfi);
     BookNoteUtil.addBookNote(toRaw(currentBookNote.value));
+    console.log(currentBookNote.value);
+    ipcRenderer.once('db-add-note-response', (event, res) => {
+        if (res.success) {
+            console.log(res.id);
+        } else {
+            console.log("添加失败");
+        }
+    })
+    ipcRenderer.send('db-insert-note', toRaw(currentBookNote.value));
     noteRefresh();
 }
-
 
 </script>
 <template>

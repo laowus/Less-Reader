@@ -2,12 +2,11 @@ import './view.js'
 import { FootnoteHandler } from './ui/footnotes.js'
 import { createTOCView } from './ui/tree.js'
 import { Overlayer } from './ui/overlayer.js'
-import RecordLocation from '../utils/readUtils/recordLocation.js';
 import StyleUtil from '../utils/readUtils/styleUtil.js';
 import EventBus from '../../common/EventBus';
 import BookNoteUtil from '../utils/fileUtils/bookNoteUtil.js';
+const { ipcRenderer } = window.require('electron');
 
-const ipcRenderer = window.require("electron").ipcRenderer;
 /**
  * fontsize 字体大小
  * spacing / lineHeight 行距 
@@ -292,8 +291,10 @@ class Reader {
 
     renderAnnotation() {
         this.bookmarks = BookNoteUtil.getBookNote(this.bookId) ?? []
+        console.log(this.bookId, this.bookmarks);
         for (const bookmark of this.bookmarks) {
-            const { value, type, color, note } = bookmark
+            const { cfi: value, type, color, note } = bookmark
+
             const annotation = {
                 value,
                 type,

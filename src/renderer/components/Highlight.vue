@@ -10,7 +10,7 @@ const props = defineProps({
 const currentStyle = reactive(NoteStyle.getNoteStyle());
 
 const colors = NoteStyle.colors;
-const tys = NoteStyle.tys;
+const types = NoteStyle.types;
 
 const setColor = (index) => {
     currentStyle.color = colors[index];
@@ -19,7 +19,7 @@ const setColor = (index) => {
     props.addNote(currentStyle.value);
 }
 const setTy = (index) => {
-    currentStyle.ty = tys[index];
+    currentStyle.type = types[index];
     NoteStyle.setNoteStyle(currentStyle);
     props.addNote(currentStyle.value);
 }

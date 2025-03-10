@@ -1,4 +1,4 @@
-export default class BookNote {
+export default class Note {
     constructor(id, bookId, color, note, type, cfi) {
         this.id = id;
         this.bookId = bookId;

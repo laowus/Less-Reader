@@ -44,10 +44,9 @@ const createTable = () => {
        CREATE TABLE tb_notes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             bookId INTEGER,
-            content TEXT,
-            chapter TEXT,
-            type TEXT,
             color TEXT, 
+            note TEXT,
+            type TEXT,
             cfi TEXT
         )
     `, (err) => {
@@ -183,7 +182,6 @@ const updateBook = (book, event) => {
         }
     });
 
-
 };
 
 const deleteBook = (id, event) => {
@@ -199,6 +197,34 @@ const deleteBook = (id, event) => {
     })
 }
 
+const insertNote = (note, event) => {
+    console.log(note);
+    db.run(`
+    INSERT INTO tb_notes (bookId, color, note, type,  cfi) 
+    VALUES (?, ?, ?, ?, ?)
+    `, [note.bookId, note.color, note.note, note.type, note.cfi], function (err) {
+        if (err) {
+            console.error(err.message);
+            event.reply('db-insert-note-response', { success: false });
+        } else {
+            console.log('Data inserted with id:', this.lastID);
+            event.reply('db-insert-note-response', { success: true, id: this.lastID });
+        }
+    });
+}
+
+
+const getAllNotes = (bookId, event) => {
+    db.all(`SELECT * FROM tb_notes where bookId = ?`, [bookId], (err, rows) => {
+        if (err) {
+            console.error(err.message);
+            event.reply('db-get-all-notes-response', { success: false });
+        } else {
+            event.reply('db-get-all-notes-response', { success: true, data: rows });
+        }
+    })
+}
+
 //导出
 module.exports = {
     initDatabase,
@@ -206,5 +232,7 @@ module.exports = {
     selectAllBook,
     getBookByKey,
     updateBook,
-    deleteBook
+    deleteBook,
+    insertNote,
+    getAllNotes
 };
