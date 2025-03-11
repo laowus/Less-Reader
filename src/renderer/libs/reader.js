@@ -403,6 +403,10 @@ export const removeNote = (cfi) => {
     reader.removeAnnotation(cfi)
 }
 
+export const addNote = (note) => {
+    reader.addAnnotation(note)
+}
+
 
 
 
