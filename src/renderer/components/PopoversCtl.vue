@@ -5,7 +5,7 @@ import EventBus from '../../common/EventBus';
 import Note from '../models/Note';
 import { noteRefresh } from '../libs/reader.js';
 import { ref, reactive, toRaw, onMounted } from 'vue';
-import BookNoteUtil from '../utils/fileUtils/bookNoteUtil';
+
 import NoteStyle from '../utils/readUtils/noteStyle';
 const { ipcRenderer } = window.require('electron');
 
@@ -16,7 +16,7 @@ const props = defineProps({
 const commonCtxMenuShow = ref(false);
 const highlightShow = ref(false);
 const ctxMenuPosStyle = reactive({ left: -999, top: -999, bottom: -999 })
-const currentBookNote = reactive({})
+const currentNote = reactive({})
 const selectionRef = reactive({})
 
 const showCommonCtxMenu = (selection) => {
@@ -44,7 +44,7 @@ const hideHighlight = () => {
 const showHighlight = () => {
     highlightShow.value = true;
 }
-
+// 显示菜单
 EventBus.on("commonCtxMenu-show", selection => {
     showCommonCtxMenu(selection);
 })
@@ -56,25 +56,35 @@ EventBus.on("commonCtxMenu-hide", () => {
 
 EventBus.on("toggleUnderline", () => {
     addNote();
+    //显示高亮框
     highlightShow.value = !highlightShow.value;
 })
 
-
 const addNote = () => {
     const noteStyle = NoteStyle.getNoteStyle();
-    currentBookNote.value = new Note(0, props.bookId, noteStyle.color, selectionRef.value.text, noteStyle.type, selectionRef.value.cfi);
-    BookNoteUtil.addBookNote(toRaw(currentBookNote.value));
-    console.log(currentBookNote.value);
-    ipcRenderer.once('db-add-note-response', (event, res) => {
+    currentNote.value = new Note(0, props.bookId, noteStyle.color, selectionRef.value.text, noteStyle.type, selectionRef.value.cfi);
+    ipcRenderer.once('db-insert-note-response', (event, res) => {
         if (res.success) {
             console.log(res.id);
+            currentNote.value.updateId(res.id);
+            console.log("修改后的当前note", currentNote);
+            noteRefresh();
         } else {
             console.log("添加失败");
         }
     })
-    ipcRenderer.send('db-insert-note', toRaw(currentBookNote.value));
-    noteRefresh();
+    ipcRenderer.send('db-insert-note', toRaw(currentNote.value));
+
+    ipcRenderer.once('db-updateNote-response', (event, res) => {
+        if (res.success) {
+            console.log(res.id);
+            noteRefresh();
+        } else {
+            console.log("修改失败");
+        }
+    })
 }
+
 
 </script>
 <template>

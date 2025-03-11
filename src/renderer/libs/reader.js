@@ -167,6 +167,12 @@ const clickPart = (cx, cy) => {
     }
 }
 
+const partAction = ["prev", "menu", "next", "prev", "menu", "next", "prev", "menu", "next"]
+
+let style
+
+const footnoteDialog = document.getElementById('footnote-dialog')
+
 const onSelectionEnd = (selection) => {
     EventBus.emit('commonCtxMenu-show', selection);
 }
@@ -175,11 +181,19 @@ const commonCtxMenuHide = () => {
     EventBus.emit('commonCtxMenu-hide');
 }
 
-const partAction = ["prev", "menu", "next", "prev", "menu", "next", "prev", "menu", "next"]
-
-let style
-
-const footnoteDialog = document.getElementById('footnote-dialog')
+const notesRefresh = (bookId) => {
+    return new Promise((resolve, reject) => {
+        ipcRenderer.once('db-get-all-notes-response', (event, res) => {
+            if (res.success) {
+                console.log('db-get-all-notes-response', res.data);
+                resolve(res.data);  // 确保返回数据
+            } else {
+                reject(new Error('获取笔记失败'));
+            }
+        });
+        ipcRenderer.send('db-get-notes', bookId);
+    });
+};
 
 
 class Reader {
@@ -236,38 +250,6 @@ class Reader {
             $('#toc-view').append(this.#tocView.element)
         }
 
-        // load and show highlights embedded in the file by Calibre
-        // const bookmarks = await book.getCalibreBookmarks?.()
-        // if (bookmarks) {
-        //     const { fromCalibreHighlight } = await import('./tools/epubcfi.js')
-        //     for (const obj of bookmarks) {
-        //         if (obj.type === 'highlight') {
-        //             const value = fromCalibreHighlight(obj)
-        //             const color = obj.style.which
-        //             const note = obj.notes
-        //             const annotation = { value, color, note }
-        //             const list = this.annotations.get(obj.spine_index)
-        //             if (list) list.push(annotation)
-        //             else this.annotations.set(obj.spine_index, [annotation])
-        //             this.annotationsByValue.set(value, annotation)
-        //         }
-        //     }
-        //     this.view.addEventListener('create-overlay', e => {
-        //         const { index } = e.detail
-        //         const list = this.annotations.get(index)
-        //         if (list) for (const annotation of list)
-        //             this.view.addAnnotation(annotation)
-        //     })
-        //     this.view.addEventListener('draw-annotation', e => {
-        //         const { draw, annotation } = e.detail
-        //         const { color } = annotation
-        //         draw(Overlayer.highlight, { color })
-        //     })
-        //     this.view.addEventListener('show-annotation', e => {
-        //         const annotation = this.annotationsByValue.get(e.detail.value)
-        //         if (annotation.note) alert(annotation.note)
-        //     })
-        // }
     }
 
     setView(view) {
@@ -289,22 +271,29 @@ class Reader {
         })
     }
 
-    renderAnnotation() {
-        this.bookmarks = BookNoteUtil.getBookNote(this.bookId) ?? []
-        console.log(this.bookId, this.bookmarks);
-        for (const bookmark of this.bookmarks) {
-            const { cfi: value, type, color, note } = bookmark
-
-            const annotation = {
-                value,
-                type,
-                color,
-                note
+    async renderAnnotation() {
+        console.log("渲染注释");
+        try {
+            // 直接调用 notesRefresh 并等待结果
+            this.bookmarks = await notesRefresh(this.bookId);
+            if (Array.isArray(this.bookmarks)) {
+                for (let i = 0; i < this.bookmarks.length; i++) {
+                    const { cfi: value, type, color, note } = this.bookmarks[i];
+                    const annotation = {
+                        value,
+                        type,
+                        color,
+                        note
+                    };
+                    this.addAnnotation(annotation);
+                }
+            } else {
+                console.error('notesRefresh 返回的结果不是数组:', this.bookmarks);
             }
-            this.addAnnotation(annotation)
+        } catch (error) {
+            console.error('获取 notes 出错:', error);
         }
     }
-
     addAnnotation(annotation) {
         const { value } = annotation
         const spineCode = (value.split('/')[2].split('!')[0] - 2) / 2

@@ -18,4 +18,8 @@ export default class Note {
             cfi: this.cfi
         }
     }
+
+    updateId(newid) {
+        this.id = newid;
+    }
 }

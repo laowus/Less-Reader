@@ -198,21 +198,51 @@ const deleteBook = (id, event) => {
 }
 
 const insertNote = (note, event) => {
-    console.log(note);
-    db.run(`
-    INSERT INTO tb_notes (bookId, color, note, type,  cfi) 
-    VALUES (?, ?, ?, ?, ?)
-    `, [note.bookId, note.color, note.note, note.type, note.cfi], function (err) {
+    db.get(`SELECT * FROM tb_notes WHERE bookId = ? AND cfi = ?`, [note.bookId, note.cfi], (err, row) => {
         if (err) {
             console.error(err.message);
-            event.reply('db-insert-note-response', { success: false });
+            event.reply('db-insert-note-response', { success: false, error: err.message });
+        } else if (row) {
+            console.log('记录已经存在，更新记录');
+            console.log('Note already exists in the database. Updating the note.', row);
+            updateNote(note, row.id, event);
         } else {
-            console.log('Data inserted with id:', this.lastID);
-            event.reply('db-insert-note-response', { success: true, id: this.lastID });
+            console.log('记录不存在，插入新记录');
+            db.run(`INSERT INTO tb_notes (bookId, color, note, type, cfi) 
+                VALUES (?, ?, ?, ?, ?)`,
+                [note.bookId, note.color, note.note, note.type, note.cfi],
+                function (err) {
+                    if (err) {
+                        console.error(err.message);
+                        event.reply('db-insert-note-response', { success: false, error: err.message });
+                    } else {
+                        console.log('Note inserted with id:', this.lastID);
+                        event.reply('db-insert-note-response', { success: true, id: this.lastID });
+                    }
+                });
         }
     });
 }
 
+const updateNote = (note, noteId, event) => {
+    console.log('updateNote:', note, noteId);
+    db.run(`UPDATE tb_notes 
+        SET color = ?, 
+            type = ?
+        WHERE id = ?`, [
+        note.color,
+        note.type,
+        noteId
+    ], function (err) {
+        if (err) {
+            console.error('Failed to update note:', err.message);
+            event.reply('db-updateNote-response', { success: false, error: err.message });
+        } else {
+            console.log('Note updated with id:', this.lastID);
+            event.reply('db-updateNote-response', { success: true, id: this.lastID });
+        }
+    });
+}
 
 const getAllNotes = (bookId, event) => {
     db.all(`SELECT * FROM tb_notes where bookId = ?`, [bookId], (err, rows) => {
@@ -221,6 +251,18 @@ const getAllNotes = (bookId, event) => {
             event.reply('db-get-all-notes-response', { success: false });
         } else {
             event.reply('db-get-all-notes-response', { success: true, data: rows });
+        }
+    })
+}
+
+const deleteNote = (note, event) => {
+    db.run(`DELETE FROM tb_notes WHERE id = ?`, [note.id], function (err) {
+        if (err) {
+            console.error('Failed to delete note:', err.message);
+            event.reply('db-delete-note-response', { success: false, error: err.message });
+        } else {
+            console.log('Note deleted with id:', this.lastID);
+            event.reply('db-delete-note-response', { success: true, id: this.lastID });
         }
     })
 }
@@ -234,5 +276,6 @@ module.exports = {
     updateBook,
     deleteBook,
     insertNote,
-    getAllNotes
+    getAllNotes,
+    updateNote
 };

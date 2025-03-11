@@ -1,5 +1,4 @@
 <script setup>
-
 import { onMounted, reactive, ref } from 'vue';
 import NoteStyle from '../utils/readUtils/noteStyle';
 const props = defineProps({
@@ -8,7 +7,6 @@ const props = defineProps({
 })
 
 const currentStyle = reactive(NoteStyle.getNoteStyle());
-
 const colors = NoteStyle.colors;
 const types = NoteStyle.types;
 
@@ -18,7 +16,7 @@ const setColor = (index) => {
     NoteStyle.setNoteStyle(currentStyle);
     props.addNote(currentStyle.value);
 }
-const setTy = (index) => {
+const setType = (index) => {
     currentStyle.type = types[index];
     NoteStyle.setNoteStyle(currentStyle);
     props.addNote(currentStyle.value);
@@ -34,13 +32,13 @@ onMounted(() => {
     <div id="highlight-options"
         :style="{ top: props.posStyle.top && props.posStyle.top + 50 + 'px', left: props.posStyle.left + 'px', bottom: props.posStyle.bottom && props.posStyle.bottom + 50 + 'px' }">
         <div class="btns">
-            <button class="btn-class" @click="setTy(0)">
+            <button class="btn-class" @click="setType(0)">
                 <div class="astyle" :style="{ 'backgroundColor': currentStyle.color }">A</div>
             </button>
-            <button class="btn-class" @click="setTy(1)">
+            <button class="btn-class" @click="setType(1)">
                 <div class="btn-underlined" :style="{ 'text-decoration-color': currentStyle.color }">A</div>
             </button>
-            <button class="btn-class" @click="setTy(2)">
+            <button class="btn-class" @click="setType(2)">
                 <div class="btn-underlined1" :style="{ 'text-decoration-color': currentStyle.color }">A</div>
             </button>
         </div>

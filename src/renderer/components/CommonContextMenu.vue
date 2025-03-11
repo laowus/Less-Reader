@@ -1,7 +1,5 @@
 <script setup>
 import EventBus from '../../common/EventBus';
-
-
 const props = defineProps({
     posStyle: Object
 })
@@ -19,7 +17,7 @@ const toggleUnderline = () => {
                 <span class="iconfont icon-fuzhi"></span>
             </button>
             <button class="my-2" title="划线" @click="toggleUnderline">
-                <span class="iconfont icon-highlight-outlined1"></span>
+                <span class="iconfont  icon-highlight-outlined1"></span>
             </button>
             <button class="my-2" title="笔记">
                 <span class="iconfont icon-biji"></span>
@@ -29,8 +27,6 @@ const toggleUnderline = () => {
             </button>
         </div>
     </div>
-
-
 
 </template>
 

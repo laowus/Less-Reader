@@ -1,5 +1,5 @@
 const { ipcMain } = require('electron')
-const { insertBook, selectAllBook, getBookByKey, updateBook, deleteBook, insertNote, getAllNotes } = require('../dbTool')
+const { insertBook, selectAllBook, getBookByKey, updateBook, deleteBook, insertNote, getAllNotes, updateNote } = require('../dbTool')
 
 const dbHandle = () => {
 
@@ -29,6 +29,10 @@ const dbHandle = () => {
 
     ipcMain.on("db-get-notes", (event, bookId) => {
         getAllNotes(bookId, event);
+    })
+
+    ipcMain.on("db-update-note", (event, note) => {
+        updateNote(note, event);
     })
 
 }
