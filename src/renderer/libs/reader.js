@@ -272,13 +272,12 @@ class Reader {
     }
 
     async renderAnnotation() {
-        console.log("渲染注释");
         try {
             // 直接调用 notesRefresh 并等待结果
             this.bookmarks = await notesRefresh(this.bookId);
             if (Array.isArray(this.bookmarks)) {
-                for (let i = 0; i < this.bookmarks.length; i++) {
-                    const { cfi: value, type, color, note } = this.bookmarks[i];
+                for (const bookmark of this.bookmarks) {
+                    const { cfi: value, type, color, note } = bookmark;
                     const annotation = {
                         value,
                         type,
@@ -302,6 +301,21 @@ class Reader {
         else this.annotations.set(spineCode, [annotation])
         this.annotationsByValue.set(value, annotation)
         this.view.addAnnotation(annotation)
+    }
+    removeAnnotation(cfi) {
+        const annotation = this.annotationsByValue.get(cfi)
+        const { value } = annotation
+        const spineCode = (value.split('/')[2].split('!')[0] - 2) / 2
+
+        const list = this.annotations.get(spineCode)
+        if (list) {
+            const index = list.findIndex(a => a.id === annotation.id)
+            if (index !== -1) list.splice(index, 1)
+        }
+
+        this.annotationsByValue.delete(value)
+
+        this.view.addAnnotation(annotation, true)
     }
 
     #onClickView({ detail: { cx, cy } }) {
@@ -381,8 +395,12 @@ export const setStyle = (newStyle) => {
 }
 
 
-export const noteRefresh = () => {
-    reader.renderAnnotation();
+export const noteRefresh = async () => {
+    await reader.renderAnnotation();
+}
+
+export const removeNote = (cfi) => {
+    reader.removeAnnotation(cfi)
 }
 
 

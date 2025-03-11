@@ -1,12 +1,35 @@
 <script setup>
+import { watch } from 'vue';
 import EventBus from '../../common/EventBus';
+import { removeNote } from '../libs/reader.js';
+const { ipcRenderer } = window.require('electron');
 const props = defineProps({
-    posStyle: Object
+    posStyle: Object,
+    currentNote: Object,
+    toggleHighlight: Function
 })
 
 const toggleUnderline = () => {
-    EventBus.emit("toggleUnderline",);
+    if (props.currentNote.id > 0) {
+        ipcRenderer.once("db-delete-note-response", (event, res) => {
+            if (res.success) {
+                console.log("db-delete-note-response", res.id);
+                removeNote(props.currentNote.cfi);
+                EventBus.emit('commonCtxMenu-hide');
+            } else {
+                console.log("删除失败");
+            }
+        });
+        ipcRenderer.send("db-delete-note", props.currentNote.id);
+    } else {
+        EventBus.emit("toggleUnderline");
+    }
 }
+
+
+watch(() => props.currentNote, (newValue, oldValue) => {
+    console.log("currentNote", newValue);
+})
 
 </script>
 
@@ -17,14 +40,12 @@ const toggleUnderline = () => {
                 <span class="iconfont icon-fuzhi"></span>
             </button>
             <button class="my-2" title="划线" @click="toggleUnderline">
-                <span class="iconfont  icon-highlight-outlined1"></span>
+                <span class="iconfont " :class="props.currentNote.id > 0 ? 'icon-shanchu' : 'icon-highlight-outlined1'"></span>
             </button>
             <button class="my-2" title="笔记">
                 <span class="iconfont icon-biji"></span>
             </button>
-            <button class="my-2" title="搜索">
-                <span class="iconfont icon-sousuo1"></span>
-            </button>
+
         </div>
     </div>
 

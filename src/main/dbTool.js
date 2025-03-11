@@ -191,8 +191,8 @@ const deleteBook = (id, event) => {
             console.error('Failed to delete book:', err.message);
             event.reply('db-delete-book-response', { success: false, error: err.message });
         } else {
-            console.log('Book deleted with id:', id);
-            event.reply('db-delete-book-response', { success: true, id: id });
+            console.log('Book deleted with id:', this.lastID);
+            event.reply('db-delete-book-response', { success: true, id: this.lastID });
         }
     })
 }
@@ -255,8 +255,8 @@ const getAllNotes = (bookId, event) => {
     })
 }
 
-const deleteNote = (note, event) => {
-    db.run(`DELETE FROM tb_notes WHERE id = ?`, [note.id], function (err) {
+const deleteNote = (noteId, event) => {
+    db.run(`DELETE FROM tb_notes WHERE id = ?`, [noteId], function (err) {
         if (err) {
             console.error('Failed to delete note:', err.message);
             event.reply('db-delete-note-response', { success: false, error: err.message });
@@ -277,5 +277,6 @@ module.exports = {
     deleteBook,
     insertNote,
     getAllNotes,
-    updateNote
+    updateNote,
+    deleteNote
 };

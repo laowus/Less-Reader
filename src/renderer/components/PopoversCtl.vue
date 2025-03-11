@@ -16,7 +16,7 @@ const props = defineProps({
 const commonCtxMenuShow = ref(false);
 const highlightShow = ref(false);
 const ctxMenuPosStyle = reactive({ left: -999, top: -999, bottom: -999 })
-const currentNote = reactive({})
+const currentNote = ref({})
 const selectionRef = reactive({})
 
 const showCommonCtxMenu = (selection) => {
@@ -52,13 +52,17 @@ EventBus.on("commonCtxMenu-show", selection => {
 EventBus.on("commonCtxMenu-hide", () => {
     hideCommonCtxMenu();
     hideHighlight();
+    currentNote.value = {};
 })
 
 EventBus.on("toggleUnderline", () => {
     addNote();
-    //显示高亮框
-    highlightShow.value = !highlightShow.value;
+    toggleHighlight();
 })
+
+const toggleHighlight = () => {
+    highlightShow.value = !highlightShow.value;
+}
 
 const addNote = () => {
     const noteStyle = NoteStyle.getNoteStyle();
@@ -78,6 +82,7 @@ const addNote = () => {
     ipcRenderer.once('db-updateNote-response', (event, res) => {
         if (res.success) {
             console.log(res.id);
+            console.log("修改后的当前note", currentNote.value);
             noteRefresh();
         } else {
             console.log("修改失败");
@@ -85,11 +90,10 @@ const addNote = () => {
     })
 }
 
-
 </script>
 <template>
     <CommonContextMenu v-show="commonCtxMenuShow"
-        :posStyle="ctxMenuPosStyle">
+        :posStyle="ctxMenuPosStyle" :currentNote="currentNote" :toggleHighlight="toggleHighlight">
     </CommonContextMenu>
     <Highlight v-show="highlightShow"
         :posStyle="ctxMenuPosStyle" :addNote="addNote">
