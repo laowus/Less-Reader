@@ -3,7 +3,7 @@ import CommonContextMenu from './CommonContextMenu.vue';
 import Highlight from './Highlight.vue';
 import EventBus from '../../common/EventBus';
 import Note from '../models/Note';
-import { noteRefresh, addAnnotation } from '../libs/reader.js';
+import { addAnnotation } from '../libs/reader.js';
 import { ref, reactive, toRaw } from 'vue';
 
 import NoteStyle from '../utils/readUtils/noteStyle';
@@ -95,8 +95,8 @@ const addNote = () => {
     ipcRenderer.once('db-insert-note-response', (event, res) => {
         if (res.success) {
             console.log(res.id);
-            currentNote.value.updateId(res.id);
-            console.log("修改后的当前note", currentNote);
+            currentNote.value = res.data;
+            console.log("增加后的当前note", currentNote.value);
             addAnnotation(currentNote.value);
         } else {
             console.log("添加失败");
@@ -106,9 +106,9 @@ const addNote = () => {
 
     ipcRenderer.once('db-updateNote-response', (event, res) => {
         if (res.success) {
-            console.log(res.id);
+            currentNote.value = res.data;
             console.log("修改后的当前note", currentNote.value);
-            noteRefresh();
+            addAnnotation(currentNote.value);
         } else {
             console.log("修改失败");
         }
