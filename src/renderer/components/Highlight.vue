@@ -1,10 +1,12 @@
 <script setup>
-import { onMounted, reactive, ref } from 'vue';
+import { reactive } from 'vue';
 import NoteStyle from '../utils/readUtils/noteStyle';
+import EventBus from '../../common/EventBus';
 const props = defineProps({
     posStyle: Object,
     addNote: Function
 })
+
 
 const currentStyle = reactive(NoteStyle.getNoteStyle());
 const colors = NoteStyle.colors;
@@ -14,17 +16,17 @@ const setColor = (index) => {
     currentStyle.color = colors[index];
     console.log(currentStyle);
     NoteStyle.setNoteStyle(currentStyle);
-    props.addNote(currentStyle.value);
+    props.addNote();
 }
 const setType = (index) => {
     currentStyle.type = types[index];
     NoteStyle.setNoteStyle(currentStyle);
-    props.addNote(currentStyle.value);
+    props.addNote();
 }
 
-onMounted(() => {
-    props.addNote(currentStyle.value);
-})
+EventBus.on('changeNoteStyle', (noteStyle) => {
+    currentStyle.value = noteStyle;
+});
 
 </script>
 

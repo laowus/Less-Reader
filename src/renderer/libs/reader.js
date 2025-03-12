@@ -181,6 +181,10 @@ const commonCtxMenuHide = () => {
     EventBus.emit('commonCtxMenu-hide');
 }
 
+const onAnnotationClick = (note) => {
+    EventBus.emit('showNote', note);
+}
+
 const notesRefresh = (bookId) => {
     return new Promise((resolve, reject) => {
         ipcRenderer.once('db-get-all-notes-response', (event, res) => {
@@ -224,6 +228,7 @@ class Reader {
         if (!cfi) this.view.renderer.next()
         this.setView(this.view)
         await this.view.init({ lastLocation: cfi })
+
         $('#header-bar').style.visibility = 'visible'
         const slider = $('#progress-slider')
         slider.dir = book.dir
@@ -253,7 +258,6 @@ class Reader {
     }
 
     setView(view) {
-
         view.addEventListener('create-overlay', e => {
             const { index } = e.detail
             //获取当前书籍的注释
@@ -268,6 +272,12 @@ class Reader {
             if (type === 'highlight') draw(Overlayer.highlight, { color })
             else if (type === 'underline') draw(Overlayer.underline, { color })
             else if (type === 'squiggly') draw(Overlayer.squiggly, { color })
+        })
+        view.addEventListener('show-annotation', e => {
+            console.log("show-annotation")
+            const annotation = this.annotationsByValue.get(e.detail.value)
+            const pos = getPosition(e.detail.range)
+            onAnnotationClick({ annotation, pos })
         })
     }
 
@@ -403,9 +413,17 @@ export const removeNote = (cfi) => {
     reader.removeAnnotation(cfi)
 }
 
-export const addNote = (note) => {
-    reader.addAnnotation(note)
+export const addAnnotation = (note) => {
+    const annotation = {
+        value: note.cfi,
+        type: note.type,
+        color: note.color,
+        note: note.note
+    };
+    reader.addAnnotation(annotation);
 }
+
+
 
 
 

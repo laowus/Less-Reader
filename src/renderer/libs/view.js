@@ -438,9 +438,11 @@ export class View extends HTMLElement {
         doc.addEventListener('click', e => {
             const [value, range] = overlayer.hitTest(e)
             if (value && !value.startsWith(SEARCH_PREFIX)) {
+                e.preventDefault()
+                e.stopPropagation()
                 this.#emit('show-annotation', { value, index, range })
             }
-        }, false)
+        }, true)
 
         const list = this.#searchResults.get(index)
         if (list) for (const item of list) this.addAnnotation(item)

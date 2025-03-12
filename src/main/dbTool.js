@@ -267,6 +267,17 @@ const deleteNote = (noteId, event) => {
     })
 }
 
+const getNoteByCfi = (cfi, event) => {
+    db.get(`SELECT * FROM tb_notes WHERE cfi = ?`, [cfi], (err, row) => {
+        if (err) {
+            console.error(err.message);
+            event.reply('db-get-note-by-cfi-response', { success: false });
+        } else {
+            event.reply('db-get-note-by-cfi-response', { success: true, data: row });
+        }
+    })
+}
+
 //导出
 module.exports = {
     initDatabase,
@@ -278,5 +289,6 @@ module.exports = {
     insertNote,
     getAllNotes,
     updateNote,
-    deleteNote
+    deleteNote,
+    getNoteByCfi
 };

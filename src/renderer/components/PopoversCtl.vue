@@ -3,8 +3,8 @@ import CommonContextMenu from './CommonContextMenu.vue';
 import Highlight from './Highlight.vue';
 import EventBus from '../../common/EventBus';
 import Note from '../models/Note';
-import { noteRefresh } from '../libs/reader.js';
-import { ref, reactive, toRaw, onMounted } from 'vue';
+import { noteRefresh, addAnnotation } from '../libs/reader.js';
+import { ref, reactive, toRaw } from 'vue';
 
 import NoteStyle from '../utils/readUtils/noteStyle';
 const { ipcRenderer } = window.require('electron');
@@ -15,9 +15,10 @@ const props = defineProps({
 
 const commonCtxMenuShow = ref(false);
 const highlightShow = ref(false);
-const ctxMenuPosStyle = reactive({ left: -999, top: -999, bottom: -999 })
-const currentNote = ref({})
-const selectionRef = reactive({})
+const ctxMenuPosStyle = reactive({ left: -999, top: -999, bottom: -999 });
+const currentNote = ref({});
+const selectionRef = reactive({});
+const highlightRef = ref(null);
 
 const showCommonCtxMenu = (selection) => {
     selectionRef.value = selection;
@@ -35,6 +36,25 @@ const showCommonCtxMenu = (selection) => {
 }
 const hideCommonCtxMenu = () => {
     commonCtxMenuShow.value = false;
+}
+
+// annotation, pos
+const showAllMenu = (note) => {
+    console.log("showAllMenu", note);
+    new Promise((resolve, reject) => {
+        getNoteByCfi(note.annotation.value);
+        console.log("currentNote", currentNote.value);
+        resolve();
+    }).then(() => {
+        const selection = {
+            pos: note.pos,
+            text: note.annotation.note,
+            cfi: note.annotation.value
+        }
+        showCommonCtxMenu(selection);
+        showHighlight();
+        EventBus.emit('changeNoteStyle', { color: note.color, type: note.type });
+    });
 }
 
 const hideHighlight = () => {
@@ -60,6 +80,11 @@ EventBus.on("toggleUnderline", () => {
     toggleHighlight();
 })
 
+EventBus.on("showNote", (note) => {
+    console.log("showNote", note)
+    showAllMenu(note);
+})
+
 const toggleHighlight = () => {
     highlightShow.value = !highlightShow.value;
 }
@@ -72,7 +97,7 @@ const addNote = () => {
             console.log(res.id);
             currentNote.value.updateId(res.id);
             console.log("修改后的当前note", currentNote);
-            noteRefresh();
+            addAnnotation(currentNote.value);
         } else {
             console.log("添加失败");
         }
@@ -90,13 +115,25 @@ const addNote = () => {
     })
 }
 
+const getNoteByCfi = (cfi) => {
+    ipcRenderer.once('db-get-note-by-cfi-response', (event, res) => {
+        if (res.success) {
+            console.log(res.data);
+            currentNote.value = res.data;
+        } else {
+            console.log("获取失败");
+        }
+    })
+    ipcRenderer.send('db-get-book-by-cfi', cfi);
+}
+
 </script>
 <template>
     <CommonContextMenu v-show="commonCtxMenuShow"
         :posStyle="ctxMenuPosStyle" :currentNote="currentNote" :toggleHighlight="toggleHighlight">
     </CommonContextMenu>
     <Highlight v-show="highlightShow"
-        :posStyle="ctxMenuPosStyle" :addNote="addNote">
+        :posStyle="ctxMenuPosStyle" :addNote="addNote" ref="highlightRef">
     </Highlight>
 </template>
 <style></style>

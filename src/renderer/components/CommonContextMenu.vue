@@ -1,5 +1,4 @@
 <script setup>
-import { watch } from 'vue';
 import EventBus from '../../common/EventBus';
 import { removeNote } from '../libs/reader.js';
 const { ipcRenderer } = window.require('electron');
@@ -26,11 +25,6 @@ const toggleUnderline = () => {
     }
 }
 
-
-watch(() => props.currentNote, (newValue, oldValue) => {
-    console.log("currentNote", newValue);
-})
-
 </script>
 
 <template>
@@ -40,7 +34,7 @@ watch(() => props.currentNote, (newValue, oldValue) => {
                 <span class="iconfont icon-fuzhi"></span>
             </button>
             <button class="my-2" title="划线" @click="toggleUnderline">
-                <span class="iconfont " :class="props.currentNote.id > 0 ? 'icon-shanchu' : 'icon-highlight-outlined1'"></span>
+                <span class="iconfont " :class="props.currentNote?.id > 0 ? 'icon-shanchu' : 'icon-highlight-outlined1'"></span>
             </button>
             <button class="my-2" title="笔记">
                 <span class="iconfont icon-biji"></span>
