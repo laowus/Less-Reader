@@ -217,7 +217,8 @@ const insertNote = (note, event) => {
                         event.reply('db-insert-note-response', { success: false, error: err.message });
                     } else {
                         console.log('Note inserted with id:', this.lastID);
-                        event.reply('db-insert-note-response', { success: true, id: this.lastID });
+                        const resNote = { ...note, ...{ id: this.lastID } }
+                        event.reply('db-insert-note-response', { success: true, data: resNote });
                     }
                 });
         }
@@ -239,7 +240,8 @@ const updateNote = (note, noteId, event) => {
             event.reply('db-updateNote-response', { success: false, error: err.message });
         } else {
             console.log('Note updated with id:', this.lastID);
-            event.reply('db-updateNote-response', { success: true, id: this.lastID });
+            const resNote = { ...note, ...{ id: this.lastID } }
+            event.reply('db-updateNote-response', { success: true, data: resNote });
         }
     });
 }
