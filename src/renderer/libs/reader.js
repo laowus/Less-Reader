@@ -208,12 +208,12 @@ class Reader {
     annotationsByValue = new Map()
     #footnoteHandler = new FootnoteHandler()
     bookmarks
-    closeSideBar() {
-        $('#dimming-overlay').classList.remove('show')
-        $('#bottom-bar').classList.remove('show')
-    }
+    // closeSideBar() {
+    //     $('#dimming-overlay').classList.remove('show')
+    //     $('#bottom-bar').classList.remove('show')
+    // }
     constructor() {
-        $('#dimming-overlay').addEventListener('click', () => this.closeSideBar())
+        //$('#dimming-overlay').addEventListener('click', () => this.closeSideBar())
     }
     async open(file, bookId, cfi) {
         this.bookId = bookId
@@ -254,7 +254,6 @@ class Reader {
             })
             $('#toc-view').append(this.#tocView.element)
         }
-
     }
 
     setView(view) {
@@ -322,9 +321,7 @@ class Reader {
             const index = list.findIndex(a => a.id === annotation.id)
             if (index !== -1) list.splice(index, 1)
         }
-
         this.annotationsByValue.delete(value)
-
         this.view.addAnnotation(annotation, true)
     }
 
@@ -338,8 +335,9 @@ class Reader {
             } else if (action === "next") {
                 this.view.goRight()
             } else if (action === "menu") {
-                $('#dimming-overlay').classList.add('show')
-                $('#bottom-bar').classList.add('show')
+                // $('#dimming-overlay').classList.add('show')
+                // $('#bottom-bar').classList.add('show')
+                // $('.LeftBar').classList.add('show')
             }
         }
     }

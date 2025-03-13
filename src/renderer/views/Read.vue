@@ -1,6 +1,7 @@
 <script setup>
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref, vShow } from 'vue';
 import { useRoute } from 'vue-router';
+import LeftBar from '../components/LeftBar.vue';
 import HeaderBar from '../components/HeaderBar.vue';
 import BottomBar from '../components/BottomBar.vue';
 import PopoversCtl from '../components/PopoversCtl.vue';
@@ -12,6 +13,8 @@ const route = useRoute();
 const bookId = route.params.id;
 const currentBook = ref({});
 const bookStyle = reactive({});
+const leftbarShow = ref(false);
+const $ = document.querySelector.bind(document)
 onMounted(() => {
     Object.assign(bookStyle, StyleUtil.getStyle());
     ipcRenderer.once('db-get-book-response', (event, items) => {
@@ -27,6 +30,18 @@ EventBus.on('updateBook', (bookRecord) => {
     const newBook = { ...currentBook.value, ...bookRecord };
     ipcRenderer.send('db-update-book', newBook);
 });
+const setLeftbarShow = (isShow) => {
+    leftbarShow.value = isShow;
+    isShow ? $('#dimming-overlay').classList.add('show') : $('#dimming-overlay').classList.remove('show')
+};
+
+onMounted(() => {
+    $('#dimming-overlay').addEventListener('click', () => closeLeftBar())
+});
+
+const closeLeftBar = () => {
+    setLeftbarShow(false);
+}
 
 </script>
 
@@ -36,7 +51,9 @@ EventBus.on('updateBook', (bookRecord) => {
     <div id="bottom-bar">
         <BottomBar :bookStyle="bookStyle" :setStyle="setStyle" />
     </div>
-    <HeaderBar :currentBook="currentBook"></HeaderBar>
+    <HeaderBar :currentBook="currentBook" :setLeftbarShow="setLeftbarShow"></HeaderBar>
+    <LeftBar v-show="leftbarShow"> </LeftBar>
+
 </template>
 
 <style>

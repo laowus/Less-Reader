@@ -6,6 +6,34 @@
   "description": "icon集合",
   "glyphs": [
     {
+      "icon_id": "17979041",
+      "name": "更多",
+      "font_class": "gengduo",
+      "unicode": "e605",
+      "unicode_decimal": 58885
+    },
+    {
+      "icon_id": "18170425",
+      "name": "固定,图钉",
+      "font_class": "relieve",
+      "unicode": "e9ba",
+      "unicode_decimal": 59834
+    },
+    {
+      "icon_id": "34198305",
+      "name": "字体大小",
+      "font_class": "zitidaxiao",
+      "unicode": "e854",
+      "unicode_decimal": 59476
+    },
+    {
+      "icon_id": "8999634",
+      "name": "数字图书馆",
+      "font_class": "library",
+      "unicode": "e741",
+      "unicode_decimal": 59201
+    },
+    {
       "icon_id": "11490918",
       "name": "最小化",
       "font_class": "zuixiaohua",

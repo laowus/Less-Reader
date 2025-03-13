@@ -5,6 +5,7 @@ const handleClose = () => {
 }
 const props = defineProps({
     currentBook: Object,
+    setLeftbarShow: Function,
 })
 
 </script>
@@ -12,7 +13,7 @@ const props = defineProps({
     <div class="chapter-title"> </div>
     <div class="header-bar">
         <div class="sidebar-bookmark-toggeler">
-            <div class="tooltip" data-tip="侧边栏">
+            <div class="tooltip" data-tip="侧边栏" @click="setLeftbarShow(true)">
                 <span class="iconfont icon-sidebarcebianlan"></span>
             </div>
             <div class="tooltip" data-tip="书签">
