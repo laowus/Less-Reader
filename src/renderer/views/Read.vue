@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import HeaderBar from '../components/HeaderBar.vue';
 import BottomBar from '../components/BottomBar.vue';
 import PopoversCtl from '../components/PopoversCtl.vue';
 import StyleUtil from '../utils/readUtils/styleUtil.js'
@@ -9,53 +10,33 @@ const { ipcRenderer } = window.require('electron');
 import EventBus from '../../common/EventBus';
 const route = useRoute();
 const bookId = route.params.id;
-let detail;
+const currentBook = ref({});
 const bookStyle = reactive({});
 onMounted(() => {
-    console.log('Read.vue mounted', route.params);
     Object.assign(bookStyle, StyleUtil.getStyle());
     ipcRenderer.once('db-get-book-response', (event, items) => {
-        detail = items.data[0];
-        console.log(detail);
-        if (detail.path) open(detail.path, detail.id, detail.lastReadPosition, bookStyle).catch(e => console.error(e))
+        currentBook.value = items.data[0];
+        console.log("currentBook.value", currentBook.value);
+        if (currentBook.value.path) open(currentBook.value.path, currentBook.value.id, currentBook.value.lastReadPosition, bookStyle).catch(e => console.error(e))
     });
     ipcRenderer.send('db-get-book', bookId);
 });
 
-const handleClose = () => {
-    ipcRenderer.send('window-close');
-}
-
 EventBus.on('updateBook', (bookRecord) => {
     //获取当前的book
-    const newBook = { ...detail, ...bookRecord };
+    const newBook = { ...currentBook.value, ...bookRecord };
     ipcRenderer.send('db-update-book', newBook);
 });
 
 </script>
 
 <template>
-    <dialog id="footnote-dialog">
-        <div>
-            <main></main>
-        </div>
-    </dialog>
     <PopoversCtl :bookId="bookId"></PopoversCtl>
     <div id="dimming-overlay" aria-hidden="true"></div>
     <div id="bottom-bar">
         <BottomBar :bookStyle="bookStyle" :setStyle="setStyle" />
     </div>
-    <div id="header-bar" class="toolbar">
-        <!-- 拖动位置 -->
-        <div class="title-bar-dragger" id="chapter-title"></div>
-        <div id="menu-button" class="menu-container">
-            <button aria-label="Show settings" aria-haspopup="true" @click="handleClose">
-                <el-icon :size="20">
-                    <Close />
-                </el-icon>
-            </button>
-        </div>
-    </div>
+    <HeaderBar :currentBook="currentBook"></HeaderBar>
 </template>
 
 <style>
@@ -86,73 +67,6 @@ body {
     fill: none;
     stroke: currentcolor;
     stroke-width: 3px;
-}
-
-#footnote-dialog {
-    padding: 0;
-    width: auto;
-    height: auto;
-    max-width: 80vw;
-    max-height: 80vh;
-    min-width: 200px;
-    min-height: 100px;
-    border-radius: 15px;
-    border: 2px solid grey;
-    user-select: none;
-}
-
-#footnote-dialog div {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-#footnote-dialog main {
-    overflow: auto;
-    flex: 1;
-}
-
-.empty-state-icon {
-    margin: auto;
-}
-
-.toolbar {
-    box-sizing: border-box;
-    position: absolute;
-    z-index: 5;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    height: 48px;
-    padding: 6px;
-    transition: opacity 250ms ease;
-    visibility: hidden;
-}
-
-.toolbar button {
-    padding: 3px;
-    border-radius: 6px;
-    background: none;
-    border: 0;
-    color: GrayText;
-}
-
-.title-bar-dragger {
-    flex: 1;
-    height: 100%;
-    user-select: none;
-    -webkit-app-region: drag;
-    -webkit-user-select: none;
-}
-
-.toolbar button:hover {
-    background: rgba(0, 0, 0, .1);
-    color: currentcolor;
-}
-
-#header-bar {
-    top: 0;
 }
 
 /* 顶部章节名字显示 */
@@ -202,30 +116,5 @@ body {
     visibility: visible;
     opacity: 1;
     transition-delay: 0s;
-}
-
-#side-bar-header {
-    padding: 1rem;
-    display: flex;
-    border-bottom: 1px solid rgba(0, 0, 0, .1);
-    align-items: center;
-}
-
-
-.popover {
-    background: Canvas;
-    color: CanvasText;
-    border-radius: 6px;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, .2), 0 0 16px rgba(0, 0, 0, .1), 0 0 32px rgba(0, 0, 0, .1);
-}
-
-.popover-arrow-down {
-    fill: Canvas;
-    filter: drop-shadow(0 -1px 0 rgba(0, 0, 0, .2));
-}
-
-.popover-arrow-up {
-    fill: Canvas;
-    filter: drop-shadow(0 1px 0 rgba(0, 0, 0, .2));
 }
 </style>

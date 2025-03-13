@@ -294,4 +294,11 @@ const changeStyle = (e, type) => {
     margin-right: 10px;
     flex: 1
 }
+
+#side-bar-header {
+    padding: 1rem;
+    display: flex;
+    border-bottom: 1px solid rgba(0, 0, 0, .1);
+    align-items: center;
+}
 </style>

@@ -229,7 +229,7 @@ class Reader {
         this.setView(this.view)
         await this.view.init({ lastLocation: cfi })
 
-        $('#header-bar').style.visibility = 'visible'
+        //$('#header-bar').style.visibility = 'visible'
         const slider = $('#progress-slider')
         slider.dir = book.dir
         slider.addEventListener('input', e =>
@@ -375,7 +375,7 @@ class Reader {
         // slider.style.visibility = 'visible'
         slider.value = fraction
         slider.title = `${percent} · ${loc}`
-        if (tocItem?.label) $('#chapter-title').innerText = tocItem?.label
+        if (tocItem?.label) $('.chapter-title').innerText = tocItem?.label
         if (tocItem?.href) this.#tocView?.setCurrentHref?.(tocItem.href)
         //保存到当前阅读记录到localstorage中
         EventBus.emit('updateBook', { id: this.bookId, currentChapter: tocItem?.label, readingPercentage: percent, lastReadPosition: cfi });

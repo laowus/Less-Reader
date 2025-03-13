@@ -7,7 +7,6 @@ const props = defineProps({
     addNote: Function
 })
 
-
 const currentStyle = reactive(NoteStyle.getNoteStyle());
 const colors = NoteStyle.colors;
 const types = NoteStyle.types;
