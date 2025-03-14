@@ -1,5 +1,71 @@
 <script setup>
+import { ref } from 'vue';
+const { ipcRenderer } = window.require('electron');
+const props = defineProps({
+    currentBook: Object,
+});
 
+const tabId = ref(0);
+const noteList = ref([]);
+const deleteButtonIndex = ref(null);
+
+const initData = () => {
+    return new Promise((resolve, reject) => {
+        ipcRenderer.once('db-get-all-notes-response', (event, res) => {
+            if (res.success) {
+                console.log('initData db-get-all-notes-response', res.data);
+                noteList.value = res.data;
+                resolve();  // 确保返回数据
+            } else {
+                reject(new Error('获取笔记失败'));
+            }
+        });
+        ipcRenderer.send('db-get-notes', props.currentBook.id);
+    });
+}
+
+const setTabId = (id) => {
+    tabId.value = id;
+    if (id == 1) {
+        initData();
+    }
+}
+const getNoteStyle = (note) => {
+    let tempStyle = ""
+    if (note.type == "underline") {
+        tempStyle = "text-decoration-line: underline;text-decoration-color:" + note.color + ";";
+    } else if (note.type == "squiggly") {
+        tempStyle = "text-decoration-line: underline;text-decoration-style: wavy; text-decoration-color:" + note.color + ";";
+    } else {
+        tempStyle = "background-color:" + note.color + ";";
+    }
+    return tempStyle;
+}
+
+const showDeleteButton = (index) => {
+    deleteButtonIndex.value = index;
+}
+
+const hideDeleteButton = (id) => {
+    deleteButtonIndex.value = null;
+}
+
+const deleteNote = (note) => {
+    ipcRenderer.once("db-delete-note-response", (event, res) => {
+        if (res.success) {
+            window.removeNote(note.cfi);
+            initData();
+        } else {
+            console.log("删除失败");
+        }
+    });
+    ipcRenderer.send('db-delete-note', note.id);
+}
+
+const goToCfi = (cfi) => {
+    console.log("goToCfi", cfi);
+    window.goToCfi(cfi);
+}
 
 </script>
 
@@ -32,7 +98,40 @@
                 <p id="side-bar-author"></p>
             </div>
         </div>
-        <div id="toc-view"></div>
+        <div class="tabContent">
+            <div id="toc-view" v-show="tabId === 0"></div>
+            <div id="noteList" v-show="tabId === 1">
+                <ul>
+                    <li v-for="(note, index) in noteList" :key="index" :style="getNoteStyle(note)"
+                        @mouseover="showDeleteButton(index)"
+                        @mouseleave="hideDeleteButton(index)"
+                        @click="goToCfi(note.cfi)">
+                        <div v-if="deleteButtonIndex === index" class="delete-button-container">
+                            <div class="iconfont-btn" @click="deleteNote(note)">
+                                <span class="iconfont icon-shanchu"></span>
+                            </div>
+                        </div>
+                        <div class="note-content">
+                            {{ note.note || '无内容' }}
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div id="noteList" v-show="tabId === 2">
+                书签列表
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <div class="iconfont-btn" :class="tabId === 0 ? 'selected' : ''" @click="setTabId(0)">
+                <span class="iconfont icon-mulu"></span>
+            </div>
+            <div class="iconfont-btn" :class="tabId === 1 ? 'selected' : ''" @click="setTabId(1)">
+                <span class="iconfont icon-anmuluchaolu-xianxing"></span>
+            </div>
+            <div class="iconfont-btn" :class="tabId === 2 ? 'selected' : ''" @click="setTabId(2)">
+                <span class="iconfont icon-shuqian"></span>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -92,7 +191,8 @@
     align-items: center;
 }
 
-.iconfont-btn:hover {
+.iconfont-btn:hover,
+.selected {
     background-color: gainsboro;
     cursor: pointer;
     border-radius: 10px;
@@ -193,5 +293,62 @@
     margin: .5rem 0;
     font-size: small;
     color: GrayText;
+}
+
+.sidebar-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 2rem;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: .5rem;
+    padding-left: .375rem;
+    border-top: 1px solid rgba(0, 0, 0, .1);
+    align-items: center;
+}
+
+#noteList {
+    padding: .5rem;
+    height: 100%;
+}
+
+#noteList ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#noteList li {
+    font-size: 0.8rem;
+    padding: .5rem;
+    border-radius: 4px;
+    margin-bottom: .25rem;
+    background-color: gainsboro;
+    display: flex;
+    flex-direction: column;
+    /* 改为列布局 */
+}
+
+.note-content {
+    margin-bottom: .5rem;
+    /* 添加内容和按钮之间的间距 */
+}
+
+.delete-button-container {
+    display: flex;
+    justify-content: flex-end;
+    /* 使按钮靠右对齐 */
+    font-size: 0.5rem;
+}
+
+#noteList li:hover {
+    background-color: #eaeaea;
+    cursor: pointer;
+}
+
+.tabContent {
+    overflow-y: auto;
+    flex: 1;
 }
 </style>

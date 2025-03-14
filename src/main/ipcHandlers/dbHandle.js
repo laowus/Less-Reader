@@ -43,6 +43,8 @@ const dbHandle = () => {
         getNoteByCfi(cfi, event)
     })
 
+
+
 }
 
 

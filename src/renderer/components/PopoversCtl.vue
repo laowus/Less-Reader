@@ -3,7 +3,6 @@ import CommonContextMenu from './CommonContextMenu.vue';
 import Highlight from './Highlight.vue';
 import EventBus from '../../common/EventBus';
 import Note from '../models/Note';
-import { addAnnotation } from '../libs/reader.js';
 import { ref, reactive, toRaw } from 'vue';
 
 import NoteStyle from '../utils/readUtils/noteStyle';
@@ -91,13 +90,13 @@ const toggleHighlight = () => {
 
 const addNote = () => {
     const noteStyle = NoteStyle.getNoteStyle();
-    currentNote.value = new Note(0, props.bookId, noteStyle.color, selectionRef.value.text, noteStyle.type, selectionRef.value.cfi);
+    currentNote.value = new Note(0, props.bookId, noteStyle.color, selectionRef.value.text, noteStyle.type, selectionRef.value.cfi, selectionRef.value.chapter);
     ipcRenderer.once('db-insert-note-response', (event, res) => {
         if (res.success) {
             console.log(res.id);
             currentNote.value = res.data;
             console.log("增加后的当前note", currentNote.value);
-            addAnnotation(currentNote.value);
+            window.addAnnotation(currentNote.value);
         } else {
             console.log("添加失败");
         }
@@ -108,7 +107,7 @@ const addNote = () => {
         if (res.success) {
             currentNote.value = res.data;
             console.log("修改后的当前note", currentNote.value);
-            addAnnotation(currentNote.value);
+            window.addAnnotation(currentNote.value);
         } else {
             console.log("修改失败");
         }

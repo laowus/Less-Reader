@@ -350,7 +350,9 @@ class Reader {
 
     #onLoad(e) {
         const { doc, index } = e.detail
+        console.log(' #onLoad(e) ', doc.title);
         doc.addEventListener('pointerup', () => {
+            const chapter = doc.title;
             const sel = doc.getSelection()
             const range = getSelectionRange(sel)
             if (!range) return
@@ -359,7 +361,7 @@ class Reader {
             const cfi = this.view.getCFI(index, range);
             const lang = getLang(range.commonAncestorContainer)
             const text = sel.toString()
-            onSelectionEnd({ index, range, lang, cfi, pos, text })
+            onSelectionEnd({ index, range, lang, cfi, pos, text, chapter })
         })
     }
     //
@@ -407,11 +409,11 @@ export const noteRefresh = async () => {
     await reader.renderAnnotation();
 }
 
-export const removeNote = (cfi) => {
+window.removeNote = (cfi) => {
     reader.removeAnnotation(cfi)
 }
 
-export const addAnnotation = (note) => {
+window.addAnnotation = (note) => {
     const annotation = {
         value: note.cfi,
         type: note.type,
@@ -420,6 +422,10 @@ export const addAnnotation = (note) => {
     };
     reader.addAnnotation(annotation);
 }
+
+
+window.goToCfi = cfi => reader.view.goTo(cfi)
+
 
 
 

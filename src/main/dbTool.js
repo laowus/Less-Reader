@@ -47,7 +47,10 @@ const createTable = () => {
             color TEXT, 
             note TEXT,
             type TEXT,
-            cfi TEXT
+            cfi TEXT,
+            chapter TEXT,
+            createTime TEXT,
+            updateTime TEXT
         )
     `, (err) => {
         if (err) {
@@ -208,9 +211,9 @@ const insertNote = (note, event) => {
             updateNote(note, row.id, event);
         } else {
             console.log('记录不存在，插入新记录');
-            db.run(`INSERT INTO tb_notes (bookId, color, note, type, cfi) 
-                VALUES (?, ?, ?, ?, ?)`,
-                [note.bookId, note.color, note.note, note.type, note.cfi],
+            db.run(`INSERT INTO tb_notes (bookId, color, note, type, cfi,chapter,createTime,updateTime) 
+                VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+                [note.bookId, note.color, note.note, note.type, note.cfi, note.chapter],
                 function (err) {
                     if (err) {
                         console.error(err.message);
@@ -229,7 +232,8 @@ const updateNote = (note, noteId, event) => {
     console.log('updateNote:', note, noteId);
     db.run(`UPDATE tb_notes 
         SET color = ?, 
-            type = ?
+            type = ?,
+            updateTime = datetime('now')
         WHERE id = ?`, [
         note.color,
         note.type,
@@ -247,7 +251,7 @@ const updateNote = (note, noteId, event) => {
 }
 
 const getAllNotes = (bookId, event) => {
-    db.all(`SELECT * FROM tb_notes where bookId = ?`, [bookId], (err, rows) => {
+    db.all(`SELECT * FROM tb_notes where bookId = ? `, [bookId], (err, rows) => {
         if (err) {
             console.error(err.message);
             event.reply('db-get-all-notes-response', { success: false });

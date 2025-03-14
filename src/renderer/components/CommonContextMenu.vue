@@ -1,6 +1,5 @@
 <script setup>
 import EventBus from '../../common/EventBus';
-import { removeNote } from '../libs/reader.js';
 const { ipcRenderer } = window.require('electron');
 const props = defineProps({
     posStyle: Object,
@@ -13,7 +12,7 @@ const toggleUnderline = () => {
         ipcRenderer.once("db-delete-note-response", (event, res) => {
             if (res.success) {
                 console.log("db-delete-note-response", res.id);
-                removeNote(props.currentNote.cfi);
+                window.removeNote(props.currentNote.cfi);
                 EventBus.emit('commonCtxMenu-hide');
             } else {
                 console.log("删除失败");

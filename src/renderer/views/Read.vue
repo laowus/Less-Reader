@@ -52,10 +52,8 @@ const closeLeftBar = () => {
         <BottomBar :bookStyle="bookStyle" :setStyle="setStyle" />
     </div>
     <HeaderBar :currentBook="currentBook" :setLeftbarShow="setLeftbarShow"></HeaderBar>
-    <LeftBar v-show="leftbarShow"> </LeftBar>
-
+    <LeftBar v-show="leftbarShow" :currentBook="currentBook"> </LeftBar>
 </template>
-
 <style>
 :root {
     --active-bg: rgba(0, 0, 0, .05);

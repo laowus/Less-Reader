@@ -6,6 +6,27 @@
   "description": "icon集合",
   "glyphs": [
     {
+      "icon_id": "2076262",
+      "name": "目录",
+      "font_class": "mulu",
+      "unicode": "e890",
+      "unicode_decimal": 59536
+    },
+    {
+      "icon_id": "4465008",
+      "name": "书签",
+      "font_class": "shuqian",
+      "unicode": "e607",
+      "unicode_decimal": 58887
+    },
+    {
+      "icon_id": "8668035",
+      "name": "按目录抄录-线性",
+      "font_class": "anmuluchaolu-xianxing",
+      "unicode": "e61c",
+      "unicode_decimal": 58908
+    },
+    {
       "icon_id": "17979041",
       "name": "更多",
       "font_class": "gengduo",
