@@ -14,7 +14,14 @@ const initData = () => {
         ipcRenderer.once('db-get-all-notes-response', (event, res) => {
             if (res.success) {
                 console.log('initData db-get-all-notes-response', res.data);
-                noteList.value = res.data;
+                const categorizedNotes = res.data.reduce((acc, note) => {
+                    if (!acc[note.chapter]) {
+                        acc[note.chapter] = [];
+                    }
+                    acc[note.chapter].push(note);
+                    return acc;
+                }, {});
+                noteList.value = categorizedNotes;
                 resolve();  // 确保返回数据
             } else {
                 reject(new Error('获取笔记失败'));
@@ -66,6 +73,9 @@ const goToCfi = (cfi) => {
     console.log("goToCfi", cfi);
     window.goToCfi(cfi);
 }
+const getNoteContent = (note) => {
+    return note.note ? note.note.substring(0, 30) + (note.note.length > 20 ? '...' : '') : '无内容';
+}
 
 </script>
 
@@ -101,21 +111,27 @@ const goToCfi = (cfi) => {
         <div class="tabContent">
             <div id="toc-view" v-show="tabId === 0"></div>
             <div id="noteList" v-show="tabId === 1">
-                <ul>
-                    <li v-for="(note, index) in noteList" :key="index" :style="getNoteStyle(note)"
-                        @mouseover="showDeleteButton(index)"
-                        @mouseleave="hideDeleteButton(index)"
-                        @click="goToCfi(note.cfi)">
-                        <div v-if="deleteButtonIndex === index" class="delete-button-container">
-                            <div class="iconfont-btn" @click="deleteNote(note)">
-                                <span class="iconfont icon-shanchu"></span>
+                <div v-for="(notes, chapter) in noteList" :key="chapter">
+                    <h3>{{ chapter }}</h3>
+                    <ul>
+                        <li v-for="(note, index) in notes" :key="index"
+                            @mouseover="showDeleteButton(index)"
+                            @mouseleave="hideDeleteButton(index)"
+                            @click="goToCfi(note.cfi)">
+                            <div v-if="deleteButtonIndex === index" class="delete-button-container">
+                                <div id="note-time">
+                                    {{ note.updateTime }}
+                                </div>
+                                <div class="iconfont-btn" @click="deleteNote(note)">
+                                    <span class="iconfont icon-shanchu"></span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="note-content">
-                            {{ note.note || '无内容' }}
-                        </div>
-                    </li>
-                </ul>
+                            <div class="note-content" :style="getNoteStyle(note)">
+                                {{ getNoteContent(note) || '无内容' }}
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
             <div id="noteList" v-show="tabId === 2">
                 书签列表
@@ -320,25 +336,29 @@ const goToCfi = (cfi) => {
 }
 
 #noteList li {
-    font-size: 0.8rem;
+    font-size: 1rem;
     padding: .5rem;
     border-radius: 4px;
     margin-bottom: .25rem;
     background-color: gainsboro;
     display: flex;
     flex-direction: column;
-    /* 改为列布局 */
+}
+
+#note-time {
+    font-size: 0.8rem;
+    font-style: italic;
+    font-weight: bold;
 }
 
 .note-content {
     margin-bottom: .5rem;
-    /* 添加内容和按钮之间的间距 */
 }
 
 .delete-button-container {
     display: flex;
-    justify-content: flex-end;
-    /* 使按钮靠右对齐 */
+    justify-content: space-between;
+    align-items: center;
     font-size: 0.5rem;
 }
 

@@ -250,7 +250,7 @@ class Reader {
         if (toc) {
             this.#tocView = createTOCView(toc, href => {
                 this.view.goTo(href).catch(e => console.error(e))
-                this.closeSideBar()
+                //this.closeSideBar()
             })
             $('#toc-view').append(this.#tocView.element)
         }
