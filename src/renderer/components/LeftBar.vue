@@ -77,6 +77,10 @@ const getNoteContent = (note) => {
     return note.note ? note.note.substring(0, 30) + (note.note.length > 20 ? '...' : '') : '无内容';
 }
 
+const changeStyle = () => {
+    document.querySelector('.sidebar-container').classList;
+}
+
 </script>
 
 <template>
@@ -164,8 +168,12 @@ const getNoteContent = (note) => {
     flex-direction: column;
     width: 15%;
     max-width: 45%;
-    position: absolute;
-    background-color: #fff;
+    position: relative;
+    /* position: relative; */
+    background-color: #f0f0f0;
+
+    /* border-right: 1px solid gray; */
+
 }
 
 .flex-shrink-0 {

@@ -6,6 +6,27 @@
   "description": "icon集合",
   "glyphs": [
     {
+      "icon_id": "27876483",
+      "name": "侧边栏 分类 折叠",
+      "font_class": "a-cebianlanfenleizhedie",
+      "unicode": "e636",
+      "unicode_decimal": 58934
+    },
+    {
+      "icon_id": "27876504",
+      "name": "分类 折叠 侧边栏",
+      "font_class": "a-fenleizhediecebianlan",
+      "unicode": "e637",
+      "unicode_decimal": 58935
+    },
+    {
+      "icon_id": "33258607",
+      "name": "关闭侧边栏",
+      "font_class": "guanbicebianlan",
+      "unicode": "e893",
+      "unicode_decimal": 59539
+    },
+    {
       "icon_id": "2076262",
       "name": "目录",
       "font_class": "mulu",

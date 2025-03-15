@@ -6,6 +6,7 @@ const handleClose = () => {
 const props = defineProps({
     currentBook: Object,
     setLeftbarShow: Function,
+    leftbarShow: Boolean
 })
 
 </script>
@@ -13,12 +14,12 @@ const props = defineProps({
     <div class="chapter-title"> </div>
     <div class="header-bar">
         <div class="sidebar-bookmark-toggeler">
-            <div class="tooltip" data-tip="侧边栏" @click="setLeftbarShow(true)">
-                <span class="iconfont icon-sidebarcebianlan"></span>
-            </div>
-            <div class="tooltip" data-tip="书签">
+            <button class="tooltip" :title="props.leftbarShow ? '关闭侧边栏' : '打开侧边栏'" @click="setLeftbarShow(!props.leftbarShow)">
+                <span class="iconfont" :class="props.leftbarShow ? 'icon-a-cebianlanfenleizhedie' : 'icon-a-fenleizhediecebianlan'"></span>
+            </button>
+            <button class="tooltip" data-tip="书签">
                 <span class="iconfont icon-tianjiashuqian"></span>
-            </div>
+            </button>
         </div>
         <!-- <div class="header-title">
             <h2 class="line-clamp-1">
@@ -26,21 +27,21 @@ const props = defineProps({
             </h2>
         </div> -->
         <div class="header-control">
-            <div class="tooltip" data-tip="字体和布局">
+            <button class="tooltip" title="字体和布局">
                 <span class="iconfont icon-font-size"></span>
-            </div>
-            <div class="tooltip" data-tip="笔记本">
+            </button>
+            <button class="tooltip" title="笔记本">
                 <span class="iconfont icon-biji"></span>
-            </div>
-            <div class="tooltip1" data-tip="最小化">
+            </button>
+            <button class="tooltip1" title="最小化">
                 <span class="iconfont icon-zuixiaohua"></span>
-            </div>
-            <div class="tooltip1" data-tip="最大化">
+            </button>
+            <button class="tooltip1" title="最大化">
                 <span class="iconfont icon-zuidahua_huaban1"></span>
-            </div>
-            <div class="tooltip1" data-tip="关闭" @click="handleClose">
+            </button>
+            <button class="tooltip1" title="关闭" @click="handleClose">
                 <span class="iconfont icon-guanbi"></span>
-            </div>
+            </button>
         </div>
     </div>
 </template>
@@ -65,7 +66,6 @@ const props = defineProps({
     user-select: none;
     -webkit-app-region: drag;
     -webkit-user-select: none;
-
 }
 
 .header-bar {
@@ -106,6 +106,8 @@ const props = defineProps({
     display: flex;
     justify-content: center;
     align-items: center;
+    border: 0;
+    background-color: transparent;
 }
 
 .tooltip:hover {
@@ -119,13 +121,15 @@ const props = defineProps({
 }
 
 .tooltip1 {
-    margin-right: 0.5rem;
-    width: 1.5rem;
-    min-height: 1.5rem;
-    height: 1.5rem;
+    margin-right: 1rem;
+    width: 1.2rem;
+    height: 1.2rem;
     display: flex;
     justify-content: center;
     align-items: center;
+    border: 0;
+    background-color: transparent;
+    cursor: pointer;
     border-radius: 50%;
     background-color: gainsboro;
 }

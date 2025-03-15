@@ -6,6 +6,7 @@ import HeaderBar from '../components/HeaderBar.vue';
 import BottomBar from '../components/BottomBar.vue';
 import PopoversCtl from '../components/PopoversCtl.vue';
 import StyleUtil from '../utils/readUtils/styleUtil.js'
+import Config from '../utils/readUtils/config.js';
 import { open, setStyle } from '../libs/reader.js';
 const { ipcRenderer } = window.require('electron');
 import EventBus from '../../common/EventBus';
@@ -13,7 +14,7 @@ const route = useRoute();
 const bookId = route.params.id;
 const currentBook = ref({});
 const bookStyle = reactive({});
-const leftbarShow = ref(false);
+const leftbarShow = ref(Config.getConfig().leftbarShow);
 const $ = document.querySelector.bind(document)
 onMounted(() => {
     Object.assign(bookStyle, StyleUtil.getStyle());
@@ -32,7 +33,9 @@ EventBus.on('updateBook', (bookRecord) => {
 });
 const setLeftbarShow = (isShow) => {
     leftbarShow.value = isShow;
-    isShow ? $('#dimming-overlay').classList.add('show') : $('#dimming-overlay').classList.remove('show')
+    Config.setConfig({ ...Config.getConfig(), ...{ leftbarShow: isShow } });
+
+    // isShow ? $('#dimming-overlay').classList.add('show') : $('#dimming-overlay').classList.remove('show')
 };
 
 onMounted(() => {
@@ -51,8 +54,18 @@ const closeLeftBar = () => {
     <div id="bottom-bar">
         <BottomBar :bookStyle="bookStyle" :setStyle="setStyle" />
     </div>
-    <HeaderBar :currentBook="currentBook" :setLeftbarShow="setLeftbarShow"></HeaderBar>
-    <LeftBar v-show="leftbarShow" :currentBook="currentBook"> </LeftBar>
+    <div class="reader-page">
+        <div class="reader-container">
+            <LeftBar v-show="leftbarShow" :currentBook="currentBook"> </LeftBar>
+            <div class="reader-content">
+                <div id="grid-cell">
+                    <div class="foliate-viewer">
+                        <HeaderBar :currentBook="currentBook" :setLeftbarShow="setLeftbarShow" :leftbarShow="leftbarShow"></HeaderBar>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 <style>
 :root {
@@ -131,5 +144,35 @@ body {
     visibility: visible;
     opacity: 1;
     transition-delay: 0s;
+}
+
+.reader-page {
+    border-radius: 10px;
+}
+
+.reader-container {
+    height: 100dvh;
+    display: flex;
+}
+
+.reader-content {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    flex-grow: 1;
+    height: 100%;
+    display: grid;
+}
+
+#grid-cell {
+    border-radius: 10px;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.foliate-viewer {
+    width: 100%;
+    height: 100%;
 }
 </style>

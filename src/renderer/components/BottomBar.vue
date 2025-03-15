@@ -38,24 +38,6 @@ const changeStyle = (e, type) => {
 </script>
 <template>
     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick" tab-position="bottom" type="border-card" stretch>
-        <el-tab-pane name="first">
-            <template #label>
-                <span class="tab-item-title">
-                    <el-icon :size="20">
-                        <List />
-                    </el-icon>
-                    <span> 目录</span>
-                </span>
-            </template>
-            <!-- <div id="side-bar-header">
-                <img id="side-bar-cover">
-                <div>
-                    <h1 id="side-bar-title"></h1>
-                    <p id="side-bar-author"></p>
-                </div>
-            </div>
-            <div id="toc-view"></div> -->
-        </el-tab-pane>
         <el-tab-pane name="second">
             <template #label>
                 <span class="tab-item-title">

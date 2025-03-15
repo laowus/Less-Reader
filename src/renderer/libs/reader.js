@@ -218,7 +218,8 @@ class Reader {
     async open(file, bookId, cfi) {
         this.bookId = bookId
         this.view = document.createElement('foliate-view')
-        document.body.append(this.view)
+        $('.foliate-viewer').append(this.view)
+        //document.body.append(this.view)
         await this.view.open(file)
         this.view.addEventListener('load', this.#onLoad.bind(this))
         this.view.addEventListener('relocate', this.#onRelocate.bind(this))
