@@ -96,6 +96,7 @@ const addNote = () => {
             console.log(res.id);
             currentNote.value = res.data;
             console.log("增加后的当前note", currentNote.value);
+            updateLeftbarNotes();
             window.addAnnotation(currentNote.value);
         } else {
             console.log("添加失败");
@@ -107,6 +108,7 @@ const addNote = () => {
         if (res.success) {
             currentNote.value = res.data;
             console.log("修改后的当前note", currentNote.value);
+            updateLeftbarNotes();
             window.addAnnotation(currentNote.value);
         } else {
             console.log("修改失败");
@@ -124,6 +126,10 @@ const getNoteByCfi = (cfi) => {
         }
     })
     ipcRenderer.send('db-get-book-by-cfi', cfi);
+}
+
+const updateLeftbarNotes = () => {
+    EventBus.emit('updateLeftbarNotes');
 }
 
 </script>

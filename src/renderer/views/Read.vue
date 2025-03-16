@@ -8,8 +8,8 @@ import PopoversCtl from '../components/PopoversCtl.vue';
 import StyleUtil from '../utils/readUtils/styleUtil.js'
 import Config from '../utils/readUtils/config.js';
 import { open, setStyle } from '../libs/reader.js';
-const { ipcRenderer } = window.require('electron');
 import EventBus from '../../common/EventBus';
+const { ipcRenderer } = window.require('electron');
 const route = useRoute();
 const bookId = route.params.id;
 const currentBook = ref({});
@@ -27,14 +27,12 @@ onMounted(() => {
 });
 
 EventBus.on('updateBook', (bookRecord) => {
-    //获取当前的book
     const newBook = { ...currentBook.value, ...bookRecord };
     ipcRenderer.send('db-update-book', newBook);
 });
 const setLeftbarShow = (isShow) => {
     leftbarShow.value = isShow;
     Config.setConfig({ ...Config.getConfig(), ...{ leftbarShow: isShow } });
-
     // isShow ? $('#dimming-overlay').classList.add('show') : $('#dimming-overlay').classList.remove('show')
 };
 

@@ -4,7 +4,6 @@ import { createTOCView } from './ui/tree.js'
 import { Overlayer } from './ui/overlayer.js'
 import StyleUtil from '../utils/readUtils/styleUtil.js';
 import EventBus from '../../common/EventBus';
-import BookNoteUtil from '../utils/fileUtils/bookNoteUtil.js';
 const { ipcRenderer } = window.require('electron');
 
 /**
@@ -208,22 +207,28 @@ class Reader {
     annotationsByValue = new Map()
     #footnoteHandler = new FootnoteHandler()
     bookmarks
-    // closeSideBar() {
-    //     $('#dimming-overlay').classList.remove('show')
-    //     $('#bottom-bar').classList.remove('show')
-    // }
+    view
     constructor() {
-        //$('#dimming-overlay').addEventListener('click', () => this.closeSideBar())
-        // 添加鼠标滚轮事件监听器
-        document.addEventListener('wheel', this.#handleWheel.bind(this));
+        document.addEventListener('wheel', this.#debounce(this.#handleWheel.bind(this), 100));
+    }
+    #debounce(func, wait) {
+        let timeout;
+        return function (...args) {
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
     }
     #handleWheel(event) {
-        if (event.deltaY > 0) {
-            // 向下滚动，翻到下一页
-            this.view.goRight();
+        console.log('wheel', event.deltaY); // 添加日志进行调试
+        if (this.view) { // 确保 view 存在
+            if (event.deltaY > 0) {
+                this.view.goRight();
+            } else {
+                this.view.goLeft();
+            }
         } else {
-            // 向上滚动，翻到上一页
-            this.view.goLeft();
+            console.error('View is not initialized');
         }
     }
     async open(file, bookId, cfi) {
@@ -235,22 +240,16 @@ class Reader {
         this.view.addEventListener('load', this.#onLoad.bind(this))
         this.view.addEventListener('relocate', this.#onRelocate.bind(this))
         this.view.addEventListener('click-view', this.#onClickView.bind(this))
+        this.view.addEventListener('wheel', this.#handleWheel.bind(this))
         const { book } = this.view
         this.view.renderer.setStyles?.(getCSS(style))
         if (!cfi) this.view.renderer.next()
         this.setView(this.view)
         await this.view.init({ lastLocation: cfi })
-
-        //$('#header-bar').style.visibility = 'visible'
         const slider = $('#progress-slider')
         slider.dir = book.dir
         slider.addEventListener('input', e =>
             this.view.goToFraction(parseFloat(e.target.value)))
-        // for (const fraction of this.view.getSectionFractions()) {
-        //     const option = document.createElement('option')
-        //     option.value = fraction
-        //     $('#tick-marks').append(option)
-        // }
         document.addEventListener('keydown', this.#handleKeydown.bind(this))
         const title = formatLanguageMap(book.metadata?.title) || 'Untitled Book'
         document.title = title
@@ -262,7 +261,6 @@ class Reader {
         if (toc) {
             this.#tocView = createTOCView(toc, href => {
                 this.view.goTo(href).catch(e => console.error(e))
-                //this.closeSideBar()
             })
             $('#toc-view').append(this.#tocView.element)
         }

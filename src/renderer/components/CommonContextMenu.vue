@@ -13,6 +13,7 @@ const toggleUnderline = () => {
             if (res.success) {
                 console.log("db-delete-note-response", res.id);
                 window.removeNote(props.currentNote.cfi);
+                EventBus.emit('updateLeftbarNotes');
                 EventBus.emit('commonCtxMenu-hide');
             } else {
                 console.log("删除失败");

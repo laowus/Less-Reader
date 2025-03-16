@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue';
+import EventBus from '../../common/EventBus';
 const { ipcRenderer } = window.require('electron');
 const props = defineProps({
     currentBook: Object,
@@ -77,9 +78,9 @@ const getNoteContent = (note) => {
     return note.note ? note.note.substring(0, 30) + (note.note.length > 20 ? '...' : '') : '无内容';
 }
 
-const changeStyle = () => {
-    document.querySelector('.sidebar-container').classList;
-}
+EventBus.on('updateLeftbarNotes', () => {
+    initData();
+});
 
 </script>
 
