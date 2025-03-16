@@ -21,11 +21,6 @@ const props = defineProps({
                 <span class="iconfont icon-tianjiashuqian"></span>
             </button>
         </div>
-        <!-- <div class="header-title">
-            <h2 class="line-clamp-1">
-                {{ props.currentBook.name }}
-            </h2>
-        </div> -->
         <div class="header-control">
             <button class="tooltip" title="字体和布局">
                 <span class="iconfont icon-font-size"></span>

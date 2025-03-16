@@ -6,6 +6,20 @@
   "description": "icon集合",
   "glyphs": [
     {
+      "icon_id": "6241224",
+      "name": "上一页",
+      "font_class": "shangyiye",
+      "unicode": "e614",
+      "unicode_decimal": 58900
+    },
+    {
+      "icon_id": "6241225",
+      "name": "下一页",
+      "font_class": "xiayiye",
+      "unicode": "e615",
+      "unicode_decimal": 58901
+    },
+    {
       "icon_id": "27876483",
       "name": "侧边栏 分类 折叠",
       "font_class": "a-cebianlanfenleizhedie",

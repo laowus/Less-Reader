@@ -3,7 +3,7 @@ import { onMounted, reactive, ref, vShow } from 'vue';
 import { useRoute } from 'vue-router';
 import LeftBar from '../components/LeftBar.vue';
 import HeaderBar from '../components/HeaderBar.vue';
-import BottomBar from '../components/BottomBar.vue';
+import FooterBar from '../components/FooterBar.vue';
 import PopoversCtl from '../components/PopoversCtl.vue';
 import StyleUtil from '../utils/readUtils/styleUtil.js'
 import Config from '../utils/readUtils/config.js';
@@ -51,9 +51,6 @@ const closeLeftBar = () => {
 <template>
     <PopoversCtl :bookId="bookId"></PopoversCtl>
     <div id="dimming-overlay" aria-hidden="true"></div>
-    <div id="bottom-bar">
-        <BottomBar :bookStyle="bookStyle" :setStyle="setStyle" />
-    </div>
     <div class="reader-page">
         <div class="reader-container">
             <LeftBar v-show="leftbarShow" :currentBook="currentBook"> </LeftBar>
@@ -61,6 +58,7 @@ const closeLeftBar = () => {
                 <div id="grid-cell">
                     <div class="foliate-viewer">
                         <HeaderBar :currentBook="currentBook" :setLeftbarShow="setLeftbarShow" :leftbarShow="leftbarShow"></HeaderBar>
+                        <FooterBar />
                     </div>
                 </div>
             </div>

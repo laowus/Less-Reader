@@ -214,6 +214,17 @@ class Reader {
     // }
     constructor() {
         //$('#dimming-overlay').addEventListener('click', () => this.closeSideBar())
+        // 添加鼠标滚轮事件监听器
+        document.addEventListener('wheel', this.#handleWheel.bind(this));
+    }
+    #handleWheel(event) {
+        if (event.deltaY > 0) {
+            // 向下滚动，翻到下一页
+            this.view.goRight();
+        } else {
+            // 向上滚动，翻到上一页
+            this.view.goLeft();
+        }
     }
     async open(file, bookId, cfi) {
         this.bookId = bookId
@@ -235,11 +246,11 @@ class Reader {
         slider.dir = book.dir
         slider.addEventListener('input', e =>
             this.view.goToFraction(parseFloat(e.target.value)))
-        for (const fraction of this.view.getSectionFractions()) {
-            const option = document.createElement('option')
-            option.value = fraction
-            $('#tick-marks').append(option)
-        }
+        // for (const fraction of this.view.getSectionFractions()) {
+        //     const option = document.createElement('option')
+        //     option.value = fraction
+        //     $('#tick-marks').append(option)
+        // }
         document.addEventListener('keydown', this.#handleKeydown.bind(this))
         const title = formatLanguageMap(book.metadata?.title) || 'Untitled Book'
         document.title = title
@@ -374,8 +385,10 @@ class Reader {
             : `Loc ${location.current}`
         const slider = $('#progress-slider')
         // slider.style.visibility = 'visible'
+        const currentPercent = $('#current-percent')
         slider.value = fraction
         slider.title = `${percent} · ${loc}`
+        currentPercent.innerText = percent
         if (tocItem?.label) $('.chapter-title').innerText = tocItem?.label
         if (tocItem?.href) this.#tocView?.setCurrentHref?.(tocItem.href)
         //保存到当前阅读记录到localstorage中
@@ -426,6 +439,10 @@ window.addAnnotation = (note) => {
 
 
 window.goToCfi = cfi => reader.view.goTo(cfi)
+
+window.goToNext = (isNext) => {
+    isNext ? reader.view.goRight() : reader.view.goLeft();
+}
 
 
 
