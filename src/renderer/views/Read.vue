@@ -2,6 +2,7 @@
 import { onMounted, reactive, ref, vShow } from 'vue';
 import { useRoute } from 'vue-router';
 import LeftBar from '../components/LeftBar.vue';
+import ReadDialog from '../components/ReadDialog.vue';
 import HeaderBar from '../components/HeaderBar.vue';
 import FooterBar from '../components/FooterBar.vue';
 import PopoversCtl from '../components/PopoversCtl.vue';
@@ -24,6 +25,7 @@ onMounted(() => {
         if (currentBook.value.path) open(currentBook.value.path, currentBook.value.id, currentBook.value.lastReadPosition, bookStyle).catch(e => console.error(e))
     });
     ipcRenderer.send('db-get-book', bookId);
+
 });
 
 EventBus.on('updateBook', (bookRecord) => {
@@ -36,16 +38,14 @@ const setLeftbarShow = (isShow) => {
     // isShow ? $('#dimming-overlay').classList.add('show') : $('#dimming-overlay').classList.remove('show')
 };
 
-onMounted(() => {
-    $('#dimming-overlay').addEventListener('click', () => closeLeftBar())
+const readDialogShow = ref(false);
+
+EventBus.on('read-dialog-show', (showHide) => {
+    readDialogShow.value = showHide;
 });
 
-const closeLeftBar = () => {
-    setLeftbarShow(false);
-}
 
 </script>
-
 <template>
     <PopoversCtl :bookId="bookId"></PopoversCtl>
     <div id="dimming-overlay" aria-hidden="true"></div>
@@ -57,6 +57,7 @@ const closeLeftBar = () => {
                     <div class="foliate-viewer">
                         <HeaderBar :currentBook="currentBook" :setLeftbarShow="setLeftbarShow" :leftbarShow="leftbarShow"></HeaderBar>
                         <FooterBar />
+                        <ReadDialog v-show="readDialogShow" />
                     </div>
                 </div>
             </div>

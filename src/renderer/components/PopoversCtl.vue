@@ -11,14 +11,12 @@ const { ipcRenderer } = window.require('electron');
 const props = defineProps({
     bookId: String
 })
-
 const commonCtxMenuShow = ref(false);
 const highlightShow = ref(false);
 const ctxMenuPosStyle = reactive({ left: -999, top: -999, bottom: -999 });
 const currentNote = ref({});
 const selectionRef = reactive({});
 const highlightRef = ref(null);
-
 const showCommonCtxMenu = (selection) => {
     selectionRef.value = selection;
     commonCtxMenuShow.value = true;

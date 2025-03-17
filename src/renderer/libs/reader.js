@@ -167,11 +167,8 @@ const clickPart = (cx, cy) => {
 }
 
 const partAction = ["prev", "menu", "next", "prev", "menu", "next", "prev", "menu", "next"]
-
 let style
-
 const footnoteDialog = document.getElementById('footnote-dialog')
-
 const onSelectionEnd = (selection) => {
     EventBus.emit('commonCtxMenu-show', selection);
 }
@@ -198,7 +195,6 @@ const notesRefresh = (bookId) => {
     });
 };
 
-
 class Reader {
     bookId
     #tocView
@@ -209,27 +205,6 @@ class Reader {
     bookmarks
     view
     constructor() {
-        document.addEventListener('wheel', this.#debounce(this.#handleWheel.bind(this), 100));
-    }
-    #debounce(func, wait) {
-        let timeout;
-        return function (...args) {
-            const context = this;
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(context, args), wait);
-        };
-    }
-    #handleWheel(event) {
-        console.log('wheel', event.deltaY); // 添加日志进行调试
-        if (this.view) { // 确保 view 存在
-            if (event.deltaY > 0) {
-                this.view.goRight();
-            } else {
-                this.view.goLeft();
-            }
-        } else {
-            console.error('View is not initialized');
-        }
     }
     async open(file, bookId, cfi) {
         this.bookId = bookId
@@ -240,7 +215,7 @@ class Reader {
         this.view.addEventListener('load', this.#onLoad.bind(this))
         this.view.addEventListener('relocate', this.#onRelocate.bind(this))
         this.view.addEventListener('click-view', this.#onClickView.bind(this))
-        this.view.addEventListener('wheel', this.#handleWheel.bind(this))
+
         const { book } = this.view
         this.view.renderer.setStyles?.(getCSS(style))
         if (!cfi) this.view.renderer.next()

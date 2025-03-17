@@ -1,5 +1,6 @@
 <script setup>
 const { ipcRenderer } = window.require('electron');
+import EventBus from '../../common/EventBus';
 const handleClose = () => {
     ipcRenderer.send('window-close');
 }
@@ -9,6 +10,9 @@ const props = defineProps({
     leftbarShow: Boolean
 })
 
+const openDialog = () => {
+    EventBus.emit('read-dialog-show', true);
+}
 </script>
 <template>
     <div class="chapter-title"> </div>
@@ -22,8 +26,8 @@ const props = defineProps({
             </button>
         </div>
         <div class="header-control">
-            <button class="tooltip" title="字体和布局">
-                <span class="iconfont icon-font-size"></span>
+            <button class="tooltip" title="字体和布局" @click="openDialog">
+                <span class="iconfont icon-zitidaxiao"></span>
             </button>
             <button class="tooltip" title="笔记本">
                 <span class="iconfont icon-biji"></span>
@@ -45,18 +49,13 @@ const props = defineProps({
     position: absolute;
     top: 10px;
     width: 50%;
-    /* 调整宽度以适应居中 */
     height: 2.75rem;
     left: 25%;
-    /* 调整 left 值以居中 */
     right: 25%;
-    /* 调整 right 值以居中 */
     margin: 0 auto;
-    /* 水平居中 */
     font-size: 14px;
     color: grey;
-    text-align: center;
-    /* 文本居中 */
+    /* text-align: center; */
     z-index: 11;
     user-select: none;
     -webkit-app-region: drag;
@@ -76,7 +75,7 @@ const props = defineProps({
     transition-duration: .3s;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    z-index: 10;
+    z-index: 12;
     vertical-align: top;
 }
 
@@ -156,7 +155,6 @@ const props = defineProps({
 }
 
 .header-control {
-    z-index: 20;
     align-items: center;
     height: 100%;
     display: flex;

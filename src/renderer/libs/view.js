@@ -374,6 +374,13 @@ export class View extends HTMLElement {
                 .then(x => x ? this.goTo(href) : null)
                 .catch(e => console.error(e))
         })
+        doc.addEventListener('wheel', e => {
+            if (e.deltaY > 0) {
+                this.goRight();
+            } else {
+                this.goLeft();
+            }
+        }, false)
     }
 
     #handleClick(doc) {
