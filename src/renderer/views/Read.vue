@@ -8,7 +8,7 @@ import FooterBar from '../components/FooterBar.vue';
 import PopoversCtl from '../components/PopoversCtl.vue';
 import StyleUtil from '../utils/readUtils/styleUtil.js'
 import Config from '../utils/readUtils/config.js';
-import { open, setStyle } from '../libs/reader.js';
+import { open } from '../libs/reader.js';
 import EventBus from '../../common/EventBus';
 const { ipcRenderer } = window.require('electron');
 const route = useRoute();
@@ -35,13 +35,13 @@ EventBus.on('updateBook', (bookRecord) => {
 const setLeftbarShow = (isShow) => {
     leftbarShow.value = isShow;
     Config.setConfig({ ...Config.getConfig(), ...{ leftbarShow: isShow } });
-    // isShow ? $('#dimming-overlay').classList.add('show') : $('#dimming-overlay').classList.remove('show')
 };
 
 const readDialogShow = ref(false);
 
 EventBus.on('read-dialog-show', (showHide) => {
     readDialogShow.value = showHide;
+    showHide ? $('#dimming-overlay').classList.add('show') : $('#dimming-overlay').classList.remove('show');
 });
 
 
@@ -118,7 +118,7 @@ body {
     color: CanvasText;
 }
 
-#bottom-bar.show {
+#bottom-bar .show {
     visibility: visible;
     transform: translateY(0);
     transition-delay: 0s;
@@ -135,6 +135,7 @@ body {
     background: rgba(0, 0, 0, .2);
     opacity: 0;
     transition: visibility 0s linear 300ms, opacity 300ms ease;
+
 }
 
 #dimming-overlay.show {

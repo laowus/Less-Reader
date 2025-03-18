@@ -160,7 +160,7 @@ EventBus.on('updateLeftbarNotes', () => {
 .sidebar-container {
     border-bottom-left-radius: 10px;
     border-top-left-radius: 10px;
-    z-index: 20;
+    z-index: 15;
     display: flex;
     opacity: 1;
     height: 100%;

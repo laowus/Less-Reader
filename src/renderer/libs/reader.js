@@ -8,20 +8,25 @@ const { ipcRenderer } = window.require('electron');
 
 /**
  * fontsize 字体大小
+ * fontWeight 字体粗细
  * spacing / lineHeight 行距 
  * letterSpacing 字间距
  * textIndent 段落缩进
  * paragraphSpacing 段落间距
  * justify 是否两端对齐
  * hyphenate 是否自动连字符
+ * 文字方向 writing-mode: horizontal-tb; writing-mode: vertical-rl;
  */
-const getCSS = ({ fontSize, lineHeight, letterSpacing, textIndent,
-    paragraphSpacing, justify, hyphenate }) => `
+const getCSS = ({ fontSize, fontWeight, lineHeight, letterSpacing, wordSpacing, textIndent,
+    paragraphSpacing, justify, hyphenate, writingMode }) => `
     @namespace epub "http://www.idpf.org/2007/ops";
     html {
         color-scheme: light dark;
         letter-spacing: ${letterSpacing}px;
-        font-size: ${fontSize}em;
+        font-size: ${fontSize}px;
+        font-weight:${fontWeight};
+        writing-mode:${writingMode};
+
     }
     /* https://github.com/whatwg/html/issues/5426 */
     @media (prefers-color-scheme: dark) {
@@ -45,6 +50,8 @@ const getCSS = ({ fontSize, lineHeight, letterSpacing, textIndent,
         hanging-punctuation: allow-end last;
         widows: 2;
         text-indent: ${textIndent}em !important;
+        letter-spacing: ${letterSpacing}px !important;
+        word-spacing:${wordSpacing}px !important;
     }
     /* prevent the above from overriding the align attribute */
     [align="left"] { text-align: left; }
@@ -382,7 +389,7 @@ export const open = async (file, bookId, cfi, bookStyle) => {
     reader.renderAnnotation();
 }
 
-export const setStyle = (newStyle) => {
+window.setStyle = (newStyle) => {
     style = {
         ...style,
         ...newStyle

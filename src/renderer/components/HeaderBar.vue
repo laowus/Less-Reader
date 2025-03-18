@@ -15,9 +15,8 @@ const openDialog = () => {
 }
 </script>
 <template>
-    <div class="chapter-title"> </div>
     <div class="header-bar">
-        <div class="sidebar-bookmark-toggeler">
+        <div class="header-bar-left">
             <button class="tooltip" :title="props.leftbarShow ? '关闭侧边栏' : '打开侧边栏'" @click="setLeftbarShow(!props.leftbarShow)">
                 <span class="iconfont" :class="props.leftbarShow ? 'icon-a-cebianlanfenleizhedie' : 'icon-a-fenleizhediecebianlan'"></span>
             </button>
@@ -25,7 +24,8 @@ const openDialog = () => {
                 <span class="iconfont icon-tianjiashuqian"></span>
             </button>
         </div>
-        <div class="header-control">
+        <div class="chapter-title"> </div>
+        <div class="header-bar-right">
             <button class="tooltip" title="字体和布局" @click="openDialog">
                 <span class="iconfont icon-zitidaxiao"></span>
             </button>
@@ -46,20 +46,14 @@ const openDialog = () => {
 </template>
 <style>
 .chapter-title {
-    position: absolute;
-    top: 10px;
-    width: 50%;
-    height: 2.75rem;
-    left: 25%;
-    right: 25%;
-    margin: 0 auto;
-    font-size: 14px;
-    color: grey;
-    /* text-align: center; */
-    z-index: 11;
+    flex: 1;
     user-select: none;
     -webkit-app-region: drag;
     -webkit-user-select: none;
+    text-align: center;
+    margin: 0 auto;
+    font-size: 14px;
+    color: grey;
 }
 
 .header-bar {
@@ -71,7 +65,6 @@ const openDialog = () => {
     align-items: center;
     padding-left: 1rem;
     padding-right: 1rem;
-    opacity: 0;
     transition-duration: .3s;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
@@ -79,18 +72,29 @@ const openDialog = () => {
     vertical-align: top;
 }
 
-.header-bar:hover {
-    opacity: 1;
-    background: white;
-}
-
-.sidebar-bookmark-toggeler {
-    opacity: 1;
+.header-bar-left {
+    opacity: 0;
     height: 100%;
     align-items: center;
     display: flex;
     z-index: 20;
 }
+
+.header-bar-right {
+    opacity: 0;
+    align-items: center;
+    height: 100%;
+    display: flex;
+    margin-left: auto;
+    padding-right: 5px;
+}
+
+.header-bar-left:hover,
+.header-bar-right:hover {
+    opacity: 1;
+    background: white;
+}
+
 
 .tooltip {
     margin-right: 1rem;
@@ -152,13 +156,5 @@ const openDialog = () => {
     text-align: center;
     max-width: 50%;
     overflow: hidden;
-}
-
-.header-control {
-    align-items: center;
-    height: 100%;
-    display: flex;
-    margin-left: auto;
-    padding-right: 20px;
 }
 </style>

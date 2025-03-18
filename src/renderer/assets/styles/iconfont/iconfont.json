@@ -6,6 +6,48 @@
   "description": "icon集合",
   "glyphs": [
     {
+      "icon_id": "34120043",
+      "name": "文字方向-纵向",
+      "font_class": "wenzifangxiang-zongxiang",
+      "unicode": "ed95",
+      "unicode_decimal": 60821
+    },
+    {
+      "icon_id": "34120044",
+      "name": "文字方向-横向",
+      "font_class": "wenzifangxiang-hengxiang",
+      "unicode": "ed96",
+      "unicode_decimal": 60822
+    },
+    {
+      "icon_id": "771175",
+      "name": "黑圆1",
+      "font_class": "oval609",
+      "unicode": "e638",
+      "unicode_decimal": 58936
+    },
+    {
+      "icon_id": "6160547",
+      "name": "黑圆点",
+      "font_class": "heiyuandian",
+      "unicode": "e616",
+      "unicode_decimal": 58902
+    },
+    {
+      "icon_id": "908593",
+      "name": "加",
+      "font_class": "jia",
+      "unicode": "e6a9",
+      "unicode_decimal": 59049
+    },
+    {
+      "icon_id": "908594",
+      "name": "减",
+      "font_class": "jian",
+      "unicode": "e6aa",
+      "unicode_decimal": 59050
+    },
+    {
       "icon_id": "5886128",
       "name": "颜色",
       "font_class": "yanse",
