@@ -81,6 +81,7 @@ ipcMain.on('window-close', event => {
 });
 
 
+
 //全局事件监听
 const registryGlobalListeners = () => {
     //主进程事件监听

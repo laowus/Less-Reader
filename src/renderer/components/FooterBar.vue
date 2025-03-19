@@ -1,12 +1,45 @@
 <script setup>
 import { onMounted } from 'vue';
+import Speak from 'speak-tts';
+const speak = new Speak();
+
 const nextPage = (isNext) => {
     window.goToNext(isNext);
 }
+onMounted(async () => {
+    try {
+        await speak.init({
+            volume: 1,
+            lang: 'zh-CN', // 设置语言为中文
+            rate: 1,
+            pitch: 1,
+            voice: 'Google 普通话（中国大陆）', // 选择合适的语音
+            splitSentences: true,
+            listeners: {
+                onstart: () => {
+                    console.log('开始朗读');
+                },
+                onend: () => {
+                    console.log('朗读结束');
+                },
+                onerror: (error) => {
+                    console.error('朗读出错:', error);
+                },
+            },
+        });
+    } catch (error) {
+        console.error('初始化失败:', error);
+    }
+});
 
-const read = () => {
-    window.ttsHere();
-}
+const speakText = () => {
+    const text = '这是一段要朗读的中文文本。';
+    speak.speak({
+        text: text,
+    });
+};
+
+
 
 </script>
 <template>
@@ -20,7 +53,7 @@ const read = () => {
                 <input id="progress-slider" type="range" min="0" max="1" step="any">
             </div>
             <button title="朗读" class="footer-bar-button">
-                <span class="iconfont icon-erji" @click="read"></span>
+                <span class="iconfont icon-erji" @click="speakText"></span>
             </button>
             <button title="下一页" class="footer-bar-button">
                 <span class="iconfont icon-xiayiye" @click="nextPage(true)"></span>
