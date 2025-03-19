@@ -1,67 +1,23 @@
 <script setup>
 import { onMounted } from 'vue';
-import Speak from 'speak-tts';
-const speak = new Speak();
-
+const synth = window.speechSynthesis;
 const nextPage = (isNext) => {
     window.goToNext(isNext);
 }
 onMounted(async () => {
-    try {
-        await speak.init({
-            volume: 1,
-            lang: 'zh-CN',
-            rate: 1,
-            pitch: 1,
-            splitSentences: true,
-            listeners: {
-                onstart: () => {
-                    console.log('开始朗读');
-                },
-                onend: () => {
-                    console.log('朗读结束');
-                },
-                onerror: (error) => {
-                    console.error('朗读出错:', error);
-                },
-            },
+    synth.onvoiceschanged = () => {
+        const voices = synth.getVoices();
+        voices.forEach((voice) => {
+            console.log(`名称: ${voice.name}, 语言: ${voice.lang}, 语音类型: ${voice.default ? '默认' : '非默认'}`);
         });
+    };
 
-        // 借助浏览器原生 Web Speech API 获取可用语音
-        const getVoices = () => {
-            return new Promise((resolve) => {
-                const synth = window.speechSynthesis;
-                let voices = synth.getVoices();
-                if (voices.length > 0) {
-                    resolve(voices);
-                } else {
-                    synth.onvoiceschanged = () => {
-                        voices = synth.getVoices();
-                        resolve(voices);
-                    };
-                }
-            });
-        };
-
-        const voices = await getVoices();
-        console.log('可用语音:', voices);
-        // 示例：选择第一个中文语音
-        const chineseVoices = voices.filter(voice => voice.lang === 'zh-CN');
-        console.log('可用语音:', chineseVoices);
-        if (chineseVoices.length > 0) {
-            const selectedVoice = chineseVoices[2];
-            // 设置选中的语音
-            speak.setVoice(selectedVoice.name);
-        }
-    } catch (error) {
-        console.error('初始化失败:', error);
-    }
 });
 const speakText = () => {
     const text = '3月19日，因韵达快递部分加盟企业对协议客户安全管理存在重大漏洞，造成受害人重大财产损失。国家邮政局依法将进行立案调查。';
-    speak.speak({
-        text: text,
-    });
+    const utterance = new SpeechSynthesisUtterance(text);
+    synth.speak(utterance);
+
 };
 
 
