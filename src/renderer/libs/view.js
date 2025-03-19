@@ -2,6 +2,7 @@ import * as CFI from './tools/epubcfi.js'
 import { TOCProgress, SectionProgress } from './ui/progress.js'
 import { Overlayer } from './ui/overlayer.js'
 import { textWalker } from './ui/text-walker.js'
+const { TTS } = await import('./tools/tts.js')
 
 const SEARCH_PREFIX = 'foliate-search:'
 
@@ -224,6 +225,7 @@ export class View extends HTMLElement {
     #tocProgress
     #pageProgress
     #searchResults = new Map()
+    #index
     #cursorAutohider = new CursorAutohider(this, () =>
         this.hasAttribute('autohide-cursor'))
     isFixedLayout = false
@@ -336,6 +338,7 @@ export class View extends HTMLElement {
         return this.dispatchEvent(new CustomEvent(name, { detail, cancelable }))
     }
     #onRelocate({ reason, range, index, fraction, size }) {
+        this.#index = index
         const progress = this.#sectionProgress?.getProgress(index, fraction, size) ?? {}
         const tocItem = this.#tocProgress?.getProgress(index, range)
         const pageItem = this.#pageProgress?.getProgress(index, range)
@@ -618,12 +621,25 @@ export class View extends HTMLElement {
             for (const item of list) this.deleteAnnotation(item)
         this.#searchResults.clear()
     }
-    async initTTS() {
+    oldValue = null
+    async initTTS(stop) {
+        if (stop)
+            return this.#getOverlayer(this.#index)?.overlayer.remove(this.oldValue)
         const doc = this.renderer.getContents()[0].doc
         if (this.tts && this.tts.doc === doc) return
-        const { TTS } = await import('./tools/tts.js')
-        this.tts = new TTS(doc, textWalker, range =>
-            this.renderer.scrollToAnchor(range, true))
+        this.tts = new TTS(doc, textWalker, range => {
+            const obj = this.#getOverlayer(this.#index);
+            if (obj) {
+                const { overlayer } = obj;
+                if (this.oldValue) {
+                    overlayer.remove(this.oldValue);
+                }
+                const value = this.getCFI(this.#index, range);
+                overlayer.add(value, range, Overlayer.squiggly, { color: '#39c5bb' });
+                this.oldValue = value;
+            }
+            this.renderer.scrollToAnchor(range, true)
+        })
     }
     startMediaOverlay() {
         const { index } = this.renderer.getContents()[0]

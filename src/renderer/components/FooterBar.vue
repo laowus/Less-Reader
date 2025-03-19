@@ -1,8 +1,12 @@
 <script setup>
+import { onMounted } from 'vue';
 const nextPage = (isNext) => {
     window.goToNext(isNext);
 }
 
+const read = () => {
+    window.ttsHere();
+}
 
 </script>
 <template>
@@ -15,6 +19,9 @@ const nextPage = (isNext) => {
             <div id="nav-bar">
                 <input id="progress-slider" type="range" min="0" max="1" step="any">
             </div>
+            <button title="朗读" class="footer-bar-button">
+                <span class="iconfont icon-erji" @click="read"></span>
+            </button>
             <button title="下一页" class="footer-bar-button">
                 <span class="iconfont icon-xiayiye" @click="nextPage(true)"></span>
             </button>

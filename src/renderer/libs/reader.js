@@ -424,6 +424,15 @@ window.goToNext = (isNext) => {
     isNext ? reader.view.goRight() : reader.view.goLeft();
 }
 
+window.initTts = () => reader.view.initTTS()
+
+window.ttsStop = () => reader.view.initTTS(true)
+
+window.ttsHere = () => {
+    initTts()
+    return reader.view.tts.from(reader.view.lastLocation.range)
+}
+
 
 
 
