@@ -10,10 +10,9 @@ onMounted(async () => {
     try {
         await speak.init({
             volume: 1,
-            lang: 'zh-CN', // 设置语言为中文
+            lang: 'zh-CN',
             rate: 1,
             pitch: 1,
-            voice: 'Google 普通话（中国大陆）', // 选择合适的语音
             splitSentences: true,
             listeners: {
                 onstart: () => {
@@ -27,13 +26,39 @@ onMounted(async () => {
                 },
             },
         });
+
+        // 借助浏览器原生 Web Speech API 获取可用语音
+        const getVoices = () => {
+            return new Promise((resolve) => {
+                const synth = window.speechSynthesis;
+                let voices = synth.getVoices();
+                if (voices.length > 0) {
+                    resolve(voices);
+                } else {
+                    synth.onvoiceschanged = () => {
+                        voices = synth.getVoices();
+                        resolve(voices);
+                    };
+                }
+            });
+        };
+
+        const voices = await getVoices();
+        console.log('可用语音:', voices);
+        // 示例：选择第一个中文语音
+        const chineseVoices = voices.filter(voice => voice.lang === 'zh-CN');
+        console.log('可用语音:', chineseVoices);
+        if (chineseVoices.length > 0) {
+            const selectedVoice = chineseVoices[2];
+            // 设置选中的语音
+            speak.setVoice(selectedVoice.name);
+        }
     } catch (error) {
         console.error('初始化失败:', error);
     }
 });
-
 const speakText = () => {
-    const text = '这是一段要朗读的中文文本。';
+    const text = '3月19日，因韵达快递部分加盟企业对协议客户安全管理存在重大漏洞，造成受害人重大财产损失。国家邮政局依法将进行立案调查。';
     speak.speak({
         text: text,
     });
