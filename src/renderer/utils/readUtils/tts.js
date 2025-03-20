@@ -18,9 +18,8 @@ export default class Tts {
         if (this.isInit) return;
         this.getHere = here;
         this.isInit = true;
-        getNextVoiceText = next;
-        getPrevVoiceText = prev;
-
+        this.getNextVoiceText = next;
+        this.getPrevVoiceText = prev;
     }
 
     static speak(text) {

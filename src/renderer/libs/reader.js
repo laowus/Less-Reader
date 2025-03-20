@@ -5,6 +5,7 @@ import { Overlayer } from './ui/overlayer.js'
 import StyleUtil from '../utils/readUtils/styleUtil.js';
 import EventBus from '../../common/EventBus';
 const { ipcRenderer } = window.require('electron');
+import Tts from '../utils/readUtils/tts.js';
 
 /**
  * fontsize 字体大小
@@ -429,8 +430,11 @@ window.initTts = () => reader.view.initTTS()
 window.ttsStop = () => reader.view.initTTS(true)
 
 window.ttsHere = () => {
-    initTts()
-    return reader.view.tts.from(reader.view.lastLocation.range)
+    initTts();
+    Tts.init();
+    Tts.speak(reader.view.lastLocation.range.toString());
+    console.log("ttsHere", reader.view.lastLocation.range.toString());
+    // return reader.view.tts.from(reader.view.lastLocation.range)
 }
 
 
