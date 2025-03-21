@@ -1,5 +1,8 @@
 <script setup>
+import { ref } from 'vue';
 import Tts from '../utils/readUtils/tts.js';
+const isPlaying = ref(false);
+const showLamp = ref(false);
 const nextPage = (isNext) => {
     window.goToNext(isNext);
 }
@@ -12,11 +15,41 @@ const speakText = () => {
         );
         Tts.speak();
         Tts.updateTtsState(Tts.PLAY_STATE.PLAYING);
+        isPlaying.value = true;
+        showLamp.value = true;
     }
 }
+const stopSpeaking = () => {
+    Tts.stop();
+    Tts.updateTtsState(Tts.PLAY_STATE.STOPPED);
+    isPlaying.value = false;
+}
 
+const showTtspanel = () => {
+    console.log("显示tss panel")
+}
 </script>
 <template>
+    <div class="tts-panel">
+        <div class="panel-container">
+            <div class="panel-top">
+                <input class="range" min="0" max="3" step="0.1" type="range" value="1">
+            </div>
+        </div>
+    </div>
+    <div class="lamp" @click="showTtspanel" v-show="showLamp">
+        <div class="lamp-container">
+            <div class="lamp-content">
+                <div class="lamp-real">
+                    <div class="lamp-item" v-for="(item, index) in 4"
+                        :style="isPlaying ?
+                            'animation-name:bounce; animation-duration: 1.' + index + 's; animation-timing-function:ease-in-out;animation-iteration-count:infinite; animation-delay: 0.' + index + 's; '
+                            : ''">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="footer-bar-container">
         <div class="footer-bar">
             <button title="上一页" class="footer-bar-button">
@@ -36,6 +69,28 @@ const speakText = () => {
     </div>
 </template>
 <style>
+@keyframes moveGradient {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    100% {
+        transform: translate(25%, 25%);
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: scaleY(1);
+    }
+
+    50% {
+        transform: scaleY(0.6);
+    }
+}
+
 .footer-bar-container {
     display: flex;
     position: absolute;
@@ -102,5 +157,88 @@ const speakText = () => {
     flex: 1;
     margin-left: .5rem;
     margin-right: .5rem;
+}
+
+.lamp {
+    width: 3rem;
+    height: 3rem;
+    right: 1.5rem;
+    bottom: 3rem;
+    position: fixed;
+    z-index: 23;
+}
+
+.lamp:hover {
+    cursor: pointer;
+}
+
+.lamp-container {
+    width: 100%;
+    position: relative;
+    height: 100%;
+}
+
+.lamp-content {
+    align-items: center;
+    display: flex;
+    inset: 0;
+    position: absolute;
+    justify-content: center;
+    background-color: #10b981;
+    border-radius: 50%;
+}
+
+
+.lamp-real {
+    align-items: flex-end;
+    display: flex;
+    gap: 0.2rem;
+}
+
+.lamp-item {
+    border-top-left-radius: .25rem;
+    border-top-right-radius: .25rem;
+    width: .25rem;
+    height: 16px;
+    background: #FFF;
+}
+
+.tts-panel {
+    position: absolute;
+    bottom: 6.5rem;
+    right: 1rem;
+    width: 324.3px;
+    height: 184px;
+    background-color: oklch(90.6701% 0 0 / 1);
+    border-radius: 1rem;
+    z-index: 25;
+}
+
+.panel-container {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: 1rem;
+}
+
+.panel-top {
+    flex-direction: column;
+    width: 100%;
+    display: flex;
+}
+
+.range {
+    width: 100%;
+    /* -webkit-appearance: none;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    border-radius: 1rem;
+    background-color: transparent;
+    height: 1.5rem;
+    cursor: pointer;
+    color: inherit; */
 }
 </style>
