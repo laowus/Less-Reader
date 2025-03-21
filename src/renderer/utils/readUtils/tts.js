@@ -1,17 +1,20 @@
-export const PLAY_STATE = {
-    PLAYING: 1, STOPPED: 2, PAUSED: 3, CONTINUED: 4
-}
+
 
 export default class Tts {
 
+    static PLAY_STATE = {
+        PLAYING: 1, STOPPED: 2, PAUSED: 3, CONTINUED: 4
+    }
+
     static synth = window.speechSynthesis;
     static voices = [];
-    static isSpeaking = false;
+    static current_tts_state = this.PLAY_STATE.STOPPED;
     static isInit = false;
 
     static getHere = () => "";
     static getNextVoiceText = () => '';
     static getPrevVoiceText = () => '';
+    static currentVoiceText = "";//当前的播放的文本
 
     // 初始化语音合成功能
     static init(here, next, prev) {
@@ -22,25 +25,36 @@ export default class Tts {
         this.getPrevVoiceText = prev;
     }
 
-    static speak(text) {
+    static async speak(content) {
+        console.log('Tts.speak', content);
+        if (content != null) {
+            this.currentVoiceText = content;
+        } else {
+            this.currentVoiceText = this.getHere();
+        }
+
         if (!this.isInit) {
             console.error('Tts is not initialized. Call Tts.init() first.');
             return;
         }
-        const utterance = new SpeechSynthesisUtterance(text);
 
-        // 监听语音合成开始事件
-        utterance.onstart = () => {
-            this.isSpeaking = true;
-            console.log('TTS started speaking.');
-        };
-
-        // 监听语音合成结束事件
-        utterance.onend = () => {
-            this.isSpeaking = false;
-            console.log('TTS finished speaking.');
-        };
-
+        let utterance = new SpeechSynthesisUtterance(this.currentVoiceText);
+        console.log('utterance', utterance);
         this.synth.speak(utterance);
+
+        utterance.onend = async () => {
+            if (this.current_tts_state === this.PLAY_STATE.PLAYING) {
+                const nextText = await this.getNextVoiceText();
+                if (nextText) {
+                    this.currentVoiceText = nextText;
+                    return this.speak(this.currentVoiceText);
+                }
+
+            }
+        }
+    }
+
+    static updateTtsState(newState) {
+        this.current_tts_state = newState;
     }
 }

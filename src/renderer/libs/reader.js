@@ -418,6 +418,10 @@ window.addAnnotation = (note) => {
     reader.addAnnotation(annotation);
 }
 
+window.prevSection = () => reader.view.renderer.prevSection()
+
+window.nextSection = () => reader.view.renderer.nextSection()
+
 
 window.goToCfi = cfi => reader.view.goTo(cfi)
 
@@ -431,11 +435,32 @@ window.ttsStop = () => reader.view.initTTS(true)
 
 window.ttsHere = () => {
     initTts();
-    Tts.init();
-    Tts.speak(reader.view.lastLocation.range.toString());
-    console.log("ttsHere", reader.view.lastLocation.range.toString());
-    // return reader.view.tts.from(reader.view.lastLocation.range)
+    return reader.view.tts.from(reader.view.lastLocation.range)
 }
+window.ttsNextSection = async () => {
+    await nextSection()
+    initTts()
+    return ttsNext()
+}
+
+window.ttsPrevSection = async (last) => {
+    await prevSection()
+    initTts()
+    return last ? reader.view.tts.end() : ttsNext()
+}
+//
+window.ttsNext = async () => {
+    const result = reader.view.tts.next(true)
+    if (result) return result
+    return await ttsNextSection()
+}
+
+window.ttsPrev = () => {
+    const result = reader.view.tts.prev(true)
+    if (result) return result
+    return ttsPrevSection(true)
+}
+
 
 
 

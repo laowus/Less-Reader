@@ -1,12 +1,19 @@
 <script setup>
-
+import Tts from '../utils/readUtils/tts.js';
 const nextPage = (isNext) => {
     window.goToNext(isNext);
 }
 const speakText = () => {
-    window.ttsHere();
+    if (Tts.current_tts_state !== 1) {
+        Tts.init(
+            window.ttsHere,
+            window.ttsNext,
+            window.ttsPrev
+        );
+        Tts.speak();
+        Tts.updateTtsState(Tts.PLAY_STATE.PLAYING);
+    }
 }
-
 
 </script>
 <template>
