@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import Tts from '../utils/readUtils/tts.js';
 const isPlaying = ref(false);
 const showLamp = ref(false);
+const spendArr = ["慢", "", "1.0", "1.5", "2.0", "", "快"];
 const nextPage = (isNext) => {
     window.goToNext(isNext);
 }
@@ -26,14 +27,37 @@ const stopSpeaking = () => {
 }
 
 const showTtspanel = () => {
-    console.log("显示tss panel")
+    showLamp.value = !showLamp.value;
 }
 </script>
 <template>
-    <div class="tts-panel">
+    <div class="tts-panel" v-if="showLamp">
         <div class="panel-container">
             <div class="panel-top">
                 <input class="range" min="0" max="3" step="0.1" type="range" value="1">
+                <div class="line">
+                    <span class="text-center" v-for="(item, index) in 7">|</span>
+                </div>
+                <div class="line">
+                    <span class="text-center" v-for="(item, index) in spendArr">{{ item }}</span>
+                </div>
+                <div class="panel-btns">
+                    <button class="panel-btn">
+                        <span class="iconfont icon-a-26Ashangyige"></span>
+                    </button>
+                    <button class="panel-btn">
+                        <span class="iconfont icon-bofang"></span>
+                    </button>
+                    <button class="panel-btn">
+                        <span class="iconfont icon-a-26Bxiayige"></span>
+                    </button>
+                    <button class="panel-btn">
+                        <span class="iconfont icon-tingzhi"></span>
+                    </button>
+                    <button class="panel-btn">
+                        <span class="iconfont icon-shengyin"></span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -228,17 +252,114 @@ const showTtspanel = () => {
     flex-direction: column;
     width: 100%;
     display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
 }
 
 .range {
-    width: 100%;
-    /* -webkit-appearance: none;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-    overflow: hidden;
-    border-radius: 1rem;
-    background-color: transparent;
-    height: 1.5rem;
+    --c: black;
+    /* active color */
+    --g: 1px;
+    /* the gap */
+    --l: 5px;
+    /* line thickness*/
+    --s: 20px;
+    /* thumb size*/
+
+    width: 90%;
+    height: var(--s);
+    /* needed for Firefox*/
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: none;
     cursor: pointer;
-    color: inherit; */
+    overflow: hidden;
+}
+
+/* chromium */
+.range::-webkit-slider-thumb {
+    height: var(--s);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    box-shadow: 0 0 0 var(--l) inset var(--c);
+    border-image: linear-gradient(90deg, var(--c) 50%, #ababab 0) 1/0 100vw/0 calc(100vw + var(--g));
+    clip-path:
+        polygon(0 calc(50% + var(--l)/2),
+            -100vw calc(50% + var(--l)/2),
+            -100vw calc(50% - var(--l)/2),
+            0 calc(50% - var(--l)/2),
+            0 0, 100% 0,
+            100% calc(50% - var(--l)/2),
+            100vw calc(50% - var(--l)/2),
+            100vw calc(50% + var(--l)/2),
+            100% calc(50% + var(--l)/2),
+            100% 100%, 0 100%);
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* Firefox */
+.range::-moz-range-thumb {
+    height: var(--s);
+    width: var(--s);
+    background: none;
+    border-radius: 50%;
+    box-shadow: 0 0 0 var(--l) inset var(--c);
+    border-image: linear-gradient(90deg, var(--c) 50%, #ababab 0) 1/0 100vw/0 calc(100vw + var(--g));
+    clip-path:
+        polygon(0 calc(50% + var(--l)/2),
+            -100vw calc(50% + var(--l)/2),
+            -100vw calc(50% - var(--l)/2),
+            0 calc(50% - var(--l)/2),
+            0 0, 100% 0,
+            100% calc(50% - var(--l)/2),
+            100vw calc(50% - var(--l)/2),
+            100vw calc(50% + var(--l)/2),
+            100% calc(50% + var(--l)/2),
+            100% 100%, 0 100%);
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.line {
+    font-size: .75rem;
+    line-height: 1rem;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    width: 100%;
+    display: grid;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.panel-btns {
+    display: flex;
+    flex-direction: row;
+    width: 90%;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.panel-btn {
+    width: 40px;
+    height: 40px;
+    background-color: transparent;
+}
+
+.panel-btn:hover {
+    background-color: #eee;
+    cursor: pointer;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+.panel-btn .iconfont {
+    font-size: 24px;
 }
 </style>

@@ -103,38 +103,4 @@ option:hover {
     border: 0 solid #e5e7eb;
 }
 
-/* 隐藏range控件默认样式 */
-[type="range"] {
-    -webkit-appearance: none;
-    appearance: none;
-    margin: 0;
-    outline: 0;
-    background-color: transparent;
-}
 
-/* 定义range控件轨道的样式 */
-[type="range"]::-webkit-slider-runnable-track {
-    height: 10px;
-    background: #eee;
-}
-
-/* 定义range控件容器的样式 */
-[type="range" i]::-webkit-slider-container {
-    height: 40px;
-    overflow: hidden;
-}
-
-/* 定义range控件拇指的样式 */
-[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    background-color: black;
-    border: 1px solid transparent;
-    margin-top: -8px;
-    /* 使用border-image属性给拇指添加渐变边框 */
-    border-image: linear-gradient(black, black) 0 fill / 8 20 8 0 / 0px 0px 0
-        2000px;
-}

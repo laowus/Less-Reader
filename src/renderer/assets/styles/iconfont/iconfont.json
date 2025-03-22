@@ -6,6 +6,48 @@
   "description": "icon集合",
   "glyphs": [
     {
+      "icon_id": "9626929",
+      "name": "声音",
+      "font_class": "shengyin",
+      "unicode": "e87c",
+      "unicode_decimal": 59516
+    },
+    {
+      "icon_id": "4955291",
+      "name": "停止",
+      "font_class": "tingzhi",
+      "unicode": "e612",
+      "unicode_decimal": 58898
+    },
+    {
+      "icon_id": "1447736",
+      "name": "暂停",
+      "font_class": "zanting",
+      "unicode": "e618",
+      "unicode_decimal": 58904
+    },
+    {
+      "icon_id": "1447738",
+      "name": "播放",
+      "font_class": "bofang",
+      "unicode": "e619",
+      "unicode_decimal": 58905
+    },
+    {
+      "icon_id": "29522729",
+      "name": "26B下一个",
+      "font_class": "a-26Bxiayige",
+      "unicode": "e689",
+      "unicode_decimal": 59017
+    },
+    {
+      "icon_id": "29522731",
+      "name": "26A上一个",
+      "font_class": "a-26Ashangyige",
+      "unicode": "e68a",
+      "unicode_decimal": 59018
+    },
+    {
       "icon_id": "3588493",
       "name": "耳机",
       "font_class": "erji",
