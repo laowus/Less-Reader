@@ -1,14 +1,14 @@
 <script setup>
 import { ref } from 'vue';
 import Tts from '../utils/readUtils/tts.js';
-const isPlaying = ref(false);
+const playState = ref(Tts.PLAY_STATE.STOPPED);
 const showLamp = ref(false);
 const spendArr = ["慢", "", "1.0", "1.5", "2.0", "", "快"];
 const nextPage = (isNext) => {
     window.goToNext(isNext);
 }
 const speakText = () => {
-    if (Tts.current_tts_state !== 1) {
+    if (playState.value !== Tts.PLAY_STATE.PLAYING) {
         Tts.init(
             window.ttsHere,
             window.ttsNext,
@@ -16,19 +16,36 @@ const speakText = () => {
         );
         Tts.speak();
         Tts.updateTtsState(Tts.PLAY_STATE.PLAYING);
-        isPlaying.value = true;
+        playState.value = Tts.PLAY_STATE.PLAYING;
         showLamp.value = true;
     }
 }
-const stopSpeaking = () => {
-    Tts.stop();
-    Tts.updateTtsState(Tts.PLAY_STATE.STOPPED);
-    isPlaying.value = false;
-}
+
 
 const showTtspanel = () => {
     showLamp.value = !showLamp.value;
 }
+
+const playOrPause = () => {
+    console.log('playOrPause');
+    if (playState.value === Tts.PLAY_STATE.PLAYING) {
+        console.log('pause');
+        Tts.pause();
+        playState.value = Tts.PLAY_STATE.PAUSED;
+        Tts.updateTtsState(Tts.PLAY_STATE.PAUSED);
+    } else if (playState.value === Tts.PLAY_STATE.PAUSED) {
+        console.log('resume');
+        // 继续后无法循环播放，需要重新初始化
+        playState.value = Tts.PLAY_STATE.PLAYING;
+        Tts.updateTtsState(Tts.PLAY_STATE.PLAYING);
+        Tts.resumeSpeak()
+    } else {
+        console.log('speak');
+        speakText();
+    }
+}
+
+
 </script>
 <template>
     <div class="tts-panel" v-if="showLamp">
@@ -45,8 +62,8 @@ const showTtspanel = () => {
                     <button class="panel-btn">
                         <span class="iconfont icon-a-26Ashangyige"></span>
                     </button>
-                    <button class="panel-btn">
-                        <span class="iconfont icon-bofang"></span>
+                    <button class="panel-btn play-active" @click="playOrPause">
+                        <span class="iconfont " :class="playState === Tts.PLAY_STATE.PLAYING ? 'icon-zanting' : 'icon-bofang'"></span>
                     </button>
                     <button class="panel-btn">
                         <span class="iconfont icon-a-26Bxiayige"></span>
@@ -66,7 +83,7 @@ const showTtspanel = () => {
             <div class="lamp-content">
                 <div class="lamp-real">
                     <div class="lamp-item" v-for="(item, index) in 4"
-                        :style="isPlaying ?
+                        :style="playState === Tts.PLAY_STATE.PLAYING ?
                             'animation-name:bounce; animation-duration: 1.' + index + 's; animation-timing-function:ease-in-out;animation-iteration-count:infinite; animation-delay: 0.' + index + 's; '
                             : ''">
                     </div>
@@ -350,7 +367,9 @@ const showTtspanel = () => {
     background-color: transparent;
 }
 
-.panel-btn:hover {
+
+.panel-btn:hover,
+.play-active {
     background-color: #eee;
     cursor: pointer;
     border-radius: 50%;

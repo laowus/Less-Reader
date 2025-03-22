@@ -1,11 +1,8 @@
-
-
 export default class Tts {
 
     static PLAY_STATE = {
         PLAYING: 1, STOPPED: 2, PAUSED: 3, CONTINUED: 4
     }
-
     static synth = window.speechSynthesis;
     static voices = [];
     static current_tts_state = this.PLAY_STATE.STOPPED;
@@ -25,8 +22,11 @@ export default class Tts {
         this.getPrevVoiceText = prev;
     }
 
+    static isSpeaking() {
+        return this.synth.speaking;
+    }
+
     static async speak(content) {
-        console.log('Tts.speak', content);
         if (content != null) {
             this.currentVoiceText = content;
         } else {
@@ -40,6 +40,7 @@ export default class Tts {
 
         let utterance = new SpeechSynthesisUtterance(this.currentVoiceText);
         console.log('utterance', utterance);
+
         this.synth.speak(utterance);
 
         utterance.onend = async () => {
@@ -49,12 +50,42 @@ export default class Tts {
                     this.currentVoiceText = nextText;
                     return this.speak(this.currentVoiceText);
                 }
-
             }
         }
     }
 
+    //记录上一次暂停或者停止的位置，用于播放上一个语音
+    static async resumeSpeak() {
+        if (this.current_tts_state === this.PLAY_STATE.PLAYING) {
+            this.synth.resume();
+            utterance.onend = async () => {
+                if (this.current_tts_state === this.PLAY_STATE.PLAYING) {
+                    const nextText = await this.getNextVoiceText();
+                    if (nextText) {
+                        this.currentVoiceText = nextText;
+                        return this.speak(this.currentVoiceText);
+                    }
+                }
+            }
+        }
+    }
     static updateTtsState(newState) {
         this.current_tts_state = newState;
+    }
+
+    // Pause the current speech
+    static pause() {
+        if (this.isSpeaking()) {
+            this.synth.pause();
+            this.updateTtsState(this.PLAY_STATE.PAUSED);
+        }
+    }
+
+    // Resume the paused speech
+    static resume() {
+        if (this.synth.paused) {
+            this.synth.resume();
+            this.updateTtsState(this.PLAY_STATE.CONTINUED);
+        }
     }
 }
