@@ -1,0 +1,382 @@
+<script setup>
+import { ref } from 'vue';
+import EventBus from '../../common/EventBus';
+const { ipcRenderer } = window.require('electron');
+const props = defineProps({
+    currentBook: Object,
+});
+
+const tabId = ref(0);
+const noteList = ref([]);
+const deleteButtonIndex = ref(null);
+
+const initData = () => {
+    return new Promise((resolve, reject) => {
+        ipcRenderer.once('db-get-all-notes-response', (event, res) => {
+            if (res.success) {
+                const categorizedNotes = res.data.reduce((acc, note) => {
+                    if (!acc[note.chapter]) {
+                        acc[note.chapter] = [];
+                    }
+                    acc[note.chapter].push(note);
+                    return acc;
+                }, {});
+                noteList.value = categorizedNotes;
+                resolve();  // 确保返回数据
+            } else {
+                reject(new Error('获取笔记失败'));
+            }
+        });
+        ipcRenderer.send('db-get-notes', props.currentBook.id);
+    });
+}
+
+const setTabId = (id) => {
+    tabId.value = id;
+    if (id == 1) {
+        initData();
+    }
+}
+const getNoteStyle = (note) => {
+    let tempStyle = ""
+    if (note.type == "underline") {
+        tempStyle = "text-decoration-line: underline;text-decoration-color:" + note.color + ";";
+    } else if (note.type == "squiggly") {
+        tempStyle = "text-decoration-line: underline;text-decoration-style: wavy; text-decoration-color:" + note.color + ";";
+    } else {
+        tempStyle = "background-color:" + note.color + ";";
+    }
+    return tempStyle;
+}
+
+const showDeleteButton = (index) => {
+    deleteButtonIndex.value = index;
+}
+
+const hideDeleteButton = (id) => {
+    deleteButtonIndex.value = null;
+}
+
+const deleteNote = (note) => {
+    ipcRenderer.once("db-delete-note-response", (event, res) => {
+        if (res.success) {
+            window.removeNote(note.cfi);
+            initData();
+        } else {
+            console.log("删除失败");
+        }
+    });
+    ipcRenderer.send('db-delete-note', note.id);
+}
+
+const goToCfi = (cfi) => {
+    console.log("goToCfi", cfi);
+    window.goToCfi(cfi);
+}
+const getNoteContent = (note) => {
+    return note.note ? note.note.substring(0, 30) + (note.note.length > 20 ? '...' : '') : '无内容';
+}
+
+EventBus.on('updateLeftbarNotes', () => {
+    initData();
+});
+
+</script>
+
+<template>
+    <div class="sidebar-container">
+        <div class="flex-shrink-0">
+            <div class="sidebar-header">
+                <div class="sidebar-header-left">
+                    <div class="iconfont-btn">
+                        <span class="iconfont icon-library"></span>
+                    </div>
+                </div>
+                <div class="sidebar-header-right">
+                    <div class="iconfont-btn">
+                        <span class="iconfont icon-sousuo1"></span>
+                    </div>
+                    <div class="iconfont-btn">
+                        <span class="iconfont icon-gengduo"></span>
+                    </div>
+                    <div class="iconfont-btn">
+                        <span class="iconfont icon-relieve"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="side-bar-header">
+            <img id="side-bar-cover" />
+            <div>
+                <h1 id="side-bar-title"></h1>
+                <p id="side-bar-author"></p>
+            </div>
+        </div>
+        <div class="tabContent">
+            <div id="toc-view" v-show="tabId === 0"></div>
+            <div id="noteList" v-show="tabId === 1">
+                <div v-for="(notes, chapter) in noteList" :key="chapter">
+                    <h3>{{ chapter }}</h3>
+                    <ul>
+                        <li v-for="(note, index) in notes" :key="index"
+                            @mouseover="showDeleteButton(index)"
+                            @mouseleave="hideDeleteButton(index)"
+                            @click="goToCfi(note.cfi)">
+                            <div v-if="deleteButtonIndex === index" class="delete-button-container">
+                                <div id="note-time">
+                                    {{ note.updateTime }}
+                                </div>
+                                <div class="iconfont-btn" @click="deleteNote(note)">
+                                    <span class="iconfont icon-shanchu"></span>
+                                </div>
+                            </div>
+                            <div class="note-content" :style="getNoteStyle(note)">
+                                {{ getNoteContent(note) || '无内容' }}
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div id="noteList" v-show="tabId === 2">
+                书签列表
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <div class="iconfont-btn" :class="tabId === 0 ? 'selected' : ''" @click="setTabId(0)">
+                <span class="iconfont icon-mulu"></span>
+            </div>
+            <div class="iconfont-btn" :class="tabId === 1 ? 'selected' : ''" @click="setTabId(1)">
+                <span class="iconfont icon-anmuluchaolu-xianxing"></span>
+            </div>
+            <div class="iconfont-btn" :class="tabId === 2 ? 'selected' : ''" @click="setTabId(2)">
+                <span class="iconfont icon-shuqian"></span>
+            </div>
+        </div>
+    </div>
+</template>
+
+<style>
+.sidebar-container {
+    border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;
+    z-index: 15;
+    display: flex;
+    opacity: 1;
+    height: 100%;
+    min-width: 15rem;
+    user-select: none;
+    flex-direction: column;
+    width: 15%;
+    max-width: 45%;
+    position: relative;
+    /* position: relative; */
+    background-color: #f0f0f0;
+
+    /* border-right: 1px solid gray; */
+
+}
+
+.flex-shrink-0 {
+    flex-shrink: 0;
+}
+
+.sidebar-header {
+    display: flex;
+    padding-right: .5rem;
+    padding-left: .375rem;
+    justify-content: space-between;
+    align-items: center;
+    height: 2.75rem;
+}
+
+.sidebar-header-left {
+    display: flex;
+    align-items: center;
+    column-gap: 2rem;
+}
+
+.sidebar-header-right {
+    display: flex;
+    justify-content: space-between;
+    width: 70%;
+    height: 70%;
+    max-width: 8rem;
+    align-items: center;
+    min-width: 6rem;
+}
+
+.iconfont-btn {
+    margin-right: 1rem;
+    width: 2rem;
+    min-height: 2rem;
+    height: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.iconfont-btn:hover,
+.selected {
+    background-color: gainsboro;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.iconfont-btn .iconfont {
+    font-size: 1.3rem;
+}
+
+#side-bar-header {
+    padding: 1rem;
+    display: flex;
+    border-bottom: 1px solid rgba(0, 0, 0, .1);
+    align-items: center;
+}
+
+#toc-view {
+    padding: .5rem;
+    overflow-y: auto;
+}
+
+#toc-view li,
+#toc-view ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#toc-view a,
+#toc-view span {
+    display: block;
+    border-radius: 6px;
+    padding: 8px;
+    margin: 2px 0;
+}
+
+#toc-view a {
+    color: CanvasText;
+    text-decoration: none;
+}
+
+#toc-view a:hover {
+    background: var(--active-bg);
+}
+
+#toc-view span {
+    color: GrayText;
+}
+
+#toc-view svg {
+    margin-inline-start: -24px;
+    padding-inline-start: 5px;
+    padding-inline-end: 6px;
+    fill: CanvasText;
+    cursor: default;
+    transition: transform .2s ease;
+    opacity: .5;
+}
+
+#toc-view svg:hover {
+    opacity: 1;
+}
+
+#toc-view [aria-current] {
+    font-weight: bold;
+    background: var(--active-bg);
+}
+
+#toc-view [aria-expanded="false"] svg {
+    transform: rotate(-90deg);
+}
+
+#toc-view [aria-expanded="false"]+[role="group"] {
+    display: none;
+}
+
+#side-bar-cover {
+    height: 10vh;
+    min-height: 60px;
+    max-height: 180px;
+    border-radius: 3px;
+    border: 0;
+    background: lightgray;
+    box-shadow: 0 0 1px rgba(0, 0, 0, .1), 0 0 16px rgba(0, 0, 0, .1);
+    margin-inline-end: 1rem;
+}
+
+#side-bar-cover:not([src]) {
+    display: none;
+}
+
+#side-bar-title {
+    margin: .5rem 0;
+    font-size: inherit;
+}
+
+#side-bar-author {
+    margin: .5rem 0;
+    font-size: small;
+    color: GrayText;
+}
+
+.sidebar-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 2rem;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: .5rem;
+    padding-left: .375rem;
+    border-top: 1px solid rgba(0, 0, 0, .1);
+    align-items: center;
+}
+
+#noteList {
+    padding: .5rem;
+    height: 100%;
+}
+
+#noteList ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#noteList li {
+    font-size: 1rem;
+    padding: .5rem;
+    border-radius: 4px;
+    margin-bottom: .25rem;
+    background-color: gainsboro;
+    display: flex;
+    flex-direction: column;
+}
+
+#note-time {
+    font-size: 0.8rem;
+    font-style: italic;
+    font-weight: bold;
+}
+
+.note-content {
+    margin-bottom: .5rem;
+}
+
+.delete-button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.5rem;
+}
+
+#noteList li:hover {
+    background-color: #eaeaea;
+    cursor: pointer;
+}
+
+.tabContent {
+    overflow-y: auto;
+    flex: 1;
+}
+</style>

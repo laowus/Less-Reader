@@ -1,78 +1,69 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, reactive, ref, vShow } from 'vue';
 import { useRoute } from 'vue-router';
-import localforage from 'localforage';
-import { open } from '../libs/reader.js'
+import LeftBar from '../components/LeftBar.vue';
+import ReadDialog from '../components/ReadDialog.vue';
+import HeaderBar from '../components/HeaderBar.vue';
+import FooterBar from '../components/FooterBar.vue';
+import PopoversCtl from '../components/PopoversCtl.vue';
+import StyleUtil from '../utils/readUtils/styleUtil.js'
+import Config from '../utils/readUtils/config.js';
+import { open } from '../libs/reader.js';
+import EventBus from '../../common/EventBus';
 const { ipcRenderer } = window.require('electron');
 const route = useRoute();
-const bookKey = route.params.key;
-
+const bookId = route.params.id;
+const currentBook = ref({});
+const bookStyle = reactive({});
+const leftbarShow = ref(Config.getConfig().leftbarShow);
+const $ = document.querySelector.bind(document)
 onMounted(() => {
-    localforage.getItem("books").then((result) => {
-        let book = result.find(item => item.key === bookKey);
-        if (book.path) open(book.path).catch(e => console.error(e))
+    Object.assign(bookStyle, StyleUtil.getStyle());
+    ipcRenderer.once('db-get-book-response', (event, items) => {
+        currentBook.value = items.data[0];
+        console.log(currentBook.value);
+        if (currentBook.value.path) open(currentBook.value, bookStyle).catch(e => console.error(e))
     });
+    ipcRenderer.send('db-get-book', bookId);
 
 });
 
-const handleClose = () => {
-    ipcRenderer.send('window-close');
-}
+EventBus.on('updateBook', (bookRecord) => {
+    const newBook = { ...currentBook.value, ...bookRecord };
+    ipcRenderer.send('db-update-book', newBook);
+});
+const setLeftbarShow = (isShow) => {
+    leftbarShow.value = isShow;
+    Config.setConfig({ ...Config.getConfig(), ...{ leftbarShow: isShow } });
+};
+
+const readDialogShow = ref(false);
+
+EventBus.on('read-dialog-show', (showHide) => {
+    readDialogShow.value = showHide;
+    showHide ? $('#dimming-overlay').classList.add('show') : $('#dimming-overlay').classList.remove('show');
+});
+
 
 </script>
-
 <template>
+    <PopoversCtl :bookId="bookId"></PopoversCtl>
     <div id="dimming-overlay" aria-hidden="true"></div>
-    <div id="side-bar">
-        <!-- 左边目录 -->
-        <div id="side-bar-header">
-            <!-- 封面 -->
-            <img id="side-bar-cover">
-            <div>
-                <!-- 书名 -->
-                <h1 id="side-bar-title"></h1>
-                <!-- 作者 -->
-                <p id="side-bar-author"></p>
+    <div class="reader-page">
+        <div class="reader-container">
+            <LeftBar v-show="leftbarShow" :currentBook="currentBook"> </LeftBar>
+            <div class="reader-content">
+                <div id="grid-cell">
+                    <div class="foliate-viewer">
+                        <HeaderBar :currentBook="currentBook" :setLeftbarShow="setLeftbarShow" :leftbarShow="leftbarShow"></HeaderBar>
+                        <FooterBar />
+                        <ReadDialog v-show="readDialogShow" />
+                    </div>
+                </div>
             </div>
         </div>
-        <!-- 目录 -->
-        <div id="toc-view"></div>
-    </div>
-    <div id="header-bar" class="toolbar">
-        <button id="side-bar-button" aria-label="Show sidebar">
-            <svg class="icon" width="24" height="24" aria-hidden="true">
-                <path d="M 4 6 h 16 M 4 12 h 16 M 4 18 h 16" />
-            </svg>
-        </button>
-        <!-- 拖动位置 -->
-        <div class="title-bar-dragger" id="chapter-title"></div>
-        <div id="menu-button" class="menu-container">
-            <button aria-label="Show settings" aria-haspopup="true" @click="handleClose">
-                <el-icon :size="20">
-                    <Close />
-                </el-icon>
-            </button>
-        </div>
-    </div>
-    <div id="nav-bar" class="toolbar">
-        <!-- 上一页切换 -->
-        <button id="left-button" aria-label="Go left">
-            <svg class="icon" width="24" height="24" aria-hidden="true">
-                <path d="M 15 6 L 9 12 L 15 18" />
-            </svg>
-        </button>
-        <!-- 进度条 -->
-        <input id="progress-slider" type="range" min="0" max="1" step="any" list="tick-marks">
-        <datalist id="tick-marks"></datalist>
-        <!-- 下一页切换 -->
-        <button id="right-button" aria-label="Go right">
-            <svg class="icon" width="24" height="24" aria-hidden="true">
-                <path d="M 9 6 L 15 12 L 9 18" />
-            </svg>
-        </button>
     </div>
 </template>
-
 <style>
 :root {
     --active-bg: rgba(0, 0, 0, .05);
@@ -98,102 +89,46 @@ body {
 }
 
 .icon {
-    display: block;
     fill: none;
     stroke: currentcolor;
-    stroke-width: 2px;
-}
-
-.empty-state-icon {
-    margin: auto;
-}
-
-.toolbar {
-    box-sizing: border-box;
-    position: absolute;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    height: 48px;
-    padding: 6px;
-    transition: opacity 250ms ease;
-    visibility: hidden;
-}
-
-.toolbar button {
-    padding: 3px;
-    border-radius: 6px;
-    background: none;
-    border: 0;
-    color: GrayText;
-}
-
-.title-bar-dragger {
-    flex: 1;
-    height: 100%;
-    user-select: none;
-    -webkit-app-region: drag;
-    -webkit-user-select: none;
-}
-
-.toolbar button:hover {
-    background: rgba(0, 0, 0, .1);
-    color: currentcolor;
-}
-
-#header-bar {
-    top: 0;
+    stroke-width: 3px;
 }
 
 /* 顶部章节名字显示 */
 #chapter-title {
     font-size: 14px;
-    color: gainsboro;
     align-items: center;
     display: flex;
     justify-content: center;
+    min-width: 100px;
 }
 
-#nav-bar {
-    bottom: 0;
-}
-
-#progress-slider {
-    flex-grow: 1;
-    margin: 0 12px;
-    visibility: hidden;
-}
-
-#side-bar {
+#bottom-bar {
     visibility: hidden;
     box-sizing: border-box;
     position: absolute;
-    z-index: 2;
-    top: 0;
+    z-index: 21;
+    bottom: 0;
+    width: 40%;
+    height: auto;
+    max-height: 80%;
+    margin: 0 auto;
     left: 0;
-    height: 100%;
-    width: 320px;
-    transform: translateX(-320px);
+    right: 0;
     display: flex;
-    flex-direction: column;
-    background: Canvas;
     color: CanvasText;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, .2), 0 0 40px rgba(0, 0, 0, .2);
-    transition: visibility 0s linear 300ms, transform 300ms ease;
 }
 
-#side-bar.show {
+#bottom-bar .show {
     visibility: visible;
-    transform: translateX(0);
+    transform: translateY(0);
     transition-delay: 0s;
 }
 
 #dimming-overlay {
     visibility: hidden;
     position: fixed;
-    z-index: 2;
+    z-index: 20;
     top: 0;
     left: 0;
     width: 100%;
@@ -201,6 +136,7 @@ body {
     background: rgba(0, 0, 0, .2);
     opacity: 0;
     transition: visibility 0s linear 300ms, opacity 300ms ease;
+
 }
 
 #dimming-overlay.show {
@@ -209,156 +145,33 @@ body {
     transition-delay: 0s;
 }
 
-#side-bar-header {
-    padding: 1rem;
+.reader-page {
+    border-radius: 10px;
+}
+
+.reader-container {
+    height: 100dvh;
     display: flex;
-    border-bottom: 1px solid rgba(0, 0, 0, .1);
-    align-items: center;
 }
 
-#side-bar-cover {
-    height: 10vh;
-    min-height: 60px;
-    max-height: 180px;
-    border-radius: 3px;
-    border: 0;
-    background: lightgray;
-    box-shadow: 0 0 1px rgba(0, 0, 0, .1), 0 0 16px rgba(0, 0, 0, .1);
-    margin-inline-end: 1rem;
+.reader-content {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    flex-grow: 1;
+    height: 100%;
+    display: grid;
 }
 
-#side-bar-cover:not([src]) {
-    display: none;
-}
-
-#side-bar-title {
-    margin: .5rem 0;
-    font-size: inherit;
-}
-
-#side-bar-author {
-    margin: .5rem 0;
-    font-size: small;
-    color: GrayText;
-}
-
-#toc-view {
-    padding: .5rem;
-    overflow-y: scroll;
-}
-
-#toc-view li,
-#toc-view ol {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-#toc-view a,
-#toc-view span {
-    display: block;
-    border-radius: 6px;
-    padding: 8px;
-    margin: 2px 0;
-}
-
-#toc-view a {
-    color: CanvasText;
-    text-decoration: none;
-}
-
-#toc-view a:hover {
-    background: var(--active-bg);
-}
-
-#toc-view span {
-    color: GrayText;
-}
-
-#toc-view svg {
-    margin-inline-start: -24px;
-    padding-inline-start: 5px;
-    padding-inline-end: 6px;
-    fill: CanvasText;
-    cursor: default;
-    transition: transform .2s ease;
-    opacity: .5;
-}
-
-#toc-view svg:hover {
-    opacity: 1;
-}
-
-#toc-view [aria-current] {
-    font-weight: bold;
-    background: var(--active-bg);
-}
-
-#toc-view [aria-expanded="false"] svg {
-    transform: rotate(-90deg);
-}
-
-#toc-view [aria-expanded="false"]+[role="group"] {
-    display: none;
-}
-
-.menu-container {
+#grid-cell {
+    border-radius: 10px;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
     position: relative;
 }
 
-.menu,
-.menu ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.menu {
-    visibility: hidden;
-    position: absolute;
-    right: 0;
-    background: Canvas;
-    color: CanvasText;
-    border-radius: 6px;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, .2), 0 0 16px rgba(0, 0, 0, .1);
-    padding: 6px;
-    cursor: default;
-}
-
-.menu.show {
-    visibility: visible;
-}
-
-.menu li {
-    padding: 6px 12px;
-    padding-left: 24px;
-    border-radius: 6px;
-}
-
-.menu li:hover {
-    background: var(--active-bg);
-}
-
-.menu li[aria-checked="true"] {
-    background-position: center left;
-    background-repeat: no-repeat;
-    background-image: url('data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%223%22%2F%3E%3C%2Fsvg%3E');
-}
-
-.popover {
-    background: Canvas;
-    color: CanvasText;
-    border-radius: 6px;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, .2), 0 0 16px rgba(0, 0, 0, .1), 0 0 32px rgba(0, 0, 0, .1);
-}
-
-.popover-arrow-down {
-    fill: Canvas;
-    filter: drop-shadow(0 -1px 0 rgba(0, 0, 0, .2));
-}
-
-.popover-arrow-up {
-    fill: Canvas;
-    filter: drop-shadow(0 1px 0 rgba(0, 0, 0, .2));
+.foliate-viewer {
+    width: 100%;
+    height: 100%;
 }
 </style>

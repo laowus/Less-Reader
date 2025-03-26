@@ -1,22 +1,25 @@
 const { app, BrowserWindow, ipcMain, Menu, shell, Tray, } = require('electron')
 const { isWinOS, isDevEnv, APP_ICON } = require('./env')
-const fs = require('fs');
 const path = require('path')
 const Store = require("electron-store");
 const store = new Store();
+const { initDatabase } = require('./dbTool')
 
-const configDir = app.getPath("userData");
-const dirPath = path.join(configDir, "uploads");
-
-let FOLDER_PATH = path.join(__dirname, '../../books');
 let resourcesRoot = path.resolve(app.getAppPath());
 let publicRoot = path.join(__dirname, '../../public')
 
 if (!isDevEnv) {
     resourcesRoot = path.dirname(resourcesRoot);
-    FOLDER_PATH = path.join(resourcesRoot, "/books")
     publicRoot = path.join(__dirname, '../../dist')
 }
+//ipc处理
+const fileHandle = require('./ipcHandlers/fileHandle');
+const dbHandle = require('./ipcHandlers/dbHandle');
+// 用于存储所有的 readerWindow 实例
+let readerWindows = [];
+
+fileHandle();
+dbHandle();
 
 let mainWin = null, readerWindow, tray = null
 let options = {
@@ -38,8 +41,13 @@ const startup = () => {
 }
 
 const init = () => {
-    app.whenReady().then(() => {
-        mainWin = createWindow()
+    app.whenReady().then(async () => {
+        try {
+            await initDatabase();
+            mainWin = createWindow();
+        } catch (error) {
+            console.error('Failed to initialize database:', error);
+        }
     })
 
     app.on('activate', (event) => {
@@ -99,27 +107,34 @@ const registryGlobalListeners = () => {
         setAppWindowZoom(value, true)
     })
 }
-
-//创建浏览窗口
-const createWindow = () => {
-
-    const mainWindow = new BrowserWindow(options);
-
-    if (isDevEnv) {
-        mainWindow.loadURL("http://localhost:7000/")
-    } else {
-        mainWindow.loadFile('dist/index.html')
-    }
-    mainWindow.webContents.openDevTools();
-    tray = new Tray(path.join(publicRoot, '/images/logo.png'));
-    tray.setToolTip('Less-Reader');
-    const contextMenu = Menu.buildFromTemplate([
+// 动态生成上下文菜单
+const generateContextMenu = () => {
+    return Menu.buildFromTemplate([
         {
             label: '打开主界面',
             icon: path.join(publicRoot, '/images/app.png'),
             click: () => {
-                mainWindow.show();
+                mainWin.show();
             },
+        },
+        {
+            label: '正在阅读',
+            icon: path.join(publicRoot, '/images/app.png'),
+            submenu: readerWindows.length > 0 ? readerWindows.map((readerItem, index) => {
+                return {
+                    label: `${readerItem.name}`,
+                    click: () => {
+                        if (!readerItem.window.isDestroyed()) {
+                            readerItem.window.show();
+                        }
+                    }
+                };
+            }) : [
+                {
+                    label: '暂无阅读窗口',
+                    enabled: false
+                }
+            ]
         },
         {
             label: '退出',
@@ -128,17 +143,39 @@ const createWindow = () => {
                 app.quit();
             },
         },
-    ])
+    ]);
+};
+
+// 更新上下文菜单
+const updateContextMenu = () => {
+    if (tray) {
+        const contextMenu = generateContextMenu();
+        tray.setContextMenu(contextMenu);
+    }
+};
+
+//创建浏览窗口
+const createWindow = () => {
+    const mainWindow = new BrowserWindow(options);
+    if (isDevEnv) {
+        mainWindow.loadURL("http://localhost:7000/")
+        mainWindow.webContents.openDevTools();
+    } else {
+        mainWindow.loadFile('dist/index.html')
+    }
+
+    tray = new Tray(path.join(publicRoot, '/images/logo.png'));
+    tray.setToolTip('Less-Reader');
+
+    let contextMenu = generateContextMenu();
     tray.setContextMenu(contextMenu);
-    //监听托盘双击事件
+
     tray.on('double-click', () => {
         mainWindow.show();
     });
-
     mainWindow.once('ready-to-show', () => {
         mainWindow.show()
     })
-
     return mainWindow
 }
 
@@ -146,7 +183,6 @@ const sendToRenderer = (channel, args) => {
     try {
         if (mainWin) mainWin.webContents.send(channel, args)
     } catch (error) {
-
     }
 }
 
@@ -176,44 +212,65 @@ const setAppWindowZoom = (value, noResize) => {
 }
 
 
-ipcMain.on("user-data", (event, arg) => {
-    event.returnValue = dirPath;
-})
 
-ipcMain.on("storage-location", (event, arg) => {
-    event.returnValue = path.join(dirPath, "data");//获取
-});
-
-ipcMain.handle("open-book", (event, config) => {
-    let { url } = config;
-    console.log(url)
-    options.webPreferences.nodeIntegrationInSubFrames = true;
-    store.set({ url });
-    readerWindow = new BrowserWindow({
-        ...options,
-        width: parseInt(store.get("windowWidth") || 1050),
-        height: parseInt(store.get("windowHeight") || 660),
-        x: parseInt(store.get("windowX")),
-        y: parseInt(store.get("windowY"))
-    });
-    readerWindow.webContents.openDevTools();
-
-    readerWindow.loadURL(url);
-    readerWindow.on("close", (event) => {
-        if (!readerWindow.isDestroyed()) {
-            let bounds = readerWindow.getBounds();
-            store.set({
-                windowWidth: bounds.width,
-                windowHeight: bounds.height,
-                windowX: bounds.x,
-                windowY: bounds.y,
-            });
+//记录当前窗口 
+ipcMain.on("open-book", (event, config) => {
+    let { url, name, bookid } = config;
+    const isExist = readerWindows.find(item => item.bookid === bookid);
+    if (isExist) {
+        const targetWindow = readerWindows.find(item => item.bookid === bookid);
+        targetWindow.window.show();
+    } else {
+        options.webPreferences.nodeIntegrationInSubFrames = true;
+        store.set({ url });
+        const newReaderWindow = new BrowserWindow({
+            ...options,
+            width: parseInt(store.get("windowWidth") || 1050),
+            height: parseInt(store.get("windowHeight") || 660),
+            x: parseInt(store.get("windowX")),
+            y: parseInt(store.get("windowY"))
+        });
+        if (isDevEnv) {
+            newReaderWindow.webContents.openDevTools();
         }
-    });
-    event.returnValue = "success";
+        newReaderWindow.loadURL(url);
+        // newReaderWindow.on("close", (event) => {
+        //     if (!newReaderWindow.isDestroyed()) {
+        //         let bounds = newReaderWindow.getBounds();
+        //         store.set({
+        //             windowWidth: bounds.width,
+        //             windowHeight: bounds.height,
+        //             windowX: bounds.x,
+        //             windowY: bounds.y,
+        //         });
+        //         // 从数组中移除关闭的窗口
+        //         readerWindows = readerWindows.filter((item) => item.window !== newReaderWindow);
+        //         // 更新上下文菜单
+        //         updateContextMenu();
+        //     }
+        // });
+
+        // 将新的 readerWindow 添加到数组中
+        const newObj = {
+            name,
+            bookid,
+            window: newReaderWindow
+        }
+        readerWindows.push(newObj);
+        // 更新上下文菜单
+        updateContextMenu();
+    }
+
 });
-
-
+//关闭阅读的窗口
+ipcMain.on('close-reader-window', (event, bookid) => {
+    const targetWindow = readerWindows.find(item => item.bookid === bookid);
+    if (targetWindow && !targetWindow.window.isDestroyed()) {
+        targetWindow.window.close();
+        readerWindows = readerWindows.filter(item => item.bookid !== targetWindow.bookid);
+        updateContextMenu();
+    }
+});
 
 //启动应用
 startup()

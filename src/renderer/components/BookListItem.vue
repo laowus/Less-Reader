@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import EmptyCover from './EmptyCover.vue'
 import BookUtil from '../utils/fileUtils/bookUtils'
 
@@ -29,16 +29,13 @@ const toggleSelect = (event) => {
 const setSelected = (value) => {
     isSelected.value = value
 }
-
 const openBook = () => {
     //如果被选中,就阻止
     if (isSelected.value) {
         toggleSelect();
         return;
     }
-
     BookUtil.RedirectBook(props.book);
-
 }
 
 </script>
@@ -50,16 +47,14 @@ const openBook = () => {
                     class="lazy-image book-item-image" v-show="book.cover" />
                 <EmptyCover :book="book" v-show="book.cover === ''" />
             </div>
-            <span v-show="selectedBooks.length > 0 || isHovered" class="icon-message book-selected-icon"
+            <span v-show="selectedBooks.length > 0 || isHovered" class="iconfont icon-dagou book-selected-icon"
                 :style="{ color: isSelected ? 'red' : 'rgb(238, 238, 238)' }" @click="toggleSelect($event)">
             </span>
         </div>
-
         <p class="book-item-title"> {{ book.name }}</p>
         <div class="reading-progress-icon">
             <div style="position: relative; left: 4px"></div>
         </div>
-        <span class="icon-more book-more-action"></span>
     </div>
 </template>
 
@@ -135,11 +130,6 @@ const openBook = () => {
 }
 
 .reading-progress-icon {
-    /* position: absolute;
-          bottom: 18px;
-          left: 17px; */
-    /* width: 31px;
-          height: 31px; */
     display: inline-block;
     margin-left: 10px;
     border-radius: 50%;

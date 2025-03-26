@@ -2,6 +2,7 @@ import * as CFI from './tools/epubcfi.js'
 import { TOCProgress, SectionProgress } from './ui/progress.js'
 import { Overlayer } from './ui/overlayer.js'
 import { textWalker } from './ui/text-walker.js'
+const { TTS } = await import('./tools/tts.js')
 
 const SEARCH_PREFIX = 'foliate-search:'
 
@@ -217,11 +218,14 @@ const languageInfo = lang => {
 }
 
 export class View extends HTMLElement {
+    //样式隔离
+    //禁止外部访问Shadow DOM，增强了封装性。
     #root = this.attachShadow({ mode: 'closed' })
     #sectionProgress
     #tocProgress
     #pageProgress
     #searchResults = new Map()
+    #index
     #cursorAutohider = new CursorAutohider(this, () =>
         this.hasAttribute('autohide-cursor'))
     isFixedLayout = false
@@ -240,7 +244,6 @@ export class View extends HTMLElement {
             || book.isDirectory) book = await makeBook(book)
         this.book = book
         this.language = languageInfo(book.metadata?.language)
-        console.log("解析后", book);
 
         if (book.splitTOCHref && book.getTOCFragment) {
             const ids = book.sections.map(s => s.id)
@@ -335,6 +338,7 @@ export class View extends HTMLElement {
         return this.dispatchEvent(new CustomEvent(name, { detail, cancelable }))
     }
     #onRelocate({ reason, range, index, fraction, size }) {
+        this.#index = index
         const progress = this.#sectionProgress?.getProgress(index, fraction, size) ?? {}
         const tocItem = this.#tocProgress?.getProgress(index, range)
         const pageItem = this.#pageProgress?.getProgress(index, range)
@@ -351,6 +355,7 @@ export class View extends HTMLElement {
             doc.documentElement.dir ||= this.language.direction ?? ''
 
         this.#handleLinks(doc, index)
+        this.#handleClick(doc)
         this.#cursorAutohider.cloneFor(doc.documentElement)
 
         this.#emit('load', { doc, index })
@@ -372,7 +377,34 @@ export class View extends HTMLElement {
                 .then(x => x ? this.goTo(href) : null)
                 .catch(e => console.error(e))
         })
+        doc.addEventListener('wheel', e => {
+            if (e.deltaY > 0) {
+                this.goRight();
+            } else {
+                this.goLeft();
+            }
+        }, false)
     }
+
+    #handleClick(doc) {
+        doc.addEventListener('click', e => {
+            if (doc.getSelection().type === "Range")
+                return
+
+            let { clientX, clientY } = e
+            // add top margin to y, y is relative to the iframe
+            // const topMargin = this.renderer.getAttribute('margin').match(/\d+/)[0]
+            // clientY += parseInt(topMargin)
+
+            this.renderer.scrollProp == 'scrollLeft'
+                ? clientX -= (this.renderer.start - this.renderer.size)
+                : clientY -= (this.renderer.start)
+
+            this.#emit('click-view', { cx: clientX, cy: clientY })
+        })
+    }
+
+
     async addAnnotation(annotation, remove) {
         const { value } = annotation
         if (value.startsWith(SEARCH_PREFIX)) {
@@ -416,9 +448,11 @@ export class View extends HTMLElement {
         doc.addEventListener('click', e => {
             const [value, range] = overlayer.hitTest(e)
             if (value && !value.startsWith(SEARCH_PREFIX)) {
+                e.preventDefault()
+                e.stopPropagation()
                 this.#emit('show-annotation', { value, index, range })
             }
-        }, false)
+        }, true)
 
         const list = this.#searchResults.get(index)
         if (list) for (const item of list) this.addAnnotation(item)
@@ -587,12 +621,25 @@ export class View extends HTMLElement {
             for (const item of list) this.deleteAnnotation(item)
         this.#searchResults.clear()
     }
-    async initTTS() {
+    oldValue = null
+    async initTTS(stop) {
+        if (stop)
+            return this.#getOverlayer(this.#index)?.overlayer.remove(this.oldValue)
         const doc = this.renderer.getContents()[0].doc
         if (this.tts && this.tts.doc === doc) return
-        const { TTS } = await import('./tools/tts.js')
-        this.tts = new TTS(doc, textWalker, range =>
-            this.renderer.scrollToAnchor(range, true))
+        this.tts = new TTS(doc, textWalker, range => {
+            const obj = this.#getOverlayer(this.#index);
+            if (obj) {
+                const { overlayer } = obj;
+                if (this.oldValue) {
+                    overlayer.remove(this.oldValue);
+                }
+                const value = this.getCFI(this.#index, range);
+                overlayer.add(value, range, Overlayer.squiggly, { color: '#39c5bb' });
+                this.oldValue = value;
+            }
+            this.renderer.scrollToAnchor(range, true)
+        })
     }
     startMediaOverlay() {
         const { index } = this.renderer.getContents()[0]

@@ -1,11 +1,10 @@
 <script setup>
-import localforage from 'localforage';
-import { ref, onMounted, toRaw, nextTick } from 'vue';
+import { ref, onMounted, toRaw, watch } from 'vue';
 import { fetchMD5 } from '../utils/fileUtils/md5Util';
 import BookUtil from '../utils/fileUtils/bookUtils';
 import { ElMessage } from 'element-plus';
 import BookListItem from '../components/BookListItem.vue';
-
+const { ipcRenderer } = window.require('electron');
 const booklist = ref([]);
 const selectedBooks = ref([]);
 const filelistRef = ref([]);
@@ -16,9 +15,14 @@ let clickFilePath = "";
 
 //上传
 const getFiles = () => {
-    if (fileList.length > 0) {
-        fileList.map(async (file) => { await getMd5WithBrowser(file.raw) })
-    }
+    Promise.all(fileList.map(async (file) => {
+        await getMd5WithBrowser(file.raw);
+    })).then(() => {
+        console.log('getFiles');
+        loadContent(); // 所有文件处理完成后更新 bookList
+    }).catch((error) => {
+        console.error('处理文件时出错:', error);
+    });
 }
 //关闭上传弹窗
 const closeUpload = () => {
@@ -36,36 +40,40 @@ const handleRemove = (file, uploadFiles) => {
 //删除选中的书籍
 const delSelectBooks = () => {
     if (selectedBooks.value.length > 0) {
-        selectedBooks.value.forEach((item) => {
-            return new Promise((resolve, reject) => {
-                BookUtil.delBook(item);//删除文件
-                const index = booklist.value.findIndex((book) => book.key === item.key);
-                if (index !== -1) {
-                    booklist.value.splice(index, 1);
+        console.log(selectedBooks.value);
+        for (const item of selectedBooks.value) {
+            ipcRenderer.once("db-delete-book-response", (event, res) => {
+                if (res.success) {
+                    booklist.value = booklist.value.filter((book) => book.id !== item.id);
+                    BookUtil.delBook(item);
                     ElMessage.success('删除' + item.name + '成功!');
+                } else {
+                    ElMessage.error('删除' + item.name + '失败!');
+
                 }
             });
-        });
-        const books = toRaw(booklist.value);
-        localforage.setItem("books", books);
+            ipcRenderer.send('db-delete-book', item.id);
+        }
+        // 清空选中的书籍列表
         selectedBooks.value = [];
         confirmVisible.value = false;
     }
 }
 //获取书籍md5
 const getMd5WithBrowser = async (file) => {
+    const bookName = file.name.substr(0, file.name.lastIndexOf('.'));
     return new Promise(async (resolve, reject) => {
         const md5 = await fetchMD5(file);
         if (!md5) {
             ElMessage.error(' <<' + bookName + '>> md5失败!');
-            return resolve();
+            reject();
         } else {
             try {
                 await handleBook(file, md5);
+                resolve();
             } catch (error) {
                 console.log(error);
             }
-            return resolve();
         }
     })
 }
@@ -73,85 +81,75 @@ const getMd5WithBrowser = async (file) => {
 // 1.判断是否存在,每本书都有一个特定的md5,假如md5和文件大小一致,即为重复书籍
 // 2. 不重复, 获取书籍信息,书名/作者/封面cover(封面cover为base64的字符串)等
 // 
-const handleBook = (file, md5) => {
+const handleBook = async (file, md5) => {
     let extension = (file.name).split(".").reverse()[0].toLocaleLowerCase();
     let bookName = file.name.substr(0, file.name.length - extension.length - 1);
-    let result;
-    return new Promise((resolve, reject) => {
-        let isRepeat = false;
-        if (booklist.value.length > 0) {
-            booklist.value.forEach((item) => {
-                if (item.md5 === md5 && item.size === file.size) {
-                    isRepeat = true;
-                    ElMessage.error('<<' + bookName + '>> 已经存在!');
-                    return resolve();
-                }
-            });
-        }
-        if (!isRepeat) {
-            let reader = new FileReader();
-            reader.readAsArrayBuffer(file);
-            reader.onload = async (e) => {
-                if (!e.target) {
-                    ElMessage.error(' <<' + bookName + '>> 导入失败!');
-                    return resolve();
-                }
-                let reader = new FileReader();
-                reader.onload = async (event) => {
-                    const file_content = event.target.result;
-                    try {
-                        result = await BookUtil.generateBook(bookName, extension, md5, file.size, file.path || clickFilePath, file);
-                    } catch (error) {
-                        console.log(error);
-                        throw error;
-                    }
-                    clickFilePath = "";
-                    if (result === "get_metadata_error") {
-                        ElMessage.error('导入 <<' + bookName + '>> 失败!');
-                        return resolve();
-                    }
-                    await handleAddBook(result, file_content);
-                    return resolve();
-                }
-                reader.readAsArrayBuffer(file);
+    let isRepeat = false;
+    if (booklist.value.length > 0) {
+        booklist.value.forEach((item) => {
+            if (item.md5 === md5 && item.size === file.size) {
+                isRepeat = true;
+                ElMessage.error('<<' + bookName + '>> 已经存在!');
+                return resolve();
             }
+        });
+    }
+    if (!isRepeat) {
+        try {
+            const book = await BookUtil.generateBook(bookName, extension, md5, file.size, file.path || clickFilePath, file);
+            await handleAddBook(book);
+        } catch (error) {
+            console.log(error);
         }
-    })
+    }
 }
+
 // 添加数据操作. 复制书籍到用户文件夹/upload/book下
 // 复制数据信息到IndexDb中
-const handleAddBook = (book, buffer) => {
-    return new Promise((resolve, reject) => {
-        BookUtil.addBook(book.key, buffer);//复制文件
-        booklist.value.push(book);
-        const books = toRaw(booklist.value);
-        localforage.setItem("books", books).then(() => {
-            ElMessage.success('导入 <<' + book.name + '>> 成功!');
-            filelistRef.value = []
-            dialogFormVisible.value = false
-        }).catch(() => {
-            ElMessage.error('导入 <<' + book.name + '>> 失败!');
-        });
-        return resolve();
-    })
-}
+const handleAddBook = async (book) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            ipcRenderer.once("db-insert-book-response", (event, res) => {
+                if (res.success) {
+                    BookUtil.addBook(book); // 复制文件
+                    book.id = res.id;
+                    // booklist.value.push(book);
+                    ElMessage.success(`导入 <<${book.name || '未知书名'}>> 成功!`);
+                    filelistRef.value = [];
+                    dialogFormVisible.value = false;
+                } else {
+                    ElMessage.error(`导入 <<${book.name || '未知书名'}>> 失败!`);
+                }
+                resolve();
+            });
+            ipcRenderer.send('db-insert-book', book);
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
 //选中 书籍
 const selectBook = (isSelected, book) => {
     isSelected ? selectedBooks.value.push(book) : unSelectBook(book);
+    console.log(selectedBooks.value);
 }
 //取消选中
 const unSelectBook = (book) => {
     selectedBooks.value = selectedBooks.value.filter((item) => item !== book);
 }
 const loadContent = () => {
-    localforage.getItem("books").then((books) => {
-        booklist.value = books ? books : [];
+    ipcRenderer.once("db-select-book-response", (event, items) => {
+        console.log(items);
+        booklist.value = items.data.length > 0 ? items.data : [];
     });
+    ipcRenderer.send("db-get-books");
 }
 
 onMounted(() => {
-    loadContent()
+    loadContent();
 });
+
+
 </script>
 <template>
     <el-dialog
@@ -188,7 +186,7 @@ onMounted(() => {
             <div style="position: relative;">
                 <input type="text" class="header-search-box" placeholder="搜索我的书库">
                 <span class="header-search-text">
-                    <span class="icon-search header-search-icon"></span>
+                    <span class="iconfont icon-sousuo header-search-icon"></span>
                 </span>
             </div>
 
@@ -198,6 +196,11 @@ onMounted(() => {
                 <el-icon class="el-icon--right">
                     <Upload />
                 </el-icon> 导入书籍
+            </el-button>
+            <el-button type="warning" @click="loadContent">
+                <el-icon>
+                    <Refresh />
+                </el-icon>
             </el-button>
             <el-popover :visible="confirmVisible" placement="top" :width="180">
                 <ul style="font-size: 12px;">
@@ -220,18 +223,6 @@ onMounted(() => {
                     </el-button>
                 </template>
             </el-popover>
-        </div>
-    </div>
-    <div class="book-list-header">
-        <div class="booklist-manage-container"></div>
-        <div>
-            <div class="book-list-view">
-                <div class="card-list-mode">
-                    <span data-tooltip-id="my-tooltip" data-tooltip-content="卡片模式"><span class="icon-grid"></span></span>
-                </div>
-                <div class="card-list-mode" style="opacity: 0.5;"><span data-tooltip-id="my-tooltip" data-tooltip-content="列表模式"><span class="icon-menu"></span></span></div>
-                <div class="card-list-mode" style="opacity: 0.5;"><span data-tooltip-id="my-tooltip" data-tooltip-content="封面模式"><span class="icon-cover"></span></span></div>
-            </div>
         </div>
     </div>
     <div class="book-list-container-parent">

@@ -1,10 +1,5 @@
 <script setup>
 import TitleBar from '../components/TitleBar.vue';
-import "../assets/styles/reset.css";
-import "../assets/styles/global.css";
-import "../assets/styles/style.css";
-import 'element-plus/dist/index.css';
-
 </script>
 <template>
     <el-container>
@@ -17,17 +12,11 @@ import 'element-plus/dist/index.css';
                     </el-icon>
                     <template #title>书架</template>
                 </el-menu-item>
-                <el-menu-item index="/book">
+                <el-menu-item index="/note">
                     <el-icon>
                         <Shop />
                     </el-icon>
                     <template #title>笔记</template>
-                </el-menu-item>
-                <el-menu-item index="/config">
-                    <el-icon>
-                        <Setting />
-                    </el-icon>
-                    <template #title>我的书架</template>
                 </el-menu-item>
             </el-menu>
         </el-aside>
