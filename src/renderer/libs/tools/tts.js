@@ -167,7 +167,7 @@ export class TTS {
         this.#lastMark = null
         const [text, range] = this.#list.first() ?? []
         if (!text) return this.next()
-        this.highlight(range.cloneRange())
+        //this.highlight(range.cloneRange())
         return this.#getText(text)
     }
 

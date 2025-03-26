@@ -635,7 +635,7 @@ export class View extends HTMLElement {
                     overlayer.remove(this.oldValue);
                 }
                 const value = this.getCFI(this.#index, range);
-                overlayer.add(value, range, Overlayer.squiggly, { color: '#39c5bb' });
+                // overlayer.add(value, range, Overlayer.squiggly, { color: '#39c5bb' });
                 this.oldValue = value;
             }
             this.renderer.scrollToAnchor(range, true)

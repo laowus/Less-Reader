@@ -1,5 +1,6 @@
 # <div align='center'><img src="https://github.com/laowus/Less-Reader/blob/main/public/icon.png" width="100" height="100"><br/>简阅 Less Reader</div>
 
+[![GitHub release](https://img.shields.io/github/release/GeekLee2012/Less-Player-Desktop)](https://github.com/GeekLee2012/Less-Player-Desktop/releases)
 
 一款基于 Electron + Vue 3 开发的电子书阅读器。
 
