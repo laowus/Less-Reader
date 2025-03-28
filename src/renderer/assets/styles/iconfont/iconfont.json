@@ -6,6 +6,20 @@
   "description": "icon集合",
   "glyphs": [
     {
+      "icon_id": "833577",
+      "name": "选中",
+      "font_class": "selected-copy",
+      "unicode": "e638",
+      "unicode_decimal": 58936
+    },
+    {
+      "icon_id": "6548521",
+      "name": "单选_未选中",
+      "font_class": "danxuan_weixuanzhong",
+      "unicode": "e652",
+      "unicode_decimal": 58962
+    },
+    {
       "icon_id": "980894",
       "name": "暂停",
       "font_class": "weibiaoti519",

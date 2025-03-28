@@ -3,6 +3,11 @@ import { ref } from 'vue';
 import EventBus from '../../common/EventBus';
 import StyleUtil from '../utils/readUtils/styleUtil'
 const tabindex = ref(0)
+// 新增颜色和背景设置数组
+const colorOptions = StyleUtil.themes;
+const currentThemeIndex = ref(StyleUtil.getThemeIndex());
+console.log(currentThemeIndex.value);
+
 EventBus.on('showDialog', (showhide) => {
     dialogRef.value.showModal();
 })
@@ -107,6 +112,17 @@ const setWritingMode = (writingMode) => {
 
 const setTabId = (id) => {
     tabindex.value = id;
+}
+
+const setTheme = (index) => {
+    currentThemeIndex.value = index;
+    const currentTheme = StyleUtil.themes[index];
+    console.log(currentTheme);
+    currentStyle.value.fontColor = currentTheme.fontColor;
+    currentStyle.value.backgroundColor = currentTheme.backgroundColor;
+    StyleUtil.setStyle(currentStyle.value);
+    console.log("setTheme", currentStyle.value);
+    window.setStyle(currentStyle.value);
 }
 </script>
 <template>
@@ -287,6 +303,17 @@ const setTabId = (id) => {
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="setColor" v-show="tabindex == 2">
+                    <h2 class="htwo">主题颜色</h2>
+                    <div class="colors">
+                        <label v-for="(option, index) in colorOptions" :key="index" class="color-item"
+                            :style="{ color: option.fontColor, backgroundColor: option.backgroundColor }" @click="setTheme(index)">
+                            <span class="iconfont" :class="index === currentThemeIndex ? 'icon-selected-copy' : 'icon-danxuan_weixuanzhong'"></span>
+                            <span>{{ option.label }}</span>
+                        </label>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -500,5 +527,40 @@ const setTabId = (id) => {
     justify-content: flex-start;
     cursor: pointer;
     color: gray;
+}
+
+.colors {
+    display: flex;
+    flex-wrap: wrap;
+    /* 允许换行 */
+    gap: 1rem;
+}
+
+.color-item {
+    display: flex;
+    cursor: pointer;
+    padding: 1rem;
+    border-radius: .5rem;
+    justify-content: center;
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 14px;
+    background-color: #f0f0f0;
+    flex: 1 0 calc(33.333% - 1rem);
+    max-width: calc(33.333% - 1rem);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.colors .active {
+    background-color: rgb(255, 255, 255);
+    color: rgb(23, 23, 23);
+    border: 1px solid rgb(23, 23, 23);
+
+}
+
+.hidden {
+    display: none;
 }
 </style>

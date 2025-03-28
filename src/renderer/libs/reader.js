@@ -19,7 +19,7 @@ import Tts from '../utils/readUtils/tts.js';
  * 文字方向 writing-mode: horizontal-tb; writing-mode: vertical-rl;
  */
 const getCSS = ({ fontSize, fontWeight, lineHeight, letterSpacing, wordSpacing, textIndent,
-    paragraphSpacing, justify, hyphenate, writingMode }) => `
+    paragraphSpacing, justify, hyphenate, writingMode, fontColor, backgroundColor }) => `
     @namespace epub "http://www.idpf.org/2007/ops";
     html {
         color-scheme: light dark;
@@ -27,7 +27,13 @@ const getCSS = ({ fontSize, fontWeight, lineHeight, letterSpacing, wordSpacing, 
         font-size: ${fontSize}px;
         font-weight:${fontWeight};
         writing-mode:${writingMode};
-
+        color: ${fontColor} !important;
+        background: none !important;
+        background-color: ${backgroundColor} !important;
+    }
+    body {
+        background: none !important;
+        background-color: transparent;
     }
     /* https://github.com/whatwg/html/issues/5426 */
     @media (prefers-color-scheme: dark) {
@@ -40,6 +46,7 @@ const getCSS = ({ fontSize, fontWeight, lineHeight, letterSpacing, wordSpacing, 
         line-height: ${lineHeight}em !important;
     }
     p, li, blockquote, dd, div, font  {
+        color: ${fontColor} !important;
         line-height: ${lineHeight};
         padding-bottom: ${paragraphSpacing}em !important;
         text-align: ${justify ? 'justify' : 'start'};
