@@ -126,8 +126,8 @@ const setTheme = (index) => {
 }
 </script>
 <template>
-    <dialog id="dialog" class="modal">
-        <div class="setting-content">
+    <dialog id="dialog" class="modal" :style="{ '--button-bg-color': currentStyle.backgroundColor }">
+        <div class="setting-content" :style="{ backgroundColor: currentStyle.backgroundColor }">
             <div class="dialog-header">
                 <div class="btn-title">
                     <button class="btn-icon" :class="tabindex == 0 ? 'active' : ''" @click="setTabId(0)">
@@ -321,12 +321,29 @@ const setTheme = (index) => {
 </template>
 
 <style>
+.btn-icon,
+.icon-close,
+.icon-btn,
+.right-icon-btn,
+.is-btn,
+.no-btn {
+    background-color: var(--button-bg-color) !important;
+}
+
+.active {
+    /* 调整亮度，值小于 1 会使颜色变深，这里设置为 0.8 */
+    filter: brightness(0.9);
+    border-radius: 5px;
+    border: 0;
+    cursor: pointer;
+}
+
 #dialog {
     width: 100%;
     height: 100%;
     z-index: 50;
     overflow: hidden;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.5);
     align-items: center;
     justify-content: center;
     display: flex;
