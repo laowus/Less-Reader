@@ -1,15 +1,17 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import EventBus from '../../common/EventBus';
 const { ipcRenderer } = window.require('electron');
+import StyleUtil from '../utils/readUtils/styleUtil.js'
 const props = defineProps({
     currentBook: Object,
+    currentStyle: Object,
 });
 
 const tabId = ref(0);
 const noteList = ref([]);
 const deleteButtonIndex = ref(null);
-
+const $ = document.querySelector.bind(document)
 const initData = () => {
     return new Promise((resolve, reject) => {
         ipcRenderer.once('db-get-all-notes-response', (event, res) => {
@@ -81,10 +83,14 @@ EventBus.on('updateLeftbarNotes', () => {
     initData();
 });
 
+EventBus.on('updateLeftbarStyle', () => {
+    $('.sidebar-container').style.backgroundColor = StyleUtil.getStyle().backgroundColor;
+});
+
 </script>
 
 <template>
-    <div class="sidebar-container">
+    <div class="sidebar-container" :style="{ '--button-bg-color': props.currentStyle.backgroundColor }">
         <div class="flex-shrink-0">
             <div class="sidebar-header">
                 <div class="sidebar-header-left">
@@ -161,7 +167,6 @@ EventBus.on('updateLeftbarNotes', () => {
     border-top-left-radius: 10px;
     z-index: 15;
     display: flex;
-    opacity: 1;
     height: 100%;
     min-width: 15rem;
     user-select: none;
@@ -169,11 +174,8 @@ EventBus.on('updateLeftbarNotes', () => {
     width: 15%;
     max-width: 45%;
     position: relative;
-    /* position: relative; */
-    background-color: #f0f0f0;
-
-    /* border-right: 1px solid gray; */
-
+    background-color: var(--button-bg-color);
+    box-shadow: 0 0 2px rgba(0, 0, 0, .1), 0 0 16px rgba(0, 0, 0, .1);
 }
 
 .flex-shrink-0 {

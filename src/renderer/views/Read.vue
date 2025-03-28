@@ -17,6 +17,7 @@ const currentBook = ref({});
 const bookStyle = reactive({});
 const leftbarShow = ref(Config.getConfig().leftbarShow);
 const $ = document.querySelector.bind(document)
+const currentStyle = ref(StyleUtil.getStyle())
 onMounted(() => {
     Object.assign(bookStyle, StyleUtil.getStyle());
     ipcRenderer.once('db-get-book-response', (event, items) => {
@@ -51,7 +52,7 @@ EventBus.on('read-dialog-show', (showHide) => {
     <div id="dimming-overlay" aria-hidden="true"></div>
     <div class="reader-page">
         <div class="reader-container">
-            <LeftBar v-show="leftbarShow" :currentBook="currentBook"> </LeftBar>
+            <LeftBar v-show="leftbarShow" :currentBook="currentBook" :currentStyle="currentStyle"> </LeftBar>
             <div class="reader-content">
                 <div id="grid-cell">
                     <div class="foliate-viewer">
@@ -67,7 +68,52 @@ EventBus.on('read-dialog-show', (showHide) => {
 <style>
 :root {
     --active-bg: rgba(0, 0, 0, .05);
+
+    /* 修改部分：定义 --button-bg-color 变量 */
+    --button-bg-color: {
+            {
+            currentStyle.value.backgroundColor
+        }
+    }
 }
+
+.btn-icon {
+    /* 确保宽度和高度相等 */
+    width: 2rem;
+    height: 2rem;
+    min-height: 2rem;
+    padding: 0;
+    /* 移除左右内边距，避免影响圆形显示 */
+    font-size: .875rem;
+    line-height: 1em;
+    font-weight: 600;
+    background-color: white;
+    border-radius: 50%;
+    /* 保持选中的代码 */
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.active {
+    filter: brightness(0.7);
+}
+
+.btn-text-icon {
+    /* 确保宽度和高度相等 */
+    width: 4rem;
+    height: 2rem;
+    padding: 0;
+    /* 移除左右内边距，避免影响圆形显示 */
+    font-size: .875rem;
+    line-height: 2rem;
+    font-weight: 600;
+    background-color: white;
+    border-radius: 5px;
+    /* 保持选中的代码 */
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
 
 @supports (color-scheme: light dark) {
     @media (prefers-color-scheme: dark) {

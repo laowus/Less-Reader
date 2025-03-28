@@ -202,6 +202,7 @@ EventBus.on('pagesTts', () => {
     bottom: 0;
     width: 100%;
     height: 3rem;
+    z-index: 30;
 }
 
 .footer-bar {
@@ -212,18 +213,20 @@ EventBus.on('pagesTts', () => {
     opacity: 0;
     transition-duration: .3s;
     margin: 0 auto;
-    z-index: 10;
     vertical-align: top;
     width: 95%;
     height: 100%;
+
 }
 
 .footer-bar:hover {
+    z-index: 20;
     opacity: 1;
-    background: white;
+    background-color: var(--button-bg-color);
 }
 
 .footer-bar-button {
+    margin-right: 1rem;
     width: 2rem;
     min-height: 2rem;
     height: 2rem;
@@ -231,13 +234,14 @@ EventBus.on('pagesTts', () => {
     justify-content: center;
     align-items: center;
     border: 0;
-    background-color: transparent;
+    background-color: var(--button-bg-color);
 }
 
 .footer-bar-button:hover {
-    background-color: gainsboro;
     cursor: pointer;
     border-radius: 10px;
+    filter: brightness(0.7);
+    box-shadow: 0 0 2px gainsboro;
 }
 
 .footer-bar-button .iconfont {

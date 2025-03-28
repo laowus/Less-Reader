@@ -6,7 +6,6 @@ const tabindex = ref(0)
 // 新增颜色和背景设置数组
 const colorOptions = StyleUtil.themes;
 const currentThemeIndex = ref(StyleUtil.getThemeIndex());
-console.log(currentThemeIndex.value);
 
 EventBus.on('showDialog', (showhide) => {
     dialogRef.value.showModal();
@@ -121,28 +120,28 @@ const setTheme = (index) => {
     currentStyle.value.fontColor = currentTheme.fontColor;
     currentStyle.value.backgroundColor = currentTheme.backgroundColor;
     StyleUtil.setStyle(currentStyle.value);
-    console.log("setTheme", currentStyle.value);
     window.setStyle(currentStyle.value);
+    EventBus.emit('updateLeftbarStyle');
 }
 </script>
 <template>
-    <dialog id="dialog" class="modal" :style="{ '--button-bg-color': currentStyle.backgroundColor }">
+    <dialog id="dialog" class="modal">
         <div class="setting-content" :style="{ backgroundColor: currentStyle.backgroundColor }">
             <div class="dialog-header">
                 <div class="btn-title">
-                    <button class="btn-icon" :class="tabindex == 0 ? 'active' : ''" @click="setTabId(0)">
+                    <button class="btn-text-icon" :class="tabindex == 0 ? 'active' : ''" @click="setTabId(0)">
                         <span class="iconfont  icon-zitidaxiao"></span>
                         字体
                     </button>
-                    <button class="btn-icon" :class="tabindex == 1 ? 'active' : ''" @click="setTabId(1)">
+                    <button class="btn-text-icon" :class="tabindex == 1 ? 'active' : ''" @click="setTabId(1)">
                         <span class="iconfont  icon-layoutForm"></span>
                         布局
                     </button>
-                    <button class="btn-icon" :class="tabindex == 2 ? 'active' : ''" @click="setTabId(2)">
+                    <button class="btn-text-icon" :class="tabindex == 2 ? 'active' : ''" @click="setTabId(2)">
                         <span class="iconfont  icon-yanse"></span>
                         颜色
                     </button>
-                    <button class="icon-close" @click="closeDialog">
+                    <button class="btn-icon" @click="closeDialog">
                         <span class="iconfont icon-guanbi"></span>
                     </button>
                 </div>
@@ -158,10 +157,10 @@ const setTheme = (index) => {
                                 </div>
                                 <div class="item-content">
                                     <span> {{ currentStyle.fontSize }}</span>
-                                    <button class="icon-btn" @click="sizejiajian(false)">
+                                    <button class="btn-icon" @click="sizejiajian(false)">
                                         <span class="iconfont icon-jian"></span>
                                     </button>
-                                    <button class="icon-btn" @click="sizejiajian(true)">
+                                    <button class="btn-icon" @click="sizejiajian(true)">
                                         <span class="iconfont icon-jia"></span>
                                     </button>
                                 </div>
@@ -175,10 +174,10 @@ const setTheme = (index) => {
                                 </div>
                                 <div class="item-content">
                                     <span> {{ currentStyle.fontWeight }}</span>
-                                    <button class="icon-btn" @click="weightjiajian(false)">
+                                    <button class="btn-icon" @click="weightjiajian(false)">
                                         <span class="iconfont icon-jian"></span>
                                     </button>
-                                    <button class="icon-btn" @click="weightjiajian(true)">
+                                    <button class="btn-icon" @click="weightjiajian(true)">
                                         <span class="iconfont icon-jia"></span>
                                     </button>
                                 </div>
@@ -191,12 +190,12 @@ const setTheme = (index) => {
                         <div class="firstTitle">
                             <h2 class="htwo">排版模式</h2>
                             <div class="right-btn">
-                                <button class="right-icon-btn" title="横排" @click="setWritingMode('horizontal-tb')">
-                                    <span class="iconfont icon-wenzifangxiang-hengxiang" :class="currentStyle.writingMode == 'horizontal-tb' ? 'active' : ''">
+                                <button class="btn-icon big-btn" :class="currentStyle.writingMode == 'horizontal-tb' ? 'active' : ''" title="横排" @click="setWritingMode('horizontal-tb')">
+                                    <span class="iconfont icon-wenzifangxiang-hengxiang">
                                     </span>
                                 </button>
-                                <button class="right-icon-btn" title="竖排" @click="setWritingMode('vertical-rl')">
-                                    <span class="iconfont icon-wenzifangxiang-zongxiang" :class="currentStyle.writingMode == 'vertical-rl' ? 'active' : ''">
+                                <button class="btn-icon big-btn" :class="currentStyle.writingMode == 'vertical-rl' ? 'active' : ''" title="竖排" @click="setWritingMode('vertical-rl')">
+                                    <span class="iconfont icon-wenzifangxiang-zongxiang">
                                     </span>
                                 </button>
                             </div>
@@ -209,10 +208,10 @@ const setTheme = (index) => {
                                 </div>
                                 <div class="item-content">
                                     <span> {{ currentStyle.paragraphSpacing }}</span>
-                                    <button class="icon-btn" @click="duanjiajian(false)">
+                                    <button class="btn-icon" @click="duanjiajian(false)">
                                         <span class="iconfont icon-jian"></span>
                                     </button>
-                                    <button class="icon-btn" @click="duanjiajian(true)">
+                                    <button class="btn-icon" @click="duanjiajian(true)">
                                         <span class="iconfont icon-jia"></span>
                                     </button>
                                 </div>
@@ -224,10 +223,10 @@ const setTheme = (index) => {
                                 </div>
                                 <div class="item-content">
                                     <span> {{ currentStyle.lineHeight }}</span>
-                                    <button class="icon-btn" @click="linejiajian(false)">
+                                    <button class="btn-icon" @click="linejiajian(false)">
                                         <span class="iconfont icon-jian"></span>
                                     </button>
-                                    <button class="icon-btn" @click="linejiajian(true)">
+                                    <button class="btn-icon" @click="linejiajian(true)">
                                         <span class="iconfont icon-jia"></span>
                                     </button>
                                 </div>
@@ -239,10 +238,10 @@ const setTheme = (index) => {
                                 </div>
                                 <div class="item-content">
                                     <span> {{ currentStyle.wordSpacing }}</span>
-                                    <button class="icon-btn" @click="wordjiajian(false)">
+                                    <button class="btn-icon" @click="wordjiajian(false)">
                                         <span class="iconfont icon-jian"></span>
                                     </button>
-                                    <button class="icon-btn" @click="wordjiajian(true)">
+                                    <button class="btn-icon" @click="wordjiajian(true)">
                                         <span class="iconfont icon-jia"></span>
                                     </button>
                                 </div>
@@ -254,10 +253,10 @@ const setTheme = (index) => {
                                 </div>
                                 <div class="item-content">
                                     <span> {{ currentStyle.letterSpacing }}</span>
-                                    <button class="icon-btn" @click="letterjiajian(false)">
+                                    <button class="btn-icon" @click="letterjiajian(false)">
                                         <span class="iconfont icon-jian"></span>
                                     </button>
-                                    <button class="icon-btn" @click="letterjiajian(true)">
+                                    <button class="btn-icon" @click="letterjiajian(true)">
                                         <span class="iconfont icon-jia"></span>
                                     </button>
                                 </div>
@@ -269,10 +268,10 @@ const setTheme = (index) => {
                                 </div>
                                 <div class="item-content">
                                     <span> {{ currentStyle.textIndent }}</span>
-                                    <button class="icon-btn" @click="tijiajian(false)">
+                                    <button class="btn-icon" @click="tijiajian(false)">
                                         <span class="iconfont icon-jian"></span>
                                     </button>
-                                    <button class="icon-btn" @click="tijiajian(true)">
+                                    <button class="btn-icon" @click="tijiajian(true)">
                                         <span class="iconfont icon-jia"></span>
                                     </button>
                                 </div>
@@ -321,23 +320,6 @@ const setTheme = (index) => {
 </template>
 
 <style>
-.btn-icon,
-.icon-close,
-.icon-btn,
-.right-icon-btn,
-.is-btn,
-.no-btn {
-    background-color: var(--button-bg-color) !important;
-}
-
-.active {
-    /* 调整亮度，值小于 1 会使颜色变深，这里设置为 0.8 */
-    filter: brightness(0.9);
-    border-radius: 5px;
-    border: 0;
-    cursor: pointer;
-}
-
 #dialog {
     width: 100%;
     height: 100%;
@@ -354,27 +336,6 @@ const setTheme = (index) => {
     justify-content: space-between;
     align-items: center;
     gap: 2rem;
-}
-
-.right-icon-btn {
-    background-color: white;
-}
-
-.right-icon-btn .iconfont {
-    border-radius: 50%;
-    background-color: white;
-    padding: 10px;
-    font-size: 1.5rem;
-}
-
-.right-icon-btn .iconfont:hover {
-    background-color: lightgray;
-    cursor: pointer;
-}
-
-.right-icon-btn .active {
-    background-color: lightgray;
-    cursor: pointer;
 }
 
 
@@ -394,6 +355,7 @@ const setTheme = (index) => {
     display: flex;
     z-index: 20;
     background-color: white;
+    padding-top: 1rem;
 }
 
 .dialog-header {
@@ -416,52 +378,30 @@ const setTheme = (index) => {
     flex-grow: 1;
     max-width: 100%;
     height: 2.5rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    margin-bottom: 1rem;
 }
 
-.btn-icon {
-    height: 2rem;
-    min-height: 2rem;
-    padding-left: .75rem;
-    padding-right: .75rem;
-    font-size: .875rem;
-    background-color: white;
-    line-height: 1em;
-    gap: .5rem;
-    font-weight: 600;
+.right-btn {
+    display: flex;
+    gap: 2rem;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
-.btn-icon:hover,
-.active {
-    background-color: lightgray;
-    border-radius: 5px;
-    border: 0;
-    cursor: pointer;
-}
-
-.icon-close {
-    background-color: white;
-}
-
-.icon-close .iconfont {
-    border-radius: 50%;
-    background-color: #f0f0f0;
-    padding: 3px;
-}
-
-.icon-close .iconfont:hover {
-    background-color: lightgray;
-    cursor: pointer;
+.big-btn {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
 }
 
 .dialog-container {
-    padding-left: 10%;
-    padding-right: 10%;
-    overflow-y: auto;
-    flex-grow: 1;
+    margin-left: 2rem;
+    margin-right: 2rem;
     margin-top: .5rem;
     margin-bottom: .5rem;
+    overflow-y: auto;
+    flex-grow: 1;
+    padding-right: 1rem;
+
 }
 
 .setFont {
@@ -484,7 +424,7 @@ const setTheme = (index) => {
     display: flex;
     flex-direction: column;
     border-radius: .5rem;
-    border: 2px solid #f0f0f0;
+    border: 1px solid #f0f0f0;
 }
 
 .card-item {
@@ -509,20 +449,6 @@ const setTheme = (index) => {
     font-size: 16px;
 }
 
-.icon-btn {
-    background-color: white;
-}
-
-.icon-btn .iconfont {
-    border-radius: 50%;
-    background-color: #f0f0f0;
-    padding: 3px;
-}
-
-.icon-btn .iconfont:hover {
-    background-color: lightgray;
-    cursor: pointer;
-}
 
 .is-btn {
     background-color: white;
@@ -568,13 +494,6 @@ const setTheme = (index) => {
     flex: 1 0 calc(33.333% - 1rem);
     max-width: calc(33.333% - 1rem);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.colors .active {
-    background-color: rgb(255, 255, 255);
-    color: rgb(23, 23, 23);
-    border: 1px solid rgb(23, 23, 23);
-
 }
 
 .hidden {

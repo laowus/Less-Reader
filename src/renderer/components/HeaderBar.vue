@@ -56,13 +56,13 @@ watch(() => props.currentBook, (newBook) => {
             <button class="tooltip" title="笔记本">
                 <span class="iconfont icon-biji"></span>
             </button>
-            <button class="tooltip1" title="最小化" @click="handleMix">
+            <button class="tooltip" title="最小化" @click="handleMix">
                 <span class="iconfont icon-zuixiaohua"></span>
             </button>
-            <button class="tooltip1" title="最大化" @click="handleMax">
+            <button class="tooltip" title="最大化" @click="handleMax">
                 <span class="iconfont icon-zuidahua_huaban1"></span>
             </button>
-            <button class="tooltip1" title="关闭" @click="handleClose">
+            <button class="tooltip" title="关闭" @click="handleClose">
                 <span class="iconfont icon-guanbi"></span>
             </button>
         </div>
@@ -102,6 +102,10 @@ watch(() => props.currentBook, (newBook) => {
     align-items: center;
     display: flex;
     z-index: 20;
+    flex-direction: row;
+    gap: 1rem;
+    background-color: var(--button-bg-color);
+
 }
 
 .header-bar-right {
@@ -116,9 +120,8 @@ watch(() => props.currentBook, (newBook) => {
 .header-bar-left:hover,
 .header-bar-right:hover {
     opacity: 1;
-    background: white;
+    background-color: var(--button-bg-color);
 }
-
 
 .tooltip {
     margin-right: 1rem;
@@ -129,40 +132,20 @@ watch(() => props.currentBook, (newBook) => {
     justify-content: center;
     align-items: center;
     border: 0;
-    background-color: transparent;
+    background-color: var(--button-bg-color);
 }
 
 .tooltip:hover {
-    background-color: gainsboro;
     cursor: pointer;
     border-radius: 10px;
+    filter: brightness(0.7);
+    box-shadow: 0 0 2px gainsboro;
 }
 
 .tooltip .iconfont {
     font-size: 20px;
 }
 
-.tooltip1 {
-    margin-right: 1rem;
-    width: 1.2rem;
-    height: 1.2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 0;
-    background-color: transparent;
-    cursor: pointer;
-    border-radius: 50%;
-    background-color: gainsboro;
-}
-
-.tooltip1 .iconfont {
-    font-size: 18px;
-}
-
-.tooltip1:hover {
-    cursor: pointer;
-}
 
 .header-title {
     display: flex;
