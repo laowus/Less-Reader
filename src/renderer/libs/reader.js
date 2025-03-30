@@ -19,7 +19,7 @@ import Tts from '../utils/readUtils/tts.js';
  * 文字方向 writing-mode: horizontal-tb; writing-mode: vertical-rl;
  */
 const getCSS = ({ fontSize, fontWeight, lineHeight, letterSpacing, wordSpacing, textIndent,
-    paragraphSpacing, justify, hyphenate, writingMode, fontColor, backgroundColor }) => `
+    paragraphSpacing, justify, hyphenate, writingMode, fontColor, backgroundColor, fontFamily }) => `
     @namespace epub "http://www.idpf.org/2007/ops";
     html {
         color-scheme: light dark;

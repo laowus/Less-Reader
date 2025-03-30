@@ -1,5 +1,4 @@
 
-
 export default class StyleUtil {
 
     static themes = [
@@ -30,7 +29,7 @@ export default class StyleUtil {
         const defaultStyle = {
             fontSize: 14, fontWeight: 400, lineHeight: 1.7, letterSpacing: 2.0, wordSpacing: 2.5, textIndent: 2,
             paragraphSpacing: 1.0, justify: true, hyphenate: true, writingMode: "horizontal-tb",
-            fontColor: this.themes[0].color, backgroundColor: this.themes[0].backgroundColor
+            fontColor: this.themes[0].color, backgroundColor: this.themes[0].backgroundColor, fontFamily: "Microsoft YaHei"
         };
         let json = localStorage.getItem("style");
         return JSON.parse(json) || defaultStyle;
@@ -48,6 +47,7 @@ export default class StyleUtil {
         // 如果没有找到匹配的索引，返回 0
         return index !== -1 ? index : 0;
     }
+
 
 
 

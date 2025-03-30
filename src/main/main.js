@@ -297,6 +297,8 @@ ipcMain.on('close-reader-window', (event, bookid) => {
     }
 });
 
+
+
 //启动应用
 startup()
 

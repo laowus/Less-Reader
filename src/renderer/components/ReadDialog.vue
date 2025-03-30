@@ -1,12 +1,12 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import EventBus from '../../common/EventBus';
 import StyleUtil from '../utils/readUtils/styleUtil'
+const { ipcRenderer } = window.require('electron');
 const tabindex = ref(0)
-// 新增颜色和背景设置数组
 const colorOptions = StyleUtil.themes;
 const currentThemeIndex = ref(StyleUtil.getThemeIndex());
-
+const currentFonts = ref([]);
 EventBus.on('showDialog', (showhide) => {
     dialogRef.value.showModal();
 })
@@ -123,6 +123,23 @@ const setTheme = (index) => {
     window.setStyle(currentStyle.value);
     EventBus.emit('updateLeftbarStyle');
 }
+
+onMounted(async () => {
+    const fontlist = await window.queryLocalFonts();
+    if (fontlist) {
+        // currentFonts.value = fontlist.filter(font => /[\u4e00-\u9fa5]/.test(font.fullName));
+        currentFonts.value = fontlist;
+        console.log(fontlist);
+    }
+});
+
+const handleFontChange = (event) => {
+    const selectedFontFamily = event.target.value;
+    currentStyle.value.fontFamily = selectedFontFamily;
+    StyleUtil.setStyle(currentStyle.value);
+    window.setStyle(currentStyle.value);
+};
+
 </script>
 <template>
     <dialog id="dialog" class="modal">
@@ -183,136 +200,153 @@ const setTheme = (index) => {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="setLayout" v-show="tabindex == 1">
-                    <div class="w-full">
-                        <div class="firstTitle">
-                            <h2 class="htwo">排版模式</h2>
-                            <div class="right-btn">
-                                <button class="btn-icon big-btn" :class="currentStyle.writingMode == 'horizontal-tb' ? 'active' : ''" title="横排" @click="setWritingMode('horizontal-tb')">
-                                    <span class="iconfont icon-wenzifangxiang-hengxiang">
-                                    </span>
-                                </button>
-                                <button class="btn-icon big-btn" :class="currentStyle.writingMode == 'vertical-rl' ? 'active' : ''" title="竖排" @click="setWritingMode('vertical-rl')">
-                                    <span class="iconfont icon-wenzifangxiang-zongxiang">
-                                    </span>
-                                </button>
-                            </div>
-                        </div>
-                        <h2 class="htwo">段落</h2>
+                        <h2 class="htwo">字体</h2>
                         <div class="card">
                             <div class="card-item">
                                 <div class="item-title">
-                                    段间距
+                                    当前字体
                                 </div>
                                 <div class="item-content">
-                                    <span> {{ currentStyle.paragraphSpacing }}</span>
-                                    <button class="btn-icon" @click="duanjiajian(false)">
-                                        <span class="iconfont icon-jian"></span>
-                                    </button>
-                                    <button class="btn-icon" @click="duanjiajian(true)">
-                                        <span class="iconfont icon-jia"></span>
-                                    </button>
+                                    <select @change="handleFontChange">
+                                        <option v-for="font in currentFonts" :key="font.family"
+                                            :selected="font.family === currentStyle.fontFamily">
+                                            {{ font.fullName }}
+                                        </option>
+                                    </select>
                                 </div>
                             </div>
-                            <div class="divider"></div>
-                            <div class="card-item">
-                                <div class="item-title">
-                                    行间距
-                                </div>
-                                <div class="item-content">
-                                    <span> {{ currentStyle.lineHeight }}</span>
-                                    <button class="btn-icon" @click="linejiajian(false)">
-                                        <span class="iconfont icon-jian"></span>
+
+                        </div>
+                    </div>
+                    <div class="setLayout" v-show="tabindex == 1">
+                        <div class="w-full">
+                            <div class="firstTitle">
+                                <h2 class="htwo">排版模式</h2>
+                                <div class="right-btn">
+                                    <button class="btn-icon big-btn" :class="currentStyle.writingMode == 'horizontal-tb' ? 'active' : ''" title="横排" @click="setWritingMode('horizontal-tb')">
+                                        <span class="iconfont icon-wenzifangxiang-hengxiang">
+                                        </span>
                                     </button>
-                                    <button class="btn-icon" @click="linejiajian(true)">
-                                        <span class="iconfont icon-jia"></span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="divider"></div>
-                            <div class="card-item">
-                                <div class="item-title">
-                                    词间距
-                                </div>
-                                <div class="item-content">
-                                    <span> {{ currentStyle.wordSpacing }}</span>
-                                    <button class="btn-icon" @click="wordjiajian(false)">
-                                        <span class="iconfont icon-jian"></span>
-                                    </button>
-                                    <button class="btn-icon" @click="wordjiajian(true)">
-                                        <span class="iconfont icon-jia"></span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="divider"></div>
-                            <div class="card-item">
-                                <div class="item-title">
-                                    字间距
-                                </div>
-                                <div class="item-content">
-                                    <span> {{ currentStyle.letterSpacing }}</span>
-                                    <button class="btn-icon" @click="letterjiajian(false)">
-                                        <span class="iconfont icon-jian"></span>
-                                    </button>
-                                    <button class="btn-icon" @click="letterjiajian(true)">
-                                        <span class="iconfont icon-jia"></span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="divider"></div>
-                            <div class="card-item">
-                                <div class="item-title">
-                                    首行缩进
-                                </div>
-                                <div class="item-content">
-                                    <span> {{ currentStyle.textIndent }}</span>
-                                    <button class="btn-icon" @click="tijiajian(false)">
-                                        <span class="iconfont icon-jian"></span>
-                                    </button>
-                                    <button class="btn-icon" @click="tijiajian(true)">
-                                        <span class="iconfont icon-jia"></span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="divider"></div>
-                            <div class="card-item">
-                                <div class="item-title">
-                                    两端对齐
-                                </div>
-                                <div class="item-content">
-                                    <button :class="currentStyle.justify ? 'is-btn' : 'no-btn'" @click="setJustify">
-                                        <span class="iconfont icon-heiyuandian">
+                                    <button class="btn-icon big-btn" :class="currentStyle.writingMode == 'vertical-rl' ? 'active' : ''" title="竖排" @click="setWritingMode('vertical-rl')">
+                                        <span class="iconfont icon-wenzifangxiang-zongxiang">
                                         </span>
                                     </button>
                                 </div>
                             </div>
-                            <div class="divider"></div>
-                            <div class="card-item">
-                                <div class="item-title">
-                                    断字
+                            <h2 class="htwo">段落</h2>
+                            <div class="card">
+                                <div class="card-item">
+                                    <div class="item-title">
+                                        段间距
+                                    </div>
+                                    <div class="item-content">
+                                        <span> {{ currentStyle.paragraphSpacing }}</span>
+                                        <button class="btn-icon" @click="duanjiajian(false)">
+                                            <span class="iconfont icon-jian"></span>
+                                        </button>
+                                        <button class="btn-icon" @click="duanjiajian(true)">
+                                            <span class="iconfont icon-jia"></span>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="item-content">
-                                    <button :class="currentStyle.hyphenate ? 'is-btn' : 'no-btn'" @click="setHyphenate">
-                                        <span class="iconfont icon-heiyuandian">
-                                        </span>
-                                    </button>
+                                <div class="divider"></div>
+                                <div class="card-item">
+                                    <div class="item-title">
+                                        行间距
+                                    </div>
+                                    <div class="item-content">
+                                        <span> {{ currentStyle.lineHeight }}</span>
+                                        <button class="btn-icon" @click="linejiajian(false)">
+                                            <span class="iconfont icon-jian"></span>
+                                        </button>
+                                        <button class="btn-icon" @click="linejiajian(true)">
+                                            <span class="iconfont icon-jia"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                                <div class="card-item">
+                                    <div class="item-title">
+                                        词间距
+                                    </div>
+                                    <div class="item-content">
+                                        <span> {{ currentStyle.wordSpacing }}</span>
+                                        <button class="btn-icon" @click="wordjiajian(false)">
+                                            <span class="iconfont icon-jian"></span>
+                                        </button>
+                                        <button class="btn-icon" @click="wordjiajian(true)">
+                                            <span class="iconfont icon-jia"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                                <div class="card-item">
+                                    <div class="item-title">
+                                        字间距
+                                    </div>
+                                    <div class="item-content">
+                                        <span> {{ currentStyle.letterSpacing }}</span>
+                                        <button class="btn-icon" @click="letterjiajian(false)">
+                                            <span class="iconfont icon-jian"></span>
+                                        </button>
+                                        <button class="btn-icon" @click="letterjiajian(true)">
+                                            <span class="iconfont icon-jia"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                                <div class="card-item">
+                                    <div class="item-title">
+                                        首行缩进
+                                    </div>
+                                    <div class="item-content">
+                                        <span> {{ currentStyle.textIndent }}</span>
+                                        <button class="btn-icon" @click="tijiajian(false)">
+                                            <span class="iconfont icon-jian"></span>
+                                        </button>
+                                        <button class="btn-icon" @click="tijiajian(true)">
+                                            <span class="iconfont icon-jia"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                                <div class="card-item">
+                                    <div class="item-title">
+                                        两端对齐
+                                    </div>
+                                    <div class="item-content">
+                                        <button :class="currentStyle.justify ? 'is-btn' : 'no-btn'" @click="setJustify">
+                                            <span class="iconfont icon-heiyuandian">
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                                <div class="card-item">
+                                    <div class="item-title">
+                                        断字
+                                    </div>
+                                    <div class="item-content">
+                                        <button :class="currentStyle.hyphenate ? 'is-btn' : 'no-btn'" @click="setHyphenate">
+                                            <span class="iconfont icon-heiyuandian">
+                                            </span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="setColor" v-show="tabindex == 2">
-                    <h2 class="htwo">主题颜色</h2>
-                    <div class="colors">
-                        <label v-for="(option, index) in colorOptions" :key="index" class="color-item"
-                            :style="{ color: option.fontColor, backgroundColor: option.backgroundColor }" @click="setTheme(index)">
-                            <span class="iconfont" :class="index === currentThemeIndex ? 'icon-selected-copy' : 'icon-danxuan_weixuanzhong'"></span>
-                            <span>{{ option.label }}</span>
-                        </label>
-                    </div>
+                    <div class="setColor" v-show="tabindex == 2">
+                        <h2 class="htwo">主题颜色</h2>
+                        <div class="colors">
+                            <label v-for="(option, index) in colorOptions" :key="index" class="color-item"
+                                :style="{ color: option.fontColor, backgroundColor: option.backgroundColor }" @click="setTheme(index)">
+                                <span class="iconfont" :class="index === currentThemeIndex ? 'icon-selected-copy' : 'icon-danxuan_weixuanzhong'"></span>
+                                <span>{{ option.label }}</span>
+                            </label>
+                        </div>
 
+                    </div>
                 </div>
             </div>
         </div>
@@ -430,6 +464,8 @@ const setTheme = (index) => {
 .card-item {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    /* 新增：垂直居中对齐 */
 }
 
 .item-title {
@@ -443,12 +479,15 @@ const setTheme = (index) => {
     display: flex;
     gap: 1rem;
     padding: 1rem;
+    align-items: center;
 }
 
-.item-content span {
-    font-size: 16px;
+.item-content span,
+.item-content select {
+    font-size: 14px;
+    text-align: right;
+    /* 新增样式，让文字靠右显示 */
 }
-
 
 .is-btn {
     background-color: white;
