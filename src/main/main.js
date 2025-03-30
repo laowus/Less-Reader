@@ -15,6 +15,7 @@ if (!isDevEnv) {
 //ipc处理
 const fileHandle = require('./ipcHandlers/fileHandle');
 const dbHandle = require('./ipcHandlers/dbHandle');
+const { transcode } = require('buffer');
 // 用于存储所有的 readerWindow 实例
 let readerWindows = [];
 
@@ -26,7 +27,17 @@ let options = {
     width: 1050,
     height: 660,
     frame: false,
-    backgroundColor: '#fff',
+    webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+        webSecurity: false,
+    },
+};
+let readerOptions = {
+    width: 1050,
+    height: 660,
+    frame: false,
+    transparent: true,
     webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
@@ -221,10 +232,10 @@ ipcMain.on("open-book", (event, config) => {
         const targetWindow = readerWindows.find(item => item.bookid === bookid);
         targetWindow.window.show();
     } else {
-        options.webPreferences.nodeIntegrationInSubFrames = true;
+        readerOptions.webPreferences.nodeIntegrationInSubFrames = true;
         store.set({ url });
         const newReaderWindow = new BrowserWindow({
-            ...options,
+            ...readerOptions,
             width: parseInt(store.get("windowWidth") || 1050),
             height: parseInt(store.get("windowHeight") || 660),
             x: parseInt(store.get("windowX")),
@@ -234,21 +245,35 @@ ipcMain.on("open-book", (event, config) => {
             newReaderWindow.webContents.openDevTools();
         }
         newReaderWindow.loadURL(url);
-        // newReaderWindow.on("close", (event) => {
-        //     if (!newReaderWindow.isDestroyed()) {
-        //         let bounds = newReaderWindow.getBounds();
-        //         store.set({
-        //             windowWidth: bounds.width,
-        //             windowHeight: bounds.height,
-        //             windowX: bounds.x,
-        //             windowY: bounds.y,
-        //         });
-        //         // 从数组中移除关闭的窗口
-        //         readerWindows = readerWindows.filter((item) => item.window !== newReaderWindow);
-        //         // 更新上下文菜单
-        //         updateContextMenu();
-        //     }
-        // });
+
+        // 监听窗口大小改变事件
+        newReaderWindow.on("resize", () => {
+            if (!newReaderWindow.isDestroyed()) {
+                let bounds = newReaderWindow.getBounds();
+                store.set({
+                    windowWidth: bounds.width,
+                    windowHeight: bounds.height,
+                    windowX: bounds.x,
+                    windowY: bounds.y,
+                });
+            }
+        });
+        // 监听窗口关闭事件
+        newReaderWindow.on("close", (event) => {
+            if (!newReaderWindow.isDestroyed()) {
+                let bounds = newReaderWindow.getBounds();
+                store.set({
+                    windowWidth: bounds.width,
+                    windowHeight: bounds.height,
+                    windowX: bounds.x,
+                    windowY: bounds.y,
+                });
+                // 从数组中移除关闭的窗口
+                readerWindows = readerWindows.filter((item) => item.window !== newReaderWindow);
+                // 更新上下文菜单
+                updateContextMenu();
+            }
+        });
 
         // 将新的 readerWindow 添加到数组中
         const newObj = {

@@ -41,6 +41,13 @@
 ![Github snap 4.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/4.jpg)
 ![Github snap 5.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/5.jpg)
 
+### TODO
+
+-   [x] 记住每个阅读窗口的大小，记住每个阅读窗口的位置，下次调用这个窗口和位置。
+-   [x] 托盘里面显示多个阅读窗口，点击后显示对应的阅读窗口。
+        ![Github snap 8.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/8.jpg)
+-   [x] 支持 TTS 朗读 调用系统（Web Speech API）这里只测试了 Windows10 系统。
+
 ### For 开发者
 
 -   请先下载安装最新版（或最新 LTS 版本） [Nodejs](https://nodejs.org/)

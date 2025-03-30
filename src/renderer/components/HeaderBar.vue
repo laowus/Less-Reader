@@ -87,13 +87,14 @@ watch(() => props.currentBook, (newBook) => {
     height: 2.7rem;
     width: 100%;
     align-items: center;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0rem;
     transition-duration: .3s;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     z-index: 12;
     vertical-align: top;
+    flex-direction: space-between;
 }
 
 .header-bar-left {
@@ -103,9 +104,9 @@ watch(() => props.currentBook, (newBook) => {
     display: flex;
     z-index: 20;
     flex-direction: row;
-    gap: 1rem;
+    gap: 0.5rem;
     background-color: var(--button-bg-color);
-
+    justify-content: flex-start;
 }
 
 .header-bar-right {
@@ -113,8 +114,7 @@ watch(() => props.currentBook, (newBook) => {
     align-items: center;
     height: 100%;
     display: flex;
-    margin-left: auto;
-    padding-right: 5px;
+    padding-right: 0px;
 }
 
 .header-bar-left:hover,
@@ -124,7 +124,7 @@ watch(() => props.currentBook, (newBook) => {
 }
 
 .tooltip {
-    margin-right: 1rem;
+    margin-right: 0.5rem;
     width: 2rem;
     min-height: 2rem;
     height: 2rem;

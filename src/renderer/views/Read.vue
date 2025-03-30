@@ -58,12 +58,13 @@ EventBus.on('read-dialog-show', (showHide) => {
                     <div class="foliate-viewer">
                         <HeaderBar :currentBook="currentBook" :setLeftbarShow="setLeftbarShow" :leftbarShow="leftbarShow"></HeaderBar>
                         <FooterBar />
-                        <ReadDialog v-show="readDialogShow" />
                     </div>
                 </div>
             </div>
+            <ReadDialog v-show="readDialogShow" />
         </div>
     </div>
+
 </template>
 <style>
 :root {
