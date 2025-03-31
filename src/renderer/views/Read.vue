@@ -1,4 +1,5 @@
 <script setup>
+import chroma from 'chroma-js';
 import { onMounted, reactive, ref, vShow } from 'vue';
 import { useRoute } from 'vue-router';
 import LeftBar from '../components/LeftBar.vue';
@@ -18,14 +19,18 @@ const bookStyle = reactive({});
 const leftbarShow = ref(Config.getConfig().leftbarShow);
 const $ = document.querySelector.bind(document)
 const currentStyle = ref(StyleUtil.getStyle())
+const changeColor = ref();
 onMounted(() => {
     Object.assign(bookStyle, StyleUtil.getStyle());
+    console.log(bookStyle);
+    changeColor.value = getDarkColor(bookStyle.backgroundColor);
+    console.log(changeColor.value);
     ipcRenderer.once('db-get-book-response', (event, items) => {
         currentBook.value = items.data[0];
         console.log(currentBook.value);
         if (currentBook.value.path) open(currentBook.value, bookStyle).catch(e => console.error(e))
     });
-    ipcRenderer.send('db-get-book', bookId);
+    ipcRenderer.send('db-get-book', bookId); 
 
 });
 
@@ -45,6 +50,10 @@ EventBus.on('read-dialog-show', (showHide) => {
     showHide ? $('#dimming-overlay').classList.add('show') : $('#dimming-overlay').classList.remove('show');
 });
 
+const getDarkColor = (color) => {
+    const rgb = chroma(color);
+    return  rgb.darken(20);
+}
 
 </script>
 <template>
@@ -75,7 +84,10 @@ EventBus.on('read-dialog-show', (showHide) => {
             {
             currentStyle.value.backgroundColor
         }
-    }
+    };
+    --bc: {{
+       changeColor.value
+    }}
 }
 
 .btn-icon {
@@ -96,7 +108,10 @@ EventBus.on('read-dialog-show', (showHide) => {
 }
 
 .active {
-    filter: brightness(0.7);
+    cursor: pointer;
+    border-color: transparent;
+    background-color: var(--bc);
+    border-radius: 10px;
 }
 
 .btn-text-icon {

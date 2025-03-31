@@ -317,9 +317,12 @@ EventBus.on('pagesTts', () => {
     right: 1rem;
     width: 324.3px;
     height: 184px;
-    background-color: oklch(90.6701% 0 0 / 1);
-    border-radius: 1rem;
+    background-color: oklch(84.1483% 0.050847 10.54018);
+    border-radius: 10px;
     z-index: 25;
+    opacity:1;
+    border-color: transparent;
+
 }
 
 .panel-container {
@@ -434,14 +437,8 @@ EventBus.on('pagesTts', () => {
     background-color: transparent;
 }
 
-
 .panel-btn:hover {
-    background-color: #eee;
     cursor: pointer;
-    border-radius: 50%;
-    justify-content: center;
-    align-items: center;
-    display: flex;
 }
 
 .play-active,

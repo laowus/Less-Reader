@@ -91,7 +91,7 @@ EventBus.on('updateLeftbarStyle', () => {
 
 <template>
     <div class="sidebar-container" :style="{ '--button-bg-color': props.currentStyle.backgroundColor }">
-        <div class="flex-shrink-0">
+        <!-- <div class="flex-shrink-0">
             <div class="sidebar-header">
                 <div class="sidebar-header-left">
                     <div class="iconfont-btn">
@@ -110,7 +110,7 @@ EventBus.on('updateLeftbarStyle', () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         <div id="side-bar-header">
             <img id="side-bar-cover" />
             <div>
@@ -163,8 +163,7 @@ EventBus.on('updateLeftbarStyle', () => {
 
 <style>
 .sidebar-container {
-    border-bottom-left-radius: 10px;
-    border-top-left-radius: 10px;
+    border-radius: 10px;
     z-index: 15;
     display: flex;
     height: 100%;
@@ -219,8 +218,9 @@ EventBus.on('updateLeftbarStyle', () => {
 
 .iconfont-btn:hover,
 .selected {
-    background-color: gainsboro;
     cursor: pointer;
+    border-color: transparent;
+    background-color: oklch(var(--bc) / .2);
     border-radius: 10px;
 }
 
@@ -325,13 +325,11 @@ EventBus.on('updateLeftbarStyle', () => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 2rem;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-right: .5rem;
-    padding-left: .375rem;
+    height: 2.5rem;
     border-top: 1px solid rgba(0, 0, 0, .1);
     align-items: center;
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 #noteList {

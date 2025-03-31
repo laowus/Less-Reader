@@ -32,8 +32,6 @@ const openDialog = () => {
 }
 
 watch(() => props.currentBook, (newBook) => {
-    // 在这里处理 currentBook 变化时的逻辑
-    // props.currentBook.value = newBook;
     headerBook.value = newBook;
     console.log('Current book has changed:', newBook);
 }, { deep: true });
@@ -132,20 +130,19 @@ watch(() => props.currentBook, (newBook) => {
     justify-content: center;
     align-items: center;
     border: 0;
-    background-color: var(--button-bg-color);
+    background-color: var(--button-bg-color); 
 }
 
 .tooltip:hover {
     cursor: pointer;
+    border-color: transparent;
+    background-color: oklch(var(--bc) / .2);
     border-radius: 10px;
-    filter: brightness(0.7);
-    box-shadow: 0 0 2px gainsboro;
 }
 
 .tooltip .iconfont {
     font-size: 20px;
 }
-
 
 .header-title {
     display: flex;

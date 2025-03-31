@@ -21,6 +21,10 @@ import Tts from '../utils/readUtils/tts.js';
 const getCSS = ({ fontSize, fontWeight, lineHeight, letterSpacing, wordSpacing, textIndent,
     paragraphSpacing, justify, hyphenate, writingMode, fontColor, backgroundColor, fontFamily }) => `
     @namespace epub "http://www.idpf.org/2007/ops";
+    @font-face {
+      font-family: ${fontFamily};
+      font-display: swap;
+    }
     html {
         color-scheme: light dark;
         letter-spacing: ${letterSpacing}px;
@@ -44,6 +48,7 @@ const getCSS = ({ fontSize, fontWeight, lineHeight, letterSpacing, wordSpacing, 
 
     * {
         line-height: ${lineHeight}em !important;
+        font-family: ${fontFamily}; 
     }
     p, li, blockquote, dd, div, font  {
         color: ${fontColor} !important;
