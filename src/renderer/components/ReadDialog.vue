@@ -438,7 +438,14 @@ const addTheme = (theme) => {
 .big-btn {
     width: 2.5rem !important;
     height: 2.5rem !important;
+    background-color:var(--cbc) !important;
+    border-radius: 50%;
 }
+.right-btn .active {
+    background-color: var(--bc) !important;
+    border-radius: 50%;
+}
+
 
 .dialog-container {
     margin-left: 2rem;
@@ -500,13 +507,14 @@ const addTheme = (theme) => {
     font-size: 14px;
     text-align: right;
     padding: 0.5rem;
-    background-color: var(--bc);
 }
 
 .is-btn {
     background-color: white;
-    width: 3rem;
+    width: 4rem;
+    height: 2rem !important;
     border: 1px solid #f0f0f0;
+    background-color: var(--bc);
     justify-items: left;
     border-radius: 10px;
     display: flex;
@@ -516,13 +524,15 @@ const addTheme = (theme) => {
 
 .no-btn {
     background-color: white;
-    width: 3rem;
+    width: 4rem;
+    height: 2rem !important;
     border: 1px solid #f0f0f0;
     border-radius: 10px;
     display: flex;
     justify-content: flex-start;
     cursor: pointer;
     color: gray;
+    background-color: var(--bc);
 }
 
 .colors {
