@@ -123,6 +123,7 @@ const setTheme = (index) => {
     StyleUtil.setStyle(currentStyle.value);
     window.setStyle(currentStyle.value);
     EventBus.emit('updateLeftbarStyle');
+    EventBus.emit('set-theme');
 }
 
 onMounted(async () => {
@@ -438,9 +439,10 @@ const addTheme = (theme) => {
 .big-btn {
     width: 2.5rem !important;
     height: 2.5rem !important;
-    background-color:var(--cbc) !important;
+    background-color: var(--cbc) !important;
     border-radius: 50%;
 }
+
 .right-btn .active {
     background-color: var(--bc) !important;
     border-radius: 50%;
@@ -502,11 +504,16 @@ const addTheme = (theme) => {
     align-items: center;
 }
 
-.item-content span,
-.item-content select {
+.item-content span {
     font-size: 14px;
-    text-align: right;
     padding: 0.5rem;
+}
+
+.item-content select {
+    background-color: var(--bc);
+    border-radius: 10px;
+    height: 2rem;
+    text-align: right;
 }
 
 .is-btn {

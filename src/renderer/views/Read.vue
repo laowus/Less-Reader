@@ -26,7 +26,6 @@ onMounted(() => {
     console.log("bc", bc.value);
     ipcRenderer.once('db-get-book-response', (event, items) => {
         currentBook.value = items.data[0];
-        console.log(currentBook.value);
         if (currentBook.value.path) open(currentBook.value, bookStyle).catch(e => console.error(e))
     });
     ipcRenderer.send('db-get-book', bookId);
@@ -49,11 +48,16 @@ EventBus.on('read-dialog-show', (showHide) => {
     showHide ? $('#dimming-overlay').classList.add('show') : $('#dimming-overlay').classList.remove('show');
 });
 
+EventBus.on('set-theme', () => {
+    Object.assign(bookStyle, StyleUtil.getStyle());
+    bc.value = StyleUtil.getChangeColor(bookStyle.backgroundColor);
+});
+
 </script>
 <template>
     <PopoversCtl :bookId="bookId"></PopoversCtl>
     <div id="dimming-overlay" aria-hidden="true"></div>
-    <div class="reader-page" :style="{ '--bc': bc,'--cbc':bookStyle.backgroundColor }">
+    <div class="reader-page" :style="{ '--bc': bc, '--cbc': bookStyle.backgroundColor }">
         <div class="reader-container">
             <LeftBar v-show="leftbarShow" :currentBook="currentBook" :currentStyle="currentStyle"> </LeftBar>
             <div class="reader-content">
@@ -95,11 +99,12 @@ EventBus.on('read-dialog-show', (showHide) => {
     line-height: 2rem;
     font-weight: 600;
     background-color: var(--cbc);
-    border-color: transparent; 
+    border-color: transparent;
     cursor: pointer;
 }
 
-.btn-text-icon:hover, .active {
+.btn-text-icon:hover,
+.active {
     background-color: var(--bc);
     border-radius: 10px;
 }
