@@ -6,6 +6,20 @@
   "description": "icon集合",
   "glyphs": [
     {
+      "icon_id": "867032",
+      "name": "确认",
+      "font_class": "queren1",
+      "unicode": "e65b",
+      "unicode_decimal": 58971
+    },
+    {
+      "icon_id": "762985",
+      "name": "取消",
+      "font_class": "quxiao",
+      "unicode": "e664",
+      "unicode_decimal": 58980
+    },
+    {
       "icon_id": "833577",
       "name": "选中",
       "font_class": "selected-copy",

@@ -3,7 +3,8 @@ import { ref, onMounted } from 'vue';
 import EventBus from '../../common/EventBus';
 import StyleUtil from '../utils/readUtils/styleUtil'
 import Theme from '../utils/readUtils/theme';
-const tabindex = ref(0)
+const tabindex = ref(0);
+const isAddTheme = ref(false);
 const colorOptions = Theme.getThemes();
 const currentThemeIndex = ref(StyleUtil.getThemeIndex());
 const currentFonts = ref([]);
@@ -14,6 +15,7 @@ const closeDialog = () => {
     EventBus.emit('read-dialog-show', false);
 }
 const currentStyle = ref(StyleUtil.getStyle())
+const addTheme = ref({ fg: "#000000", bg: "#FFFFFF" })
 
 const sizejiajian = (isJia) => {
     if (currentStyle.value.fontSize <= 10 && !isJia || currentStyle.value.fontSize >= 20 && isJia) {
@@ -145,14 +147,10 @@ const handleFontChange = (event) => {
     window.setStyle(currentStyle.value);
 };
 
-const addTheme = (theme) => {
-
-}
-
 </script>
 <template>
     <dialog id="dialog" class="modal">
-        <div class="setting-content" :style="{ backgroundColor: currentStyle.backgroundColor }">
+        <div class="setting-content">
             <div class="dialog-header">
                 <div class="btn-title">
                     <button class="btn-text-icon" :class="tabindex == 0 ? 'active' : ''" @click="setTabId(0)">
@@ -345,7 +343,7 @@ const addTheme = (theme) => {
                         </div>
                     </div>
                 </div>
-                <div class="setColor" v-show="tabindex == 2">
+                <div class="setColor" v-show="tabindex == 2 && isAddTheme == false">
                     <h2 class="htwo">主题颜色</h2>
                     <div class="colors">
                         <label v-for="(option, index) in colorOptions" :key="index" class="color-item"
@@ -354,13 +352,64 @@ const addTheme = (theme) => {
                             <span>{{ option.label }}</span>
 
                         </label>
-                        <label class="color-item" @click="addTheme()">
+                        <label class="color-item" @click="isAddTheme = true">
                             <span class="iconfont icon-jia add"></span>
                             <span>自定义</span>
                         </label>
-
                     </div>
-
+                </div>
+                <div class="setColor" v-show="tabindex == 2 && isAddTheme == true">
+                    <div class="firstTitle">
+                        <h2 class="htwo">自定义主题</h2>
+                        <div class="right-btn">
+                            <button class="btn-text-icon">
+                                <span class="iconfont icon-queren1 "></span>
+                                保存
+                            </button>
+                            <button class="btn-text-icon" @click="isAddTheme = false">
+                                <span class="iconfont icon-quxiao"></span>
+                                取消
+                            </button>
+                        </div>
+                    </div>
+                    <div class="firstTitle">
+                        <h2 class="htwo">主题名称</h2>
+                        <div class="right-btn1">
+                            <input class="themeName" value="自定义">
+                        </div>
+                    </div>
+                    <div class="themeContent">
+                        <div class="themeCard">
+                            <div>
+                                文本颜色
+                            </div>
+                            <div class="color-select-panel">
+                                <div class="select-panel" :style="{ 'backgroundColor': addTheme.fg }">
+                                </div>
+                                <div class="color-data">
+                                    <input v-model="addTheme.fg">
+                                </div>
+                            </div>
+                            <div>
+                                背景颜色
+                            </div>
+                            <div class="color-select-panel">
+                                <div class="select-panel" :style="{ 'backgroundColor': addTheme.bg }">
+                                </div>
+                                <div class="color-data">
+                                    <input v-model="addTheme.bg">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="themeCard">
+                            <div class="example-text">
+                                预览
+                            </div>
+                            <div class="result" :style="{ 'backgroundColor': addTheme.bg, 'color': addTheme.fg }">
+                                Less-Reader是一款基于 Electron + Vue 3 开发的电子书阅读器。 支持格式: epub , mobi, azw3。
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -368,6 +417,68 @@ const addTheme = (theme) => {
 </template>
 
 <style>
+.themeName {
+    width: 80%;
+    height: 2rem;
+    border-radius: 10px;
+    border-color: #000;
+    font-size: 16px;
+
+}
+
+.themeContent {
+    padding-top: 1rem;
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    width: 100%;
+    flex: 1;
+}
+
+.themeCard {
+    background-color: var(--bc);
+    border-radius: 10px;
+    border-color: transparent;
+    width: 80%;
+    height: 200px;
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.color-select-panel {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.select-panel {
+    width: 3rem;
+    height: 2rem;
+    background-color: #3f2f3c;
+    border-radius: 5px;
+}
+
+
+
+.color-data input {
+    width: 80%;
+    height: 2rem;
+    border-radius: 5px;
+    font-size: 16px;
+    letter-spacing: 1px;
+}
+
+.result {
+    border-radius: 5px;
+    flex: 1;
+    background-color: white;
+    text-indent: 2rem;
+    padding: 0.5rem;
+}
+
 #dialog {
     width: 100%;
     height: 100%;
@@ -402,7 +513,7 @@ const addTheme = (theme) => {
     flex-direction: column;
     display: flex;
     z-index: 20;
-    background-color: white;
+    background-color: var(--cbc);
     padding-top: 1rem;
 }
 
@@ -435,6 +546,14 @@ const addTheme = (theme) => {
     flex-direction: row;
     justify-content: space-between;
 }
+
+.right-btn1 {
+    display: flex;
+    gap: 2rem;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
 
 .big-btn {
     width: 2.5rem !important;
