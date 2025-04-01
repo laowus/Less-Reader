@@ -91,26 +91,6 @@ EventBus.on('updateLeftbarStyle', () => {
 
 <template>
     <div class="sidebar-container" :style="{ '--button-bg-color': props.currentStyle.backgroundColor }">
-        <!-- <div class="flex-shrink-0">
-            <div class="sidebar-header">
-                <div class="sidebar-header-left">
-                    <div class="iconfont-btn">
-                        <span class="iconfont icon-library"></span>
-                    </div>
-                </div>
-                <div class="sidebar-header-right">
-                    <div class="iconfont-btn">
-                        <span class="iconfont icon-sousuo1"></span>
-                    </div>
-                    <div class="iconfont-btn">
-                        <span class="iconfont icon-gengduo"></span>
-                    </div>
-                    <div class="iconfont-btn">
-                        <span class="iconfont icon-relieve"></span>
-                    </div>
-                </div>
-            </div>
-        </div> -->
         <div id="side-bar-header">
             <img id="side-bar-cover" />
             <div>
@@ -217,10 +197,10 @@ EventBus.on('updateLeftbarStyle', () => {
 }
 
 .iconfont-btn:hover,
-.selected {
+.sidebar-footer .selected {
     cursor: pointer;
     border-color: transparent;
-    background-color: oklch(var(--bc) / .2);
+    background-color: var(--bc);
     border-radius: 10px;
 }
 

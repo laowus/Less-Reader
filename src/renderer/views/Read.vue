@@ -1,5 +1,5 @@
 <script setup>
-import chroma from 'chroma-js';
+import tinycolor from 'tinycolor2';
 import { onMounted, reactive, ref, vShow } from 'vue';
 import { useRoute } from 'vue-router';
 import LeftBar from '../components/LeftBar.vue';
@@ -19,18 +19,17 @@ const bookStyle = reactive({});
 const leftbarShow = ref(Config.getConfig().leftbarShow);
 const $ = document.querySelector.bind(document)
 const currentStyle = ref(StyleUtil.getStyle())
-const changeColor = ref();
+const bc = ref()
 onMounted(() => {
     Object.assign(bookStyle, StyleUtil.getStyle());
-    console.log(bookStyle);
-    changeColor.value = getDarkColor(bookStyle.backgroundColor);
-    console.log(changeColor.value);
+    bc.value = StyleUtil.getChangeColor(bookStyle.backgroundColor);
+    console.log("bc", bc.value);
     ipcRenderer.once('db-get-book-response', (event, items) => {
         currentBook.value = items.data[0];
         console.log(currentBook.value);
         if (currentBook.value.path) open(currentBook.value, bookStyle).catch(e => console.error(e))
     });
-    ipcRenderer.send('db-get-book', bookId); 
+    ipcRenderer.send('db-get-book', bookId);
 
 });
 
@@ -50,16 +49,11 @@ EventBus.on('read-dialog-show', (showHide) => {
     showHide ? $('#dimming-overlay').classList.add('show') : $('#dimming-overlay').classList.remove('show');
 });
 
-const getDarkColor = (color) => {
-    const rgb = chroma(color);
-    return  rgb.darken(20);
-}
-
 </script>
 <template>
     <PopoversCtl :bookId="bookId"></PopoversCtl>
     <div id="dimming-overlay" aria-hidden="true"></div>
-    <div class="reader-page">
+    <div class="reader-page" :style="{ '--bc': bc }">
         <div class="reader-container">
             <LeftBar v-show="leftbarShow" :currentBook="currentBook" :currentStyle="currentStyle"> </LeftBar>
             <div class="reader-content">
@@ -76,19 +70,10 @@ const getDarkColor = (color) => {
 
 </template>
 <style>
-:root {
-    --active-bg: rgba(0, 0, 0, .05);
-
-    /* 修改部分：定义 --button-bg-color 变量 */
-    --button-bg-color: {
-            {
-            currentStyle.value.backgroundColor
-        }
-    };
-    --bc: {{
-       changeColor.value
-    }}
-}
+/* :root {
+    --bc: {{ bc.value }};
+    --bc : v-bind(bc);
+} */
 
 .btn-icon {
     /* 确保宽度和高度相等 */
@@ -206,6 +191,7 @@ body {
     opacity: 1;
     transition-delay: 0s;
 }
+
 
 .reader-page {
     border-radius: 10px;

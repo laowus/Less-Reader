@@ -1,10 +1,10 @@
 export default class Theme {
 
     static baseThemes = [
-        { label: '默认', backgroundColor: 'rgb(255,255,255)', fontColor: 'rgb(23,23,23)' },
-        { label: '素雅', backgroundColor: 'rgb(224,224,224)', fontColor: 'rgb(34,34,34)' },
-        { label: '旧韵', backgroundColor: 'rgb(241,232,208)', fontColor: 'rgb(91,70,54)' },
-        { label: '青草', backgroundColor: 'rgb(215,219,189)', fontColor: 'rgb(35,44,22)' }
+        { label: '默认', backgroundColor: '#ffffff', fontColor: '#171717' },
+        { label: '素雅', backgroundColor: '#e0e0e0', fontColor: '#222222' },
+        { label: '旧韵', backgroundColor: '#f1e8d0', fontColor: '#5b4636' },
+        { label: '青草', backgroundColor: '#d7dbbd', fontColor: '#232c16' }
     ]
 
     static getThemes() {

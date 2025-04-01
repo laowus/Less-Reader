@@ -240,8 +240,9 @@ EventBus.on('pagesTts', () => {
 .footer-bar-button:hover {
     cursor: pointer;
     border-radius: 10px;
-    filter: brightness(0.7);
-    box-shadow: 0 0 2px gainsboro;
+    /* filter: brightness(0.7);
+    box-shadow: 0 0 2px gainsboro; */
+    background-color: var(--bc);
 }
 
 .footer-bar-button .iconfont {
@@ -320,7 +321,7 @@ EventBus.on('pagesTts', () => {
     background-color: oklch(84.1483% 0.050847 10.54018);
     border-radius: 10px;
     z-index: 25;
-    opacity:1;
+    opacity: 1;
     border-color: transparent;
 
 }

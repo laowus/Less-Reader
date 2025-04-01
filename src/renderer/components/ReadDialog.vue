@@ -2,8 +2,9 @@
 import { ref, onMounted } from 'vue';
 import EventBus from '../../common/EventBus';
 import StyleUtil from '../utils/readUtils/styleUtil'
+import Theme from '../utils/readUtils/theme';
 const tabindex = ref(0)
-const colorOptions = StyleUtil.themes;
+const colorOptions = Theme.getThemes();
 const currentThemeIndex = ref(StyleUtil.getThemeIndex());
 const currentFonts = ref([]);
 EventBus.on('showDialog', (showhide) => {
@@ -114,10 +115,11 @@ const setTabId = (id) => {
 
 const setTheme = (index) => {
     currentThemeIndex.value = index;
-    const currentTheme = StyleUtil.themes[index];
+    const currentTheme = Theme.getThemes()[index];
     console.log(currentTheme);
     currentStyle.value.fontColor = currentTheme.fontColor;
     currentStyle.value.backgroundColor = currentTheme.backgroundColor;
+    currentStyle.value.changeColor = StyleUtil.getChangeColor(currentTheme.backgroundColor);
     StyleUtil.setStyle(currentStyle.value);
     window.setStyle(currentStyle.value);
     EventBus.emit('updateLeftbarStyle');
@@ -498,7 +500,7 @@ const addTheme = (theme) => {
     font-size: 14px;
     text-align: right;
     padding: 0.5rem;
-    background-color: var(--button-bg-color);
+    background-color: var(--bc);
 }
 
 .is-btn {

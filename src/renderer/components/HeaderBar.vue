@@ -130,13 +130,13 @@ watch(() => props.currentBook, (newBook) => {
     justify-content: center;
     align-items: center;
     border: 0;
-    background-color: var(--button-bg-color); 
+    background-color: var(--button-bg-color);
 }
 
 .tooltip:hover {
     cursor: pointer;
     border-color: transparent;
-    background-color: oklch(var(--bc) / .2);
+    background-color: var(--bc);
     border-radius: 10px;
 }
 
