@@ -18,14 +18,11 @@ const bookStyle = reactive({});
 const leftbarShow = ref(Config.getConfig().leftbarShow);
 const $ = document.querySelector.bind(document)
 const currentStyle = ref(StyleUtil.getStyle())
-const bc = ref()
+
 onMounted(() => {
-    Object.assign(bookStyle, StyleUtil.getStyle());
-    bc.value = currentStyle.value.btnBgColor;
-    console.log("bc", bc.value);
     ipcRenderer.once('db-get-book-response', (event, items) => {
         currentBook.value = items.data[0];
-        if (currentBook.value.path) open(currentBook.value, bookStyle).catch(e => console.error(e))
+        if (currentBook.value.path) open(currentBook.value, currentStyle.value).catch(e => console.error(e))
     });
     ipcRenderer.send('db-get-book', bookId);
 
@@ -48,15 +45,16 @@ EventBus.on('read-dialog-show', (showHide) => {
 });
 
 EventBus.on('set-theme', () => {
-    Object.assign(bookStyle, StyleUtil.getStyle());
-    bc.value = StyleUtil.getChangeColor(bookStyle.backgroundColor);
+    console.log('改变样式');
+    currentStyle.value = StyleUtil.getStyle();
+    console.log(currentStyle.value);
 });
 
 </script>
 <template>
     <PopoversCtl :bookId="bookId"></PopoversCtl>
     <div id="dimming-overlay" aria-hidden="true"></div>
-    <div class="reader-page" :style="{ '--bc': bc, '--cbc': bookStyle.backgroundColor }">
+    <div class="reader-page" :style="{ '--bbc': currentStyle.btnBgColor, '--bg': currentStyle.backgroundColor, '--fc': currentStyle.fontColor }">
         <div class="reader-container">
             <LeftBar v-show="leftbarShow" :currentBook="currentBook" :currentStyle="currentStyle"> </LeftBar>
             <div class="reader-content">
@@ -73,11 +71,6 @@ EventBus.on('set-theme', () => {
 
 </template>
 <style>
-/* :root {
-    --bc: {{ bc.value }};
-    --bc : v-bind(bc);
-} */
-
 .btn-icon {
     width: 2rem;
     height: 2rem;
@@ -85,7 +78,8 @@ EventBus.on('set-theme', () => {
     font-size: .875rem;
     line-height: 1em;
     font-weight: 600;
-    background-color: var(--bc);
+    background-color: var(--bbc);
+    color: var(--fc);
     border-radius: 50%;
     cursor: pointer;
 }
@@ -97,19 +91,17 @@ EventBus.on('set-theme', () => {
     font-size: .875rem;
     line-height: 2rem;
     font-weight: 600;
-    background-color: var(--cbc);
+    background-color: var(--bg);
     border-color: transparent;
     cursor: pointer;
+    color: var(--fc);
 }
 
 .btn-text-icon:hover,
 .active {
-    background-color: var(--bc);
+    background-color: var(--bbc);
     border-radius: 10px;
 }
-
-
-
 
 
 @supports (color-scheme: light dark) {

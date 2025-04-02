@@ -222,7 +222,7 @@ EventBus.on('pagesTts', () => {
 .footer-bar:hover {
     z-index: 20;
     opacity: 1;
-    background-color: var(--button-bg-color);
+    background-color: var(--bc);
 }
 
 .footer-bar-button {
@@ -234,15 +234,14 @@ EventBus.on('pagesTts', () => {
     justify-content: center;
     align-items: center;
     border: 0;
-    background-color: var(--button-bg-color);
+    background-color: var(--bg);
+    color: var(--fc);
 }
 
 .footer-bar-button:hover {
     cursor: pointer;
     border-radius: 10px;
-    /* filter: brightness(0.7);
-    box-shadow: 0 0 2px gainsboro; */
-    background-color: var(--bc);
+    background-color: var(--bbc);
 }
 
 .footer-bar-button .iconfont {
@@ -260,6 +259,7 @@ EventBus.on('pagesTts', () => {
     width: 2rem;
     margin-left: .5rem;
     margin-right: .5rem;
+    color: var(--fc);
 }
 
 #progress-slider {

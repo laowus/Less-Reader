@@ -75,7 +75,7 @@ watch(() => props.currentBook, (newBook) => {
     text-align: center;
     margin: 0 auto;
     font-size: 14px;
-    color: grey;
+    color: var(--fc);
 }
 
 .header-bar {
@@ -103,7 +103,7 @@ watch(() => props.currentBook, (newBook) => {
     z-index: 20;
     flex-direction: row;
     gap: 0.5rem;
-    background-color: var(--button-bg-color);
+    background-color: var(--bg);
     justify-content: flex-start;
 }
 
@@ -118,7 +118,7 @@ watch(() => props.currentBook, (newBook) => {
 .header-bar-left:hover,
 .header-bar-right:hover {
     opacity: 1;
-    background-color: var(--button-bg-color);
+    background-color: var(--bg);
 }
 
 .tooltip {
@@ -130,13 +130,14 @@ watch(() => props.currentBook, (newBook) => {
     justify-content: center;
     align-items: center;
     border: 0;
-    background-color: var(--button-bg-color);
+    background-color: var(--bg);
+    color: var(--fc);
 }
 
 .tooltip:hover {
     cursor: pointer;
     border-color: transparent;
-    background-color: var(--bc);
+    background-color: var(--bbc);
     border-radius: 10px;
 }
 

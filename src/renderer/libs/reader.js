@@ -238,6 +238,7 @@ class Reader {
         this.view.addEventListener('relocate', this.#onRelocate.bind(this))
         this.view.addEventListener('click-view', this.#onClickView.bind(this))
         const { book } = this.view
+        console.log("style", style)
         this.view.renderer.setStyles?.(getCSS(style))
         if (!bookObj.lastReadPosition) this.view.renderer.next()
         this.setView(this.view)
@@ -394,15 +395,15 @@ class Reader {
     }
 }
 
-export const open = async (bookObj, bookStyle) => {
+export const open = async (bookObj, currentStyle) => {
     //初始化样式
-    style = bookStyle || {
-        fontSize: 1.0, lineHeight: 1.8, letterSpacing: 2.0, wordSpacing: 2.0,
-        paragraphSpacing: 1.0, textIndent: 0, justify: true, hyphenate: true,
+    style = currentStyle || {
+        fontSize: 14, fontWeight: 400, lineHeight: 1.7, letterSpacing: 2.0, wordSpacing: 2.5, textIndent: 2,
+        paragraphSpacing: 1.0, justify: true, hyphenate: true, writingMode: "horizontal-tb",
+        fontColor: '#171717', backgroundColor: '#ffffff', fontFamily: "Microsoft YaHei", btnBgColor: '#cccccc'
     };
     const reader = new Reader();
     globalThis.reader = reader;
-    //await reader.open(bookObj.path, bookObj.id, bookObj.lastReadPosition);
     await reader.open(bookObj);
     reader.renderAnnotation();
 }

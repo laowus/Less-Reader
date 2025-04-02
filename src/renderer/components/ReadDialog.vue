@@ -470,7 +470,6 @@ const setBtnBgColor = (event) => {
     border-radius: 10px;
     border-color: #000;
     font-size: 16px;
-
 }
 
 .themeContent {
@@ -483,7 +482,7 @@ const setBtnBgColor = (event) => {
 }
 
 .themeCard {
-    background-color: var(--bc);
+    background-color: var(--bg);
     border-radius: 10px;
     border-color: transparent;
     width: 80%;
@@ -537,6 +536,7 @@ const setBtnBgColor = (event) => {
     align-items: center;
     justify-content: center;
     display: flex;
+    color: var(--fc);
 }
 
 .firstTitle {
@@ -562,7 +562,7 @@ const setBtnBgColor = (event) => {
     flex-direction: column;
     display: flex;
     z-index: 20;
-    background-color: var(--cbc);
+    background-color: var(--bg);
     padding-top: 1rem;
 }
 
@@ -607,12 +607,12 @@ const setBtnBgColor = (event) => {
 .big-btn {
     width: 2.5rem !important;
     height: 2.5rem !important;
-    background-color: var(--cbc) !important;
+    background-color: var(--bg) !important;
     border-radius: 50%;
 }
 
 .right-btn .active {
-    background-color: var(--bc) !important;
+    background-color: var(--bbc) !important;
     border-radius: 50%;
 }
 
@@ -678,10 +678,11 @@ const setBtnBgColor = (event) => {
 }
 
 .item-content select {
-    background-color: var(--bc);
+    background-color: var(--bbc);
     border-radius: 10px;
     height: 2rem;
     text-align: right;
+    color: var(--fc);
 }
 
 .is-btn {
@@ -689,7 +690,7 @@ const setBtnBgColor = (event) => {
     width: 4rem;
     height: 2rem !important;
     border: 1px solid #f0f0f0;
-    background-color: var(--bc);
+    background-color: var(--bbc);
     justify-items: left;
     border-radius: 10px;
     display: flex;
@@ -707,7 +708,7 @@ const setBtnBgColor = (event) => {
     justify-content: flex-start;
     cursor: pointer;
     color: gray;
-    background-color: var(--bc);
+    background-color: var(--bbc);
 }
 
 .colors {

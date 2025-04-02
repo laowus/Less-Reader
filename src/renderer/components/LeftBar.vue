@@ -90,7 +90,7 @@ EventBus.on('updateLeftbarStyle', () => {
 </script>
 
 <template>
-    <div class="sidebar-container" :style="{ '--button-bg-color': props.currentStyle.backgroundColor }">
+    <div class="sidebar-container">
         <div id="side-bar-header">
             <img id="side-bar-cover" />
             <div>
@@ -153,8 +153,9 @@ EventBus.on('updateLeftbarStyle', () => {
     width: 15%;
     max-width: 45%;
     position: relative;
-    background-color: var(--button-bg-color);
+    background-color: var(--bg);
     box-shadow: 0 0 2px rgba(0, 0, 0, .1), 0 0 16px rgba(0, 0, 0, .1);
+    color: var(--fc);
 }
 
 .flex-shrink-0 {
@@ -200,7 +201,7 @@ EventBus.on('updateLeftbarStyle', () => {
 .sidebar-footer .selected {
     cursor: pointer;
     border-color: transparent;
-    background-color: var(--bc);
+    background-color: var(--bbc);
     border-radius: 10px;
 }
 
@@ -213,11 +214,13 @@ EventBus.on('updateLeftbarStyle', () => {
     display: flex;
     border-bottom: 1px solid rgba(0, 0, 0, .1);
     align-items: center;
+    color: var(--fc);
 }
 
 #toc-view {
     padding: .5rem;
     overflow-y: auto;
+
 }
 
 #toc-view li,
@@ -225,6 +228,7 @@ EventBus.on('updateLeftbarStyle', () => {
     margin: 0;
     padding: 0;
     list-style: none;
+
 }
 
 #toc-view a,
@@ -233,15 +237,17 @@ EventBus.on('updateLeftbarStyle', () => {
     border-radius: 6px;
     padding: 8px;
     margin: 2px 0;
+
 }
 
 #toc-view a {
     color: CanvasText;
     text-decoration: none;
+    color: var(--fc);
 }
 
 #toc-view a:hover {
-    background: var(--active-bg);
+    background: var(--bbc);
 }
 
 #toc-view span {
@@ -264,7 +270,7 @@ EventBus.on('updateLeftbarStyle', () => {
 
 #toc-view [aria-current] {
     font-weight: bold;
-    background: var(--active-bg);
+    background: var(--bbc);
 }
 
 #toc-view [aria-expanded="false"] svg {
