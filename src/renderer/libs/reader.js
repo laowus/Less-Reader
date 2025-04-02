@@ -23,13 +23,13 @@ const getCSS = ({ fontSize, fontWeight, lineHeight, letterSpacing, wordSpacing, 
     @namespace epub "http://www.idpf.org/2007/ops";
     @font-face {
       font-family: ${fontFamily};
+      src: url(${fontFamily});
       font-display: swap;
     }
     html {
         color-scheme: light dark;
         letter-spacing: ${letterSpacing}px;
         font-size: ${fontSize}px;
-        font-weight:${fontWeight};
         writing-mode:${writingMode};
         color: ${fontColor} !important;
         background: none !important;
@@ -48,9 +48,10 @@ const getCSS = ({ fontSize, fontWeight, lineHeight, letterSpacing, wordSpacing, 
 
     * {
         line-height: ${lineHeight}em !important;
-        font-family: ${fontFamily}; 
+        ${fontFamily}; 
     }
     p, li, blockquote, dd, div, font  {
+        font-weight: ${fontWeight} !important;
         color: ${fontColor} !important;
         line-height: ${lineHeight};
         padding-bottom: ${paragraphSpacing}em !important;
