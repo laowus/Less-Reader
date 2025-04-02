@@ -16,7 +16,7 @@ const closeDialog = () => {
     EventBus.emit('read-dialog-show', false);
 }
 const currentStyle = ref(StyleUtil.getStyle())
-const addTheme = ref({ label: "自定义", backgroundColor: "#FFFFFF", fontColor: "#000000", btnBgColor: '#f0f0f0' })
+const addTheme = ref({ label: "自定义", backgroundColor: "#FFFFFF", fontColor: "#000000", btnBgColor: '#0066cc' })
 
 const sizejiajian = (isJia) => {
     if (currentStyle.value.fontSize <= 10 && !isJia || currentStyle.value.fontSize >= 20 && isJia) {
