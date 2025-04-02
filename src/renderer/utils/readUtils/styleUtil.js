@@ -19,14 +19,19 @@ export default class StyleUtil {
         const defaultStyle = {
             fontSize: 14, fontWeight: 400, lineHeight: 1.7, letterSpacing: 2.0, wordSpacing: 2.5, textIndent: 2,
             paragraphSpacing: 1.0, justify: true, hyphenate: true, writingMode: "horizontal-tb",
-            fontColor: Theme.getThemes()[0].fontColor, backgroundColor: Theme.getThemes()[0].backgroundColor, fontFamily: "Microsoft YaHei"
+            fontColor: '#000000', backgroundColor: '#ffffff', fontFamily: "Microsoft YaHei", btnBgColor: '#cccccc'
         };
         let json = localStorage.getItem("style");
         return JSON.parse(json) || defaultStyle;
     }
 
-    static getChangeColor(color) {
-        return tinycolor(color).darken(20).toHexString();
+    static getChangeColor(color, type, value) {
+        console.log("getChangeColor", color, type, value);
+        if (type === "light") {
+            return tinycolor(color).lighten(value).toHexString();
+        } else if (type === "dark") {
+            return tinycolor(color).darken(value).toHexString();
+        }
     }
 
     static setStyle(bookStyle) {

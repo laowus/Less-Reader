@@ -123,4 +123,13 @@ option:hover {
     background: #555; /* 鼠标悬停时滚动条滑块背景颜色 */
 }
 
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+    border-radius: 5px; 
+}
+input[type="color"]::-webkit-color-swatch {
+    border: 0;
+    border-radius: 5px; 
+}
+
 

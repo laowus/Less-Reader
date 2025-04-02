@@ -1,5 +1,4 @@
 <script setup>
-import tinycolor from 'tinycolor2';
 import { onMounted, reactive, ref, vShow } from 'vue';
 import { useRoute } from 'vue-router';
 import LeftBar from '../components/LeftBar.vue';
@@ -22,7 +21,7 @@ const currentStyle = ref(StyleUtil.getStyle())
 const bc = ref()
 onMounted(() => {
     Object.assign(bookStyle, StyleUtil.getStyle());
-    bc.value = StyleUtil.getChangeColor(bookStyle.backgroundColor);
+    bc.value = currentStyle.value.btnBgColor;
     console.log("bc", bc.value);
     ipcRenderer.once('db-get-book-response', (event, items) => {
         currentBook.value = items.data[0];

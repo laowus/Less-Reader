@@ -5,9 +5,10 @@ import StyleUtil from '../utils/readUtils/styleUtil'
 import Theme from '../utils/readUtils/theme';
 const tabindex = ref(0);
 const isAddTheme = ref(false);
-const colorOptions = Theme.getThemes();
+const colorOptions = ref(Theme.getThemes());
 const currentThemeIndex = ref(StyleUtil.getThemeIndex());
 const currentFonts = ref([]);
+const showColorPicker = ref(false);
 EventBus.on('showDialog', (showhide) => {
     dialogRef.value.showModal();
 })
@@ -15,7 +16,7 @@ const closeDialog = () => {
     EventBus.emit('read-dialog-show', false);
 }
 const currentStyle = ref(StyleUtil.getStyle())
-const addTheme = ref({ fg: "#000000", bg: "#FFFFFF" })
+const addTheme = ref({ label: "自定义", backgroundColor: "#FFFFFF", fontColor: "#000000", btnBgColor: '#f0f0f0' })
 
 const sizejiajian = (isJia) => {
     if (currentStyle.value.fontSize <= 10 && !isJia || currentStyle.value.fontSize >= 20 && isJia) {
@@ -118,10 +119,9 @@ const setTabId = (id) => {
 const setTheme = (index) => {
     currentThemeIndex.value = index;
     const currentTheme = Theme.getThemes()[index];
-    console.log(currentTheme);
     currentStyle.value.fontColor = currentTheme.fontColor;
     currentStyle.value.backgroundColor = currentTheme.backgroundColor;
-    currentStyle.value.changeColor = StyleUtil.getChangeColor(currentTheme.backgroundColor);
+    currentStyle.value.btnBgColor = currentTheme.btnBgColor;
     StyleUtil.setStyle(currentStyle.value);
     window.setStyle(currentStyle.value);
     EventBus.emit('updateLeftbarStyle');
@@ -129,6 +129,7 @@ const setTheme = (index) => {
 }
 
 onMounted(async () => {
+    initBtnBgColor();
     const fontlist = await window.queryLocalFonts();
     if (fontlist) {
         const nonChineseFonts = fontlist.filter(font => !/[\u4e00-\u9fa5]/.test(font.fullName));
@@ -140,12 +141,37 @@ onMounted(async () => {
     }
 });
 
+const initBtnBgColor = () => {
+    currentStyle.value.btnBgColor = StyleUtil.getChangeColor(currentStyle.value.backgroundColor, "dark", 20);
+}
+
 const handleFontChange = (event) => {
     const selectedFontFamily = event.target.value;
     currentStyle.value.fontFamily = selectedFontFamily;
     StyleUtil.setStyle(currentStyle.value);
     window.setStyle(currentStyle.value);
 };
+
+const saveTheme = () => {
+    const res = Theme.addTheme(addTheme.value);
+    if (res) {
+        colorOptions.value = Theme.getThemes();
+        isAddTheme.value = false;
+    } else {
+        alert("主题名称重复");
+    }
+}
+const deleteTheme = (label) => {
+    Theme.deleteTheme(label);
+    colorOptions.value = Theme.getThemes();
+}
+
+const setBtnBgColor = (event) => {
+    const str = event.target.value;
+    console.log('setBtnBgColor', str);
+    const [type, value] = str.split("-");
+    addTheme.value.btnBgColor = StyleUtil.getChangeColor(addTheme.value.backgroundColor, type, value);
+}
 
 </script>
 <template>
@@ -350,7 +376,9 @@ const handleFontChange = (event) => {
                             :style="{ color: option.fontColor, backgroundColor: option.backgroundColor }" @click="setTheme(index)">
                             <span class="iconfont" :class="index === currentThemeIndex ? 'icon-selected-copy' : 'icon-danxuan_weixuanzhong'"></span>
                             <span>{{ option.label }}</span>
-
+                            <span class="iconfont icon-guanbi" :class="[index > 0 ? 'btn-delete' : 'hidden']" :style="{ color: option.backgroundColor, backgroundColor: option.fontColor }"
+                                @click="deleteTheme(option.label)">
+                            </span>
                         </label>
                         <label class="color-item" @click="isAddTheme = true">
                             <span class="iconfont icon-jia add"></span>
@@ -362,8 +390,8 @@ const handleFontChange = (event) => {
                     <div class="firstTitle">
                         <h2 class="htwo">自定义主题</h2>
                         <div class="right-btn">
-                            <button class="btn-text-icon">
-                                <span class="iconfont icon-queren1 "></span>
+                            <button class="btn-text-icon" @click="saveTheme">
+                                <span class="iconfont icon-queren1"></span>
                                 保存
                             </button>
                             <button class="btn-text-icon" @click="isAddTheme = false">
@@ -375,7 +403,7 @@ const handleFontChange = (event) => {
                     <div class="firstTitle">
                         <h2 class="htwo">主题名称</h2>
                         <div class="right-btn1">
-                            <input class="themeName" value="自定义">
+                            <input class="themeName" v-model="addTheme.label">
                         </div>
                     </div>
                     <div class="themeContent">
@@ -384,20 +412,39 @@ const handleFontChange = (event) => {
                                 文本颜色
                             </div>
                             <div class="color-select-panel">
-                                <div class="select-panel" :style="{ 'backgroundColor': addTheme.fg }">
-                                </div>
+                                <input class="select-panel"
+                                    type="color"
+                                    v-model="addTheme.fontColor">
                                 <div class="color-data">
-                                    <input v-model="addTheme.fg">
+                                    <input v-model="addTheme.fontColor" disabled>
                                 </div>
                             </div>
                             <div>
                                 背景颜色
                             </div>
                             <div class="color-select-panel">
-                                <div class="select-panel" :style="{ 'backgroundColor': addTheme.bg }">
-                                </div>
+                                <input class="select-panel"
+                                    type="color"
+                                    v-model="addTheme.backgroundColor">
                                 <div class="color-data">
-                                    <input v-model="addTheme.bg">
+                                    <input v-model="addTheme.backgroundColor" disabled>
+                                </div>
+                            </div>
+                            <div>
+                                过度颜色
+                            </div>
+                            <div class="color-select-panel">
+                                <select @change="setBtnBgColor">
+                                    <option value="dark-10">暗10%</option>
+                                    <option value="dark-20">暗20%</option>
+                                    <option value="light-10">亮10%</option>
+                                    <option value="light-20">亮20%</option>
+                                </select>
+                                <input class="select-panel"
+                                    type="color"
+                                    v-model="addTheme.btnBgColor">
+                                <div class="color-data">
+                                    <input v-model="addTheme.btnBgColor" disabled>
                                 </div>
                             </div>
                         </div>
@@ -405,7 +452,7 @@ const handleFontChange = (event) => {
                             <div class="example-text">
                                 预览
                             </div>
-                            <div class="result" :style="{ 'backgroundColor': addTheme.bg, 'color': addTheme.fg }">
+                            <div class="result" :style="{ 'backgroundColor': addTheme.backgroundColor, 'color': addTheme.fontColor }">
                                 Less-Reader是一款基于 Electron + Vue 3 开发的电子书阅读器。 支持格式: epub , mobi, azw3。
                             </div>
                         </div>
@@ -457,8 +504,10 @@ const handleFontChange = (event) => {
 .select-panel {
     width: 3rem;
     height: 2rem;
-    background-color: #3f2f3c;
     border-radius: 5px;
+    cursor: pointer;
+    padding: 0;
+    border-color: transparent;
 }
 
 
@@ -693,5 +742,23 @@ const handleFontChange = (event) => {
 
 .hidden {
     display: none;
+}
+
+.btn-delete {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    border: none;
+    cursor: pointer;
+    visibility: hidden;
+    font-size: 1rem !important;
+    background-color: transparent;
+    border-radius: 50%;
+
+}
+
+
+.color-item:hover .btn-delete {
+    visibility: visible;
 }
 </style>
