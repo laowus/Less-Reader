@@ -79,6 +79,8 @@ const selectVoice = (index) => {
         ttsVoiceIndex: index
     };
     Tts.setUtterance(ttsDataObj);
+    // 新增：关闭声音选择菜单
+    isShowVoiceMenu.value = false;
 }
 onMounted(() => {
     // 监听菜单显示状态的变化
@@ -161,7 +163,7 @@ EventBus.on('pagesTts', () => {
             </button>
             <div id="current-percent"></div>
             <div id="nav-bar">
-                <input id="progress-slider" type="range" min="0" max="1" step="any">
+                <input id="progress-slider" class="range" type="range" min="0" max="1" step="any">
             </div>
             <button title="朗读" class="footer-bar-button">
                 <span class="iconfont icon-erji" @click="speakText"></span>
@@ -198,8 +200,7 @@ EventBus.on('pagesTts', () => {
 .footer-bar-container {
     display: flex;
     position: absolute;
-    justify-content: center;
-    bottom: 0;
+    bottom: 1rem;
     width: 100%;
     height: 3rem;
     z-index: 30;
@@ -210,19 +211,17 @@ EventBus.on('pagesTts', () => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    opacity: 0;
     transition-duration: .3s;
     margin: 0 auto;
     vertical-align: top;
-    width: 95%;
+    width: 90%;
     height: 100%;
-
+    opacity: 0;
+    background-color: var(--bg);
 }
 
 .footer-bar:hover {
-    z-index: 20;
     opacity: 1;
-    background-color: var(--bc);
 }
 
 .footer-bar-button {
@@ -260,6 +259,7 @@ EventBus.on('pagesTts', () => {
     margin-left: .5rem;
     margin-right: .5rem;
     color: var(--fc);
+    font-size: 1rem;
 }
 
 #progress-slider {
@@ -274,7 +274,7 @@ EventBus.on('pagesTts', () => {
     right: 1.5rem;
     bottom: 3rem;
     position: fixed;
-    z-index: 23;
+    z-index: 40;
 }
 
 .lamp:hover {
@@ -293,7 +293,7 @@ EventBus.on('pagesTts', () => {
     inset: 0;
     position: absolute;
     justify-content: center;
-    background-color: #10b981;
+    background-color: var(--bbc);
     border-radius: 50%;
 }
 
@@ -309,7 +309,7 @@ EventBus.on('pagesTts', () => {
     border-top-right-radius: .25rem;
     width: .25rem;
     height: 16px;
-    background: #FFF;
+    background: var(--fc);
 }
 
 .tts-panel {
@@ -318,12 +318,13 @@ EventBus.on('pagesTts', () => {
     right: 1rem;
     width: 324.3px;
     height: 184px;
-    background-color: oklch(84.1483% 0.050847 10.54018);
+    background-color: var(--bg);
     border-radius: 10px;
     z-index: 25;
     opacity: 1;
-    border-color: transparent;
-
+    border-color: var(--bbc);
+    box-shadow: 0 4px 8px var(--bbc);
+    color: var(--fc) !important;
 }
 
 .panel-container {
@@ -334,6 +335,7 @@ EventBus.on('pagesTts', () => {
     justify-content: center;
     gap: .5rem;
     padding: 1rem;
+
 }
 
 .panel-top {
@@ -343,72 +345,6 @@ EventBus.on('pagesTts', () => {
     align-items: center;
     justify-content: center;
     gap: .5rem;
-}
-
-.range {
-    --c: black;
-    /* active color */
-    --g: 1px;
-    /* the gap */
-    --l: 5px;
-    /* line thickness*/
-    --s: 20px;
-    /* thumb size*/
-
-    width: 90%;
-    height: var(--s);
-    /* needed for Firefox*/
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background: none;
-    cursor: pointer;
-    overflow: hidden;
-}
-
-/* chromium */
-.range::-webkit-slider-thumb {
-    height: var(--s);
-    aspect-ratio: 1;
-    border-radius: 50%;
-    box-shadow: 0 0 0 var(--l) inset var(--c);
-    border-image: linear-gradient(90deg, var(--c) 50%, #ababab 0) 1/0 100vw/0 calc(100vw + var(--g));
-    clip-path:
-        polygon(0 calc(50% + var(--l)/2),
-            -100vw calc(50% + var(--l)/2),
-            -100vw calc(50% - var(--l)/2),
-            0 calc(50% - var(--l)/2),
-            0 0, 100% 0,
-            100% calc(50% - var(--l)/2),
-            100vw calc(50% - var(--l)/2),
-            100vw calc(50% + var(--l)/2),
-            100% calc(50% + var(--l)/2),
-            100% 100%, 0 100%);
-    -webkit-appearance: none;
-    appearance: none;
-}
-
-/* Firefox */
-.range::-moz-range-thumb {
-    height: var(--s);
-    width: var(--s);
-    background: none;
-    border-radius: 50%;
-    box-shadow: 0 0 0 var(--l) inset var(--c);
-    border-image: linear-gradient(90deg, var(--c) 50%, #ababab 0) 1/0 100vw/0 calc(100vw + var(--g));
-    clip-path:
-        polygon(0 calc(50% + var(--l)/2),
-            -100vw calc(50% + var(--l)/2),
-            -100vw calc(50% - var(--l)/2),
-            0 calc(50% - var(--l)/2),
-            0 0, 100% 0,
-            100% calc(50% - var(--l)/2),
-            100vw calc(50% - var(--l)/2),
-            100vw calc(50% + var(--l)/2),
-            100% calc(50% + var(--l)/2),
-            100% 100%, 0 100%);
-    -moz-appearance: none;
-    appearance: none;
 }
 
 .line {
@@ -436,6 +372,7 @@ EventBus.on('pagesTts', () => {
     width: 40px;
     height: 40px;
     background-color: transparent;
+    color: var(--fc);
 }
 
 .panel-btn:hover {
@@ -444,13 +381,12 @@ EventBus.on('pagesTts', () => {
 
 .play-active,
 .play-active:hover {
-    background-color: #4169E1;
+    background-color: var(--bbc);
     cursor: pointer;
     border-radius: 50%;
     justify-content: center;
     align-items: center;
     display: flex;
-    color: white;
 }
 
 .play-active .iconfont {
@@ -464,13 +400,11 @@ EventBus.on('pagesTts', () => {
 /* 声音选择菜单的样式 */
 .voice-menu {
     position: fixed;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: var(--bg);
     padding: 8px;
     z-index: 100;
     width: 150px;
+    color: var(--fc);
 }
 
 .voice-menu ul {
@@ -482,15 +416,17 @@ EventBus.on('pagesTts', () => {
 .voice-menu li {
     padding: 8px;
     cursor: pointer;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px var(--bbc);
 
 }
 
 .voice-menu li:hover {
-    background-color: #f0f0f0;
+    background-color: var(--bbc);
 }
 
 .voice-menu li.active {
-    background-color: #f0f0f0;
+    background-color: var(--bbc);
 }
 
 .single-line {

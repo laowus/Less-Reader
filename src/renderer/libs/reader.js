@@ -21,11 +21,6 @@ import Tts from '../utils/readUtils/tts.js';
 const getCSS = ({ fontSize, fontWeight, lineHeight, letterSpacing, wordSpacing, textIndent,
     paragraphSpacing, justify, hyphenate, writingMode, fontColor, backgroundColor, fontFamily }) => `
     @namespace epub "http://www.idpf.org/2007/ops";
-    @font-face {
-      font-family: ${fontFamily};
-      src: url(${fontFamily});
-      font-display: swap;
-    }
     html {
         color-scheme: light dark;
         letter-spacing: ${letterSpacing}px;
@@ -48,7 +43,7 @@ const getCSS = ({ fontSize, fontWeight, lineHeight, letterSpacing, wordSpacing, 
 
     * {
         line-height: ${lineHeight}em !important;
-        ${fontFamily}; 
+       font-family: ${fontFamily} !important;
     }
     p, li, blockquote, dd, div, font  {
         font-weight: ${fontWeight} !important;
@@ -218,7 +213,6 @@ const notesRefresh = (bookId) => {
 class Reader {
     bookId
     #tocView
-    bookStyle
     annotations = new Map()
     annotationsByValue = new Map()
     #footnoteHandler = new FootnoteHandler()
@@ -239,7 +233,6 @@ class Reader {
         this.view.addEventListener('relocate', this.#onRelocate.bind(this))
         this.view.addEventListener('click-view', this.#onClickView.bind(this))
         const { book } = this.view
-        console.log("style", style)
         this.view.renderer.setStyles?.(getCSS(style))
         if (!bookObj.lastReadPosition) this.view.renderer.next()
         this.setView(this.view)
@@ -388,6 +381,7 @@ class Reader {
         if (tocItem?.href) this.#tocView?.setCurrentHref?.(tocItem.href)
         //保存到当前阅读记录到localstorage中
         EventBus.emit('updateBook', { id: this.bookId, currentChapter: tocItem?.label, readingPercentage: percent, lastReadPosition: cfi });
+        this.view.renderer.updatePageNumber(style.fontColor)
         //页面更新重新读取
         if (Tts.synth?.speaking) {
             Tts.stop();

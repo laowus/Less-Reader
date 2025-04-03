@@ -571,7 +571,6 @@ export class Paginator extends HTMLElement {
                     setSelectionTo(detail.range, -1)
                 else setSelectionTo(this.#anchor, -1)
             }
-            this.#footer.innerHTML = `第 ${this.page} 页 / 总 ${this.pages - 2} 页`
         })
         const checkPointerSelection = debounce((range, sel) => {
             const selRange = sel.getRangeAt(0)
@@ -614,6 +613,11 @@ export class Paginator extends HTMLElement {
             this.#background.style.background = getBackground(this.#view.document)
         }
         this.#mediaQuery.addEventListener('change', this.#mediaQueryListener)
+    }
+    updatePageNumber(fc) {
+        this.#footer.innerHTML = `<span>第 ${this.page} 页 / 总 ${this.pages - 2} 页</span>`
+        this.#footer.style = 'color:' + fc + ';  font-size: 0.75rem; padding-bottom: 1rem; font-weight: bold;'
+
     }
     attributeChangedCallback(name, _, value) {
         switch (name) {

@@ -210,4 +210,92 @@ body {
     width: 100%;
     height: 100%;
 }
+
+
+
+/* 设置滚动条轨道 */
+::-webkit-scrollbar-track {
+    background: var(--fc);
+    /* 滚动条轨道背景颜色 */
+}
+
+/* 设置滚动条滑块 */
+::-webkit-scrollbar-thumb {
+    background: var(--bbc);
+    /* 滚动条滑块背景颜色 */
+    border-radius: 4px;
+    /* 滚动条滑块圆角 */
+}
+
+/* 鼠标悬停在滚动条滑块上的样式 */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+    /* 鼠标悬停时滚动条滑块背景颜色 */
+}
+
+.range {
+    --c: var(--bbc);
+    /* active color */
+    --g: 1px;
+    /* the gap */
+    --l: 5px;
+    /* line thickness*/
+    --s: 20px;
+    /* thumb size*/
+
+    width: 90%;
+    height: var(--s);
+    /* needed for Firefox*/
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: none;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+/* chromium */
+.range::-webkit-slider-thumb {
+    height: var(--s);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    box-shadow: 0 0 0 var(--l) inset var(--c);
+    border-image: linear-gradient(90deg, var(--c) 50%, var(--fc) 0) 1/0 100vw/0 calc(100vw + var(--g));
+    clip-path:
+        polygon(0 calc(50% + var(--l)/2),
+            -100vw calc(50% + var(--l)/2),
+            -100vw calc(50% - var(--l)/2),
+            0 calc(50% - var(--l)/2),
+            0 0, 100% 0,
+            100% calc(50% - var(--l)/2),
+            100vw calc(50% - var(--l)/2),
+            100vw calc(50% + var(--l)/2),
+            100% calc(50% + var(--l)/2),
+            100% 100%, 0 100%);
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* Firefox */
+.range::-moz-range-thumb {
+    height: var(--s);
+    width: var(--s);
+    background: none;
+    border-radius: 50%;
+    box-shadow: 0 0 0 var(--l) inset var(--c);
+    border-image: linear-gradient(90deg, var(--c) 50%, var(--fc) 0) 1/0 100vw/0 calc(100vw + var(--g));
+    clip-path:
+        polygon(0 calc(50% + var(--l)/2),
+            -100vw calc(50% + var(--l)/2),
+            -100vw calc(50% - var(--l)/2),
+            0 calc(50% - var(--l)/2),
+            0 0, 100% 0,
+            100% calc(50% - var(--l)/2),
+            100vw calc(50% - var(--l)/2),
+            100vw calc(50% + var(--l)/2),
+            100% calc(50% + var(--l)/2),
+            100% 100%, 0 100%);
+    -moz-appearance: none;
+    appearance: none;
+}
 </style>

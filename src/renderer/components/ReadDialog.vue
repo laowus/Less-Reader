@@ -19,7 +19,7 @@ const currentStyle = ref(StyleUtil.getStyle())
 const addTheme = ref({ label: "自定义", backgroundColor: "#FFFFFF", fontColor: "#000000", btnBgColor: '#0066cc' })
 
 const sizejiajian = (isJia) => {
-    if (currentStyle.value.fontSize <= 10 && !isJia || currentStyle.value.fontSize >= 20 && isJia) {
+    if (currentStyle.value.fontSize <= 10 && !isJia || currentStyle.value.fontSize >= 25 && isJia) {
         return;
     }
     isJia ? currentStyle.value.fontSize++ : currentStyle.value.fontSize--;
@@ -28,7 +28,7 @@ const sizejiajian = (isJia) => {
 }
 const weightjiajian = (isJia) => {
     console.log(currentStyle.value.fontWeight);
-    if (currentStyle.value.fontWeight <= 100 && !isJia || currentStyle.value.fontWeight >= 600 && isJia) {
+    if (currentStyle.value.fontWeight <= 100 && !isJia || currentStyle.value.fontWeight >= 800 && isJia) {
         console.log("不执行");
         return;
     }
@@ -240,9 +240,10 @@ const setBtnBgColor = (event) => {
                                     当前字体
                                 </div>
                                 <div class="item-content">
-                                    <select @change="handleFontChange">
+                                    <select @change="handleFontChange" :style="{ 'font-family': currentStyle.fontFamily, 'font-weight': currentStyle.fontWeight, 'font-size': currentStyle.fontSize }"
+                                        class="select-option">
                                         <option v-for="font in currentFonts" :key="font.family"
-                                            :selected="font.family === currentStyle.fontFamily" :value="font.family">
+                                            :selected="font.family === currentStyle.fontFamily" :value="font.family" :style="{ 'font-family': font.family }" class="sel-option">
                                             {{ font.fullName }}
                                         </option>
                                     </select>
@@ -464,6 +465,21 @@ const setBtnBgColor = (event) => {
 </template>
 
 <style>
+.select-option {
+    width: 15rem;
+    text-wrap: wrap;
+}
+
+.sel-option {
+    width: 10rem;
+    white-space: normal;
+    /* 允许文本换行 */
+    word-wrap: break-word;
+    /* 允许长单词换行 */
+    overflow-wrap: break-word;
+    /* 同上，用于更广泛的浏览器兼容性 */
+}
+
 .themeName {
     width: 80%;
     height: 2rem;

@@ -154,7 +154,7 @@ EventBus.on('updateLeftbarStyle', () => {
     max-width: 45%;
     position: relative;
     background-color: var(--bg);
-    box-shadow: 0 0 2px rgba(0, 0, 0, .1), 0 0 16px rgba(0, 0, 0, .1);
+    box-shadow: 0 0 2px var(--bbc), 0 0 16px var(--bbc);
     color: var(--fc);
 }
 
@@ -212,7 +212,7 @@ EventBus.on('updateLeftbarStyle', () => {
 #side-bar-header {
     padding: 1rem;
     display: flex;
-    border-bottom: 1px solid rgba(0, 0, 0, .1);
+    border-bottom: 1px solid var(--bbc);
     align-items: center;
     color: var(--fc);
 }
@@ -312,7 +312,7 @@ EventBus.on('updateLeftbarStyle', () => {
     justify-content: space-between;
     align-items: center;
     height: 2.5rem;
-    border-top: 1px solid rgba(0, 0, 0, .1);
+    border-top: 1px solid var(--bbc);
     align-items: center;
     padding-left: 1rem;
     padding-right: 1rem;
@@ -334,7 +334,7 @@ EventBus.on('updateLeftbarStyle', () => {
     padding: .5rem;
     border-radius: 4px;
     margin-bottom: .25rem;
-    background-color: gainsboro;
+    background-color: var(--bbc);
     display: flex;
     flex-direction: column;
 }
@@ -357,7 +357,7 @@ EventBus.on('updateLeftbarStyle', () => {
 }
 
 #noteList li:hover {
-    background-color: #eaeaea;
+    background-color: var(--bbc);
     cursor: pointer;
 }
 
