@@ -27,6 +27,7 @@ let options = {
     width: 1050,
     height: 660,
     frame: false,
+    transparent: true,
     webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
@@ -93,7 +94,13 @@ ipcMain.on('window-close', event => {
     const win = BrowserWindow.fromWebContents(webContent);
     win.hide();
 });
-
+//gei Home 窗口传递 更新
+ipcMain.on('home-set-theme', (event, isUpdate) => {
+    console.log(isUpdate);
+    if (mainWin) {
+        mainWin.webContents.send('home-set-theme-response', isUpdate);
+    }
+})
 
 //全局事件监听
 const registryGlobalListeners = () => {
@@ -221,7 +228,6 @@ const setAppWindowZoom = (value, noResize) => {
         mainWin.center()
     }
 }
-
 
 
 //记录当前窗口 

@@ -103,15 +103,6 @@ EventBus.on('set-theme', () => {
     border-radius: 10px;
 }
 
-
-@supports (color-scheme: light dark) {
-    @media (prefers-color-scheme: dark) {
-        :root {
-            --active-bg: rgba(255, 255, 255, .1);
-        }
-    }
-}
-
 html {
     height: 100%;
 }
@@ -182,7 +173,7 @@ body {
 
 
 .reader-page {
-    border-radius: 10px;
+    border-radius: 20px;
 }
 
 .reader-container {
@@ -199,7 +190,7 @@ body {
 }
 
 #grid-cell {
-    border-radius: 10px;
+    border-radius: 20px;
     overflow: hidden;
     width: 100%;
     height: 100%;
@@ -210,8 +201,6 @@ body {
     width: 100%;
     height: 100%;
 }
-
-
 
 /* 设置滚动条轨道 */
 ::-webkit-scrollbar-track {

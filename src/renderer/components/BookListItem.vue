@@ -120,7 +120,7 @@ const openBook = () => {
     font-size: 12px;
     line-height: 15px;
     opacity: 1;
-    text-align: left;
+    text-align: center;
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-box-orient: vertical;

@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import EventBus from '../../common/EventBus';
 import StyleUtil from '../utils/readUtils/styleUtil'
 import Theme from '../utils/readUtils/theme';
+const { ipcRenderer } = window.require('electron');
 const tabindex = ref(0);
 const isAddTheme = ref(false);
 const colorOptions = ref(Theme.getThemes());
@@ -126,6 +127,7 @@ const setTheme = (index) => {
     window.setStyle(currentStyle.value);
     EventBus.emit('updateLeftbarStyle');
     EventBus.emit('set-theme');
+    ipcRenderer.send('home-set-theme', true);
 }
 
 onMounted(async () => {
@@ -137,7 +139,6 @@ onMounted(async () => {
         const chineseFonts = fontlist.filter(font => /[\u4e00-\u9fa5]/.test(font.fullName));
         // 拼接非中文字体和中文字体，中文字体排在最后
         currentFonts.value = nonChineseFonts.concat(chineseFonts);
-        console.log(fontlist);
     }
 });
 

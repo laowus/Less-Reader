@@ -125,11 +125,9 @@ option:hover {
 
 input[type="color"]::-webkit-color-swatch-wrapper {
     padding: 0;
-    border-radius: 5px; 
+    border-radius: 5px;
 }
 input[type="color"]::-webkit-color-swatch {
     border: 0;
-    border-radius: 5px; 
+    border-radius: 5px;
 }
-
-

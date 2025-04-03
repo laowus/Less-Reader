@@ -6,6 +6,13 @@
   "description": "icon集合",
   "glyphs": [
     {
+      "icon_id": "160247",
+      "name": "refresh",
+      "font_class": "shuaxin",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    },
+    {
       "icon_id": "867032",
       "name": "确认",
       "font_class": "queren1",

@@ -1,7 +1,7 @@
 {
     "name": "less-reader",
     "private": true,
-    "version": "0.0.1",
+    "version": "0.0.2",
     "main": "src/main/main.js",
     "scripts": {
         "dev": "cross-env NODE_ENV=dev concurrently vite \"electron .\"",
