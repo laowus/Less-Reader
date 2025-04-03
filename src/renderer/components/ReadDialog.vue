@@ -16,7 +16,7 @@ const closeDialog = () => {
     EventBus.emit('read-dialog-show', false);
 }
 const currentStyle = ref(StyleUtil.getStyle())
-const addTheme = ref({ label: "自定义", backgroundColor: "#FFFFFF", fontColor: "#000000", btnBgColor: '#0066cc' })
+const addTheme = ref({ label: "自定义", backgroundColor: "#FFFFFF", fontColor: "#000000", btnBgColor: '#cccccc' })
 
 const sizejiajian = (isJia) => {
     if (currentStyle.value.fontSize <= 10 && !isJia || currentStyle.value.fontSize >= 25 && isJia) {
@@ -240,10 +240,9 @@ const setBtnBgColor = (event) => {
                                     当前字体
                                 </div>
                                 <div class="item-content">
-                                    <select @change="handleFontChange" :style="{ 'font-family': currentStyle.fontFamily, 'font-weight': currentStyle.fontWeight, 'font-size': currentStyle.fontSize }"
-                                        class="select-option">
+                                    <select @change="handleFontChange" :style="{ 'font-family': currentStyle.fontFamily, 'font-weight': currentStyle.fontWeight, 'font-size': currentStyle.fontSize }">
                                         <option v-for="font in currentFonts" :key="font.family"
-                                            :selected="font.family === currentStyle.fontFamily" :value="font.family" :style="{ 'font-family': font.family }" class="sel-option">
+                                            :selected="font.family === currentStyle.fontFamily" :value="font.family" :style="{ 'font-family': font.family }">
                                             {{ font.fullName }}
                                         </option>
                                     </select>
@@ -407,6 +406,7 @@ const setBtnBgColor = (event) => {
                             <input class="themeName" v-model="addTheme.label">
                         </div>
                     </div>
+
                     <div class="themeContent">
                         <div class="themeCard">
                             <div>
@@ -434,13 +434,13 @@ const setBtnBgColor = (event) => {
                             <div>
                                 过度颜色
                             </div>
+                            <select @change="setBtnBgColor" style="width: 4rem;height: 1.5rem;">
+                                <option value="dark-10">暗10%</option>
+                                <option value="dark-20">暗20%</option>
+                                <option value="light-10">亮10%</option>
+                                <option value="light-20">亮20%</option>
+                            </select>
                             <div class="color-select-panel">
-                                <select @change="setBtnBgColor">
-                                    <option value="dark-10">暗10%</option>
-                                    <option value="dark-20">暗20%</option>
-                                    <option value="light-10">亮10%</option>
-                                    <option value="light-20">亮20%</option>
-                                </select>
                                 <input class="select-panel"
                                     type="color"
                                     v-model="addTheme.btnBgColor">
@@ -449,14 +449,23 @@ const setBtnBgColor = (event) => {
                                 </div>
                             </div>
                         </div>
-                        <div class="themeCard">
+                        <div class="themeCard" :style="{ '--testcolor': addTheme.fontColor, '--testbg': addTheme.backgroundColor, '--testbbc': addTheme.btnBgColor }">
                             <div class="example-text">
                                 预览
                             </div>
-                            <div class="result" :style="{ 'backgroundColor': addTheme.backgroundColor, 'color': addTheme.fontColor }">
-                                Less-Reader是一款基于 Electron + Vue 3 开发的电子书阅读器。 支持格式: epub , mobi, azw3。
+                            <div class="result">
+                                Less-Reader是一款基于 Electron + Vue 3 开发的电子书阅读器。
+                                <div class="res-btns">
+                                    <button class="active"> 点过 </button>
+                                    <button class="btn-hover" :class="{ 'color': addTheme.fontColor, 'background-color': addTheme.btnBgColor }"> 略过按钮 </button>
+                                </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="themetitle">
+                        用法: 过度颜色用于，显示按钮的背景颜色，请根据背景颜色的进行选择,
+                        如果背景颜色是暗色系（较暗），请选择加亮操作。如果是亮色系（较亮），请选择加暗操作。
+                        可以多试几次，找到适合自己的颜色。不是自己喜欢的主题，可以删除。
                     </div>
                 </div>
             </div>
@@ -465,20 +474,43 @@ const setBtnBgColor = (event) => {
 </template>
 
 <style>
-.select-option {
-    width: 15rem;
-    text-wrap: wrap;
+.themetitle {
+    display: flex;
+    height: 3rem;
+    width: 100%;
+    color: var(--fc);
 }
 
-.sel-option {
-    width: 10rem;
-    white-space: normal;
-    /* 允许文本换行 */
-    word-wrap: break-word;
-    /* 允许长单词换行 */
-    overflow-wrap: break-word;
-    /* 同上，用于更广泛的浏览器兼容性 */
+.result {
+    color: var(--testcolor);
+    background-color: var(--testbg) !important;
 }
+
+.res-btns {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+}
+
+
+
+.res-btns button {
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: var(--testbg);
+    opacity: 0;
+}
+
+
+.res-btns .active,
+.res-btns button:hover {
+    color: var(--testcolor);
+    background-color: var(--testbbc);
+    opacity: 1;
+}
+
 
 .themeName {
     width: 80%;
@@ -489,12 +521,10 @@ const setBtnBgColor = (event) => {
 }
 
 .themeContent {
-    padding-top: 1rem;
     display: flex;
     flex-direction: row;
     gap: 2rem;
     width: 100%;
-    flex: 1;
 }
 
 .themeCard {
@@ -502,12 +532,13 @@ const setBtnBgColor = (event) => {
     border-radius: 10px;
     border-color: transparent;
     width: 80%;
-    height: 200px;
     font-size: 16px;
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    padding: 1rem;
+    padding: 0.5rem;
+    flex: 1;
+    height: 100%;
 }
 
 .color-select-panel {
@@ -525,8 +556,6 @@ const setBtnBgColor = (event) => {
     border-color: transparent;
 }
 
-
-
 .color-data input {
     width: 80%;
     height: 2rem;
@@ -537,10 +566,10 @@ const setBtnBgColor = (event) => {
 
 .result {
     border-radius: 5px;
-    flex: 1;
     background-color: white;
     text-indent: 2rem;
-    padding: 0.5rem;
+    padding: 1rem;
+    height: auto;
 }
 
 #dialog {
@@ -579,7 +608,7 @@ const setBtnBgColor = (event) => {
     display: flex;
     z-index: 20;
     background-color: var(--bg);
-    padding-top: 1rem;
+    padding-top: 0.5rem;
 }
 
 .dialog-header {
@@ -601,8 +630,7 @@ const setBtnBgColor = (event) => {
     align-items: center;
     flex-grow: 1;
     max-width: 100%;
-    height: 2.5rem;
-    margin-bottom: 1rem;
+    height: 2rem;
 }
 
 .right-btn {
@@ -619,7 +647,6 @@ const setBtnBgColor = (event) => {
     justify-content: flex-end;
 }
 
-
 .big-btn {
     width: 2.5rem !important;
     height: 2.5rem !important;
@@ -632,7 +659,6 @@ const setBtnBgColor = (event) => {
     border-radius: 50%;
 }
 
-
 .dialog-container {
     margin-left: 2rem;
     margin-right: 2rem;
@@ -640,8 +666,6 @@ const setBtnBgColor = (event) => {
     margin-bottom: .5rem;
     overflow-y: auto;
     flex-grow: 1;
-    padding-right: 1rem;
-
 }
 
 .setFont {
@@ -771,9 +795,16 @@ const setBtnBgColor = (event) => {
     font-size: 1rem !important;
     background-color: transparent;
     border-radius: 50%;
-
 }
 
+.setColor {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+
+}
 
 .color-item:hover .btn-delete {
     visibility: visible;
