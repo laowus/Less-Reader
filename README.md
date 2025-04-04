@@ -49,7 +49,12 @@
 -   [x] 支持 TTS 朗读 调用系统（Web Speech API）这里只测试了 Windows10 系统。
         注： 1. 可以选择声音，语速等。只有三种声音,而且都是女生,区别不大。 2. 免费
         ![Github snap 5.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/9.jpg)
--   [ ] 自定义字体颜色和背景，导入字体。
+-   [x] 自定义字体颜色和背景，导入字体。
+        默认 9 种主题。可以删除，也可恢复。
+        ![Github snap 10.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/10.jpg)
+        自定义主题。
+        ![Github snap 11.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/11.jpg)
+-   [x] 修复其他 bug。初始化窗口大小问题，放大缩回问题。
 
 ### For 开发者
 
