@@ -57,12 +57,29 @@ if (!singleInstance) {
     });
 }
 
+const initWindowBounds = (isMain, win) => {
+
+    if (isMain) {
+        store.get('mainWindowWidth') || store.set('mainWindowWidth', win.getSize()[0]);
+        store.get('mainWindowHeight') || store.set('mainWindowHeight', win.getSize()[1]);
+        store.get('mainWindowX') || store.set('mainWindowX', win.getPosition()[0]);
+        store.get('mainWindowY') || store.set('mainWindowY', win.getPosition()[1]);
+    } else {
+        store.get('readerWindowWidth') || store.set('readerWindowWidth', win.getSize()[0]);
+        store.get('readerWindowHeight') || store.set('readerWindowHeight', win.getSize()[1]);
+        store.get('readerWindowX') || store.set('readerWindowX', win.getPosition()[0]);
+        store.get('readerWindowY') || store.set('readerWindowY', win.getPosition()[1]);
+    }
+
+}
 
 const init = () => {
     app.whenReady().then(async () => {
         try {
             await initDatabase();
             mainWin = createWindow();
+            initWindowBounds(true, mainWin);
+
         } catch (error) {
             console.error('Failed to initialize database:', error);
         }
@@ -93,13 +110,13 @@ ipcMain.on('window-min', event => {
 ipcMain.on('window-max', event => {
     const webContent = event.sender;
     const win = BrowserWindow.fromWebContents(webContent);
+    console.log("是否最大化", win.isMaximized());
     if (win.isMaximized()) {
         if (win === mainWin) {
-            // 从存储中获取最大化之前的窗口大小和位置
-            const width = store.get("mainWindowWidth");
-            const height = store.get("mainWindowHeight");
-            const x = store.get("mainWindowX");
-            const y = store.get("mainWindowY");
+            const width = store.get("mainWindowWidth") || 1050;
+            const height = store.get("mainWindowHeight") || 660;
+            const x = store.get("mainWindowX") || mainWin.getPosition()[0];
+            const y = store.get("mainWindowY") || mainWin.getPosition()[1];
             if (width && height) {
                 win.setSize(width, height);
                 if (x && y) {
@@ -108,10 +125,11 @@ ipcMain.on('window-max', event => {
             }
         } else {
             // 处理阅读窗口
-            const width = store.get("readerWindowWidth");
-            const height = store.get("readerWindowHeight");
-            const x = store.get("readerWindowX");
-            const y = store.get("readerWindowY");
+            console.log("阅读窗口最大化恢复原状");
+            const width = store.get("readerWindowWidth") || 1050;;
+            const height = store.get("readerWindowHeight") || 660;;
+            const x = store.get("readerWindowX") || mainWin.getPosition()[0];
+            const y = store.get("readerWindowY") || mainWin.getPosition()[1];
             if (width && height) {
                 win.setSize(width, height);
                 if (x && y) {
@@ -120,6 +138,7 @@ ipcMain.on('window-max', event => {
             }
         }
     } else {
+        console.log("执行最大化");
         win.maximize();
     }
 });
@@ -224,35 +243,28 @@ const createWindow = () => {
         // 监听窗口大小改变事件
         mainWindow.on("resize", () => {
             if (!mainWindow.isDestroyed()) {
-                let bounds = mainWindow.getBounds();
-                store.set({
-                    mainWindowWidth: bounds.width,
-                    mainWindowHeight: bounds.height,
-                });
-
+                if (!mainWindow.isMaximized()) {
+                    let bounds = mainWindow.getBounds();
+                    store.set({
+                        mainWindowWidth: bounds.width,
+                        mainWindowHeight: bounds.height,
+                    });
+                } else {
+                    console.log('当前为大化状态，不保存窗口大小和位置');
+                }
             }
         });
 
         // 监听窗口移动事件
         mainWindow.on("move", () => {
             if (!mainWindow.isDestroyed()) {
-                let bounds = mainWindow.getBounds();
-                store.set({
-                    mainWindowX: bounds.x,
-                    mainWindowY: bounds.y,
-                });
-            }
-        });
-        // 监听窗口将要最大化事件，记录窗口大小和位置
-        mainWindow.on("will-maximize", () => {
-            if (!mainWindow.isDestroyed()) {
-                let bounds = mainWindow.getBounds();
-                store.set({
-                    mainWindowWidth: bounds.width,
-                    mainWindowHeight: bounds.height,
-                    mainWindowX: bounds.x,
-                    mainWindowY: bounds.y
-                });
+                if (!mainWindow.isMaximized()) {
+                    let bounds = mainWindow.getBounds();
+                    store.set({
+                        mainWindowX: bounds.x,
+                        mainWindowY: bounds.y,
+                    });
+                }
             }
         });
 
@@ -282,11 +294,12 @@ ipcMain.on("open-book", (event, config) => {
         store.set({ url });
         const newReaderWindow = new BrowserWindow({
             ...readerOptions,
-            width: parseInt(store.get("readerWindowWidth") || 1050),
-            height: parseInt(store.get("readerWindowHeight") || 660),
+            width: parseInt(store.get("readerWindowWidth")),
+            height: parseInt(store.get("readerWindowHeight")),
             x: parseInt(store.get("readerWindowX")),
             y: parseInt(store.get("readerWindowY"))
         });
+        initWindowBounds(false, newReaderWindow);
         if (isDevEnv) {
             newReaderWindow.webContents.openDevTools();
         }
@@ -295,15 +308,30 @@ ipcMain.on("open-book", (event, config) => {
         // 监听窗口大小改变事件
         newReaderWindow.on("resize", () => {
             if (!newReaderWindow.isDestroyed()) {
-                let bounds = newReaderWindow.getBounds();
-                store.set({
-                    readerWindowWidth: bounds.width,
-                    readerWindowHeight: bounds.height,
-                    readerWindowX: bounds.x,
-                    readerWindowY: bounds.y,
-                });
+                if (!newReaderWindow.isMaximized()) {
+                    let bounds = newReaderWindow.getBounds();
+                    store.set({
+                        readerWindowWidth: bounds.width,
+                        readerWindowHeight: bounds.height,
+                    });
+                }
             }
         });
+
+        // 监听窗口移动事件
+        newReaderWindow.on("move", () => {
+            if (!newReaderWindow.isDestroyed()) {
+                if (!newReaderWindow.isMaximized()) {
+                    let bounds = newReaderWindow.getBounds();
+                    store.set({
+                        readerWindowX: bounds.x,
+                        readerWindowY: bounds.y,
+                    });
+                }
+            }
+        });
+
+
         // 监听窗口关闭事件
         newReaderWindow.on("close", (event) => {
             if (!newReaderWindow.isDestroyed()) {
