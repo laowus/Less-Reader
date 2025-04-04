@@ -19,7 +19,7 @@ const dbHandle = () => {
         updateBook(book, event);
     });
 
-    ipcMain.on("db-delete-book", (event, key) => {
+    ipcMain.on("db-delete-book", (event, bookId) => {
         deleteBook(bookId, event);
     });
 

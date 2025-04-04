@@ -5,7 +5,7 @@ import BookUtil from '../utils/fileUtils/bookUtils';
 import { ElMessage } from 'element-plus';
 import BookListItem from '../components/BookListItem.vue';
 import StyleUtil from '../utils/readUtils/styleUtil.js'
-import EventBus from '../../common/EventBus';
+
 const { ipcRenderer } = window.require('electron');
 const booklist = ref([]);
 const selectedBooks = ref([]);
