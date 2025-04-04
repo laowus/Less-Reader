@@ -19,7 +19,7 @@ export default class StyleUtil {
         const defaultStyle = {
             fontSize: 14, fontWeight: 400, lineHeight: 1.7, letterSpacing: 2.0, wordSpacing: 2.5, textIndent: 2,
             paragraphSpacing: 1.0, justify: true, hyphenate: true, writingMode: "horizontal-tb",
-            fontColor: '#171717', backgroundColor: '#ffffff', fontFamily: "Microsoft YaHei", btnBgColor: '#cccccc'
+            fontColor: '#5b4636', backgroundColor: '#f1e8d0', fontFamily: "Microsoft YaHei", btnBgColor: '#dac281'
         };
         let json = localStorage.getItem("style");
         return JSON.parse(json) || defaultStyle;
