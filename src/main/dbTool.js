@@ -112,11 +112,16 @@ const insertBook = (book, event) => {
 
 }
 
-const selectAllBook = (event) => {
-    db.all(`SELECT * FROM tb_books`, (err, rows) => {
+const selectAllBook = (event, keyword) => {
+    let strSql = `SELECT * FROM tb_books`;
+    if (keyword) {
+        strSql = `SELECT * FROM tb_books WHERE name like '%${keyword}%'`;
+    }
+
+    db.all(strSql, (err, rows) => {
         if (err) {
             console.error(err.message);
-            event.reply('db-select-book-response', { success: false });
+            event.reply('db-select-book-response', { success: false, data: [] });
         } else {
             //console.log('Data selected:', rows);
             event.reply('db-select-book-response', { success: true, data: rows });

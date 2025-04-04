@@ -7,8 +7,8 @@ const dbHandle = () => {
         insertBook(book, event);
     });
 
-    ipcMain.on("db-get-books", (event, arg) => {
-        selectAllBook(event);
+    ipcMain.on("db-get-books", (event, keyword) => {
+        selectAllBook(event, keyword);
     });
 
     ipcMain.on("db-get-book", (event, bookId) => {

@@ -12,10 +12,11 @@ const selectedBooks = ref([]);
 const filelistRef = ref([]);
 const dialogFormVisible = ref(false);
 const confirmVisible = ref(false);
+const $ = document.querySelector.bind(document)
 let fileList = [];
 let clickFilePath = "";
 const currentStyle = ref(StyleUtil.getStyle())
-
+const keyword = ref("");
 const handleClose = () => {
     ipcRenderer.send('window-close');
 }
@@ -155,7 +156,7 @@ const loadContent = () => {
         console.log(items);
         booklist.value = items.data.length > 0 ? items.data : [];
     });
-    ipcRenderer.send("db-get-books");
+    ipcRenderer.send("db-get-books", keyword.value);
 
     ipcRenderer.on("home-set-theme-response", (event, success) => {
         console.log(success);
@@ -165,6 +166,11 @@ const loadContent = () => {
 onMounted(() => {
     loadContent();
 });
+
+const setKeyword = () => {
+    keyword.value = $('.header-search-box').value;
+    loadContent();
+}
 
 </script>
 <template>
@@ -201,9 +207,7 @@ onMounted(() => {
         <div class="header">
             <div class="header-left">
                 <input type="text" class="header-search-box" placeholder="搜索我的书库">
-                <span class="header-search-text">
-                    <span class="iconfont icon-sousuo header-search-icon"></span>
-                </span>
+                <span class="iconfont icon-sousuo1" @click="setKeyword"></span>
             </div>
             <div class="drag-bar"></div>
             <div class="header-right">
@@ -271,6 +275,8 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     border-radius: 20px;
+    padding: 10px;
+
 }
 
 .main-container .btn-text-icon {
@@ -296,20 +302,38 @@ onMounted(() => {
 }
 
 .header {
-    width: 95%;
+    width: 100%;
     height: 60px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    padding-right: 1rem;
 }
+
+.header-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: var(--bbc);
+    border: none;
+    color: var(--fc);
+    margin-left: 1rem;
+    padding-right: 1rem;
+    border-radius: 25px;
+    justify-content: space-between;
+}
+
 
 .header-search-box {
     width: 150px;
     height: 30px;
-    border-radius: 25px;
-    margin-left: 2rem;
-    padding-left: 5px;
+    margin-left: 1rem;
+    background-color: var(--bbc);
+}
+
+.header-left .iconfont {
+    cursor: pointer;
 }
 
 .drag-bar {
@@ -322,11 +346,6 @@ onMounted(() => {
 
 }
 
-.header-left {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
 
 .header-right {
     display: flex;
@@ -339,8 +358,8 @@ onMounted(() => {
 .book-list-container {
     flex: 1;
     background-color: var(--bg);
-    padding: 1rem;
     border-radius: 20px;
+    overflow-y: auto;
 
 }
 </style>
