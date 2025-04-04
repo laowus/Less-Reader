@@ -44,16 +44,19 @@ let readerOptions = {
         webSecurity: false,
     },
 };
-const appWidth = 1020, appHeight = 768
-/* 自定义函数 */
-const startup = () => {
-    if (!mainWin) { // 检查 mainWin 是否已经创建
-        init();
-        registryGlobalListeners();
-    } else {
-        mainWin.show();
-    }
+
+const singleInstance = app.requestSingleInstanceLock();
+if (!singleInstance) {
+    app.quit();
+} else {
+    app.on("second-instance", (event, argv, workingDir) => {
+        if (mainWin) {
+            if (!mainWin.isVisible()) mainWin.show();
+            mainWin.focus();
+        }
+    });
 }
+
 
 const init = () => {
     app.whenReady().then(async () => {
@@ -90,13 +93,42 @@ ipcMain.on('window-min', event => {
 ipcMain.on('window-max', event => {
     const webContent = event.sender;
     const win = BrowserWindow.fromWebContents(webContent);
-    win.maximize();
+    if (win.isMaximized()) {
+        if (win === mainWin) {
+            // 从存储中获取最大化之前的窗口大小和位置
+            const width = store.get("mainWindowWidth");
+            const height = store.get("mainWindowHeight");
+            const x = store.get("mainWindowX");
+            const y = store.get("mainWindowY");
+            if (width && height) {
+                win.setSize(width, height);
+                if (x && y) {
+                    win.setPosition(x, y);
+                }
+            }
+        } else {
+            // 处理阅读窗口
+            const width = store.get("readerWindowWidth");
+            const height = store.get("readerWindowHeight");
+            const x = store.get("readerWindowX");
+            const y = store.get("readerWindowY");
+            if (width && height) {
+                win.setSize(width, height);
+                if (x && y) {
+                    win.setPosition(x, y);
+                }
+            }
+        }
+    } else {
+        win.maximize();
+    }
 });
 ipcMain.on('window-close', event => {
     const webContent = event.sender;
     const win = BrowserWindow.fromWebContents(webContent);
     win.hide();
 });
+
 //gei Home 窗口传递 更新
 ipcMain.on('home-set-theme', (event, isUpdate) => {
     console.log(isUpdate);
@@ -105,29 +137,7 @@ ipcMain.on('home-set-theme', (event, isUpdate) => {
     }
 })
 
-//全局事件监听
-const registryGlobalListeners = () => {
-    //主进程事件监听
-    ipcMain.on('app-quit', () => {
-        app.quit()
-    }).on('app-min', () => {
-        if (mainWin.isFullScreen()) mainWin.setFullScreen(false)
-        if (mainWin.isMaximized() || mainWin.isNormal()) mainWin.minimize()
-    }).on('app-max', () => {
-        let isFullScreen = false
-        if (isWinOS) {
-            isFullScreen = toggleWinOSFullScreen()
-        } else {
-            isFullScreen = !mainWin.isFullScreen()
-            mainWin.setFullScreen(isFullScreen)
-        }
-        sendToRenderer('app-max', isFullScreen)
-    }).on('app-zoom', (e, value) => {
-        setAppWindowZoom(value)
-    }).on('app-zoom-noResize', (e, value) => {
-        setAppWindowZoom(value, true)
-    })
-}
+
 // 动态生成上下文菜单
 const generateContextMenu = () => {
     return Menu.buildFromTemplate([
@@ -175,7 +185,7 @@ const updateContextMenu = () => {
     }
 };
 
-//创建浏览窗口
+//创建主窗口
 const createWindow = () => {
     if (!mainWin) {
         // 从 electron-store 中获取窗口大小和位置
@@ -219,6 +229,7 @@ const createWindow = () => {
                     mainWindowWidth: bounds.width,
                     mainWindowHeight: bounds.height,
                 });
+
             }
         });
 
@@ -232,6 +243,19 @@ const createWindow = () => {
                 });
             }
         });
+        // 监听窗口将要最大化事件，记录窗口大小和位置
+        mainWindow.on("will-maximize", () => {
+            if (!mainWindow.isDestroyed()) {
+                let bounds = mainWindow.getBounds();
+                store.set({
+                    mainWindowWidth: bounds.width,
+                    mainWindowHeight: bounds.height,
+                    mainWindowX: bounds.x,
+                    mainWindowY: bounds.y
+                });
+            }
+        });
+
         return mainWindow
     }
     return mainWin;
@@ -242,31 +266,6 @@ const sendToRenderer = (channel, args) => {
     try {
         if (mainWin) mainWin.webContents.send(channel, args)
     } catch (error) {
-    }
-}
-
-const toggleWinOSFullScreen = () => {
-    if (!isWinOS) return null
-    const isMax = mainWin.isMaximized()
-    if (isMax) {
-        mainWin.unmaximize()
-    } else {
-        mainWin.maximize()
-    }
-    return !isMax
-}
-
-const setAppWindowZoom = (value, noResize) => {
-    const zoom = Number(value || 100)
-    const zoomFactor = parseFloat(zoom / 100)
-    const width = parseInt(appWidth * zoomFactor)
-    const height = parseInt(appHeight * zoomFactor)
-    mainWin.webContents.setZoomFactor(zoomFactor)
-    if (noResize) return
-    mainWin.setMinimumSize(width, height)
-    if (mainWin.isNormal()) {
-        mainWin.setSize(width, height)
-        mainWin.center()
     }
 }
 
@@ -344,40 +343,6 @@ ipcMain.on('close-reader-window', (event, bookid) => {
     }
 });
 
-
-// 确保应用程序只有一个实例在运行
-// const gotTheLock = app.requestSingleInstanceLock();
-
-// if (!gotTheLock) {
-//     // 如果没有获取到锁，说明已经有一个实例在运行，退出当前实例
-//     if (mainWin) {
-//         console.log('尝试启动第二个实例，将焦点转移到第一个实例的窗口。');
-//         // 如果主窗口最小化，则恢复它
-//         if (mainWin.isMinimized()) {
-//             mainWin.restore();
-//         }
-//         // 将主窗口置于最前面并聚焦
-//         mainWin.show();
-//         mainWin.focus();
-//     }
-//     app.quit();
-
-// } else {
-//     console.log('没有实例运行');
-
-// }
-
-
-if (mainWin) {
-    console.log('如果当前窗口存在，将焦点转移到当前窗口。');
-    // 如果主窗口最小化，则恢复它
-    if (mainWin.isMinimized()) {
-        mainWin.restore();
-    }
-    // 将主窗口置于最前面并聚焦
-    mainWin.show();
-    mainWin.focus();
-} else {
-    // 启动应用
-    startup();
-}
+app.on("ready", () => {
+    init();
+});
