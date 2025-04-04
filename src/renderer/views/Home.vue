@@ -20,7 +20,6 @@ const keyword = ref("");
 const handleClose = () => {
     ipcRenderer.send('window-close');
 }
-
 const handleMax = () => {
     ipcRenderer.send('window-max');
 }
@@ -111,8 +110,13 @@ const handleBook = async (file, md5) => {
     }
     if (!isRepeat) {
         try {
-            const book = await BookUtil.generateBook(bookName, extension, md5, file.size, file.path || clickFilePath, file);
-            await handleAddBook(book);
+            const res = await BookUtil.generateBook(bookName, extension, md5, file.size, file.path || clickFilePath, file);
+            if (res.success) {
+                await handleAddBook(res.book);
+            } else {
+                ElMessage.error('<<' + bookName + '>> 文件有问题, 导入失败!');
+            }
+
         } catch (error) {
             console.log(error);
         }
@@ -127,7 +131,6 @@ const handleAddBook = async (book) => {
                 if (res.success) {
                     BookUtil.addBook(book); // 复制文件
                     book.id = res.id;
-                    // booklist.value.push(book);
                     ElMessage.success(`导入 <<${book.name || '未知书名'}>> 成功!`);
                     filelistRef.value = [];
                     dialogFormVisible.value = false;
@@ -276,7 +279,6 @@ const setKeyword = () => {
     flex-direction: column;
     border-radius: 20px;
     padding: 10px;
-
 }
 
 .main-container .btn-text-icon {
@@ -324,12 +326,18 @@ const setKeyword = () => {
     justify-content: space-between;
 }
 
-
 .header-search-box {
     width: 150px;
     height: 30px;
     margin-left: 1rem;
     background-color: var(--bbc);
+    color: var(--fc);
+}
+
+/* 设置 placeholder 颜色 */
+.header-search-box::placeholder {
+    color: var(--fc);
+    /* 可以根据需要修改颜色 */
 }
 
 .header-left .iconfont {

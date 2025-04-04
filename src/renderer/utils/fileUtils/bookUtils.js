@@ -12,6 +12,8 @@ class BookUtil {
         : ipcRenderer.sendSync("get-book-path", "ping");
 
     static addBook(book) {
+        console.log(book);
+
         ipcRenderer.send('copy-book', book.toMap());
     }
 
@@ -94,12 +96,13 @@ class BookUtil {
                     await this.saveCoverToLocal(coverString, cover);
                 }
                 path = this.getBookPath(key, name, format);
-                resolve(
-                    new Book(0, key, name, author, description, md5, cover, format, publisher, size, page, frompath, path, charset)
-                );
+                resolve({
+                    success: true, book:
+                        new Book(0, key, name, author, description, md5, cover, format, publisher, size, page, frompath, path, charset)
+                });
             } catch (error) {
                 console.log(error);
-                resolve("get_metadata_error");
+                resolve({ success: false });
             }
         });
 

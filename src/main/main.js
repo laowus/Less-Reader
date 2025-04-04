@@ -15,14 +15,13 @@ if (!isDevEnv) {
 //ipc处理
 const fileHandle = require('./ipcHandlers/fileHandle');
 const dbHandle = require('./ipcHandlers/dbHandle');
-const { transcode } = require('buffer');
-// 用于存储所有的 readerWindow 实例
+
 let readerWindows = [];
 
 fileHandle();
 dbHandle();
 
-let mainWin = null, readerWindow, tray = null
+let mainWin = null, tray = null
 let options = {
     width: 1050,
     height: 660,
@@ -48,8 +47,12 @@ let readerOptions = {
 const appWidth = 1020, appHeight = 768
 /* 自定义函数 */
 const startup = () => {
-    init()
-    registryGlobalListeners()
+    if (!mainWin) { // 检查 mainWin 是否已经创建
+        init();
+        registryGlobalListeners();
+    } else {
+        mainWin.show();
+    }
 }
 
 const init = () => {
@@ -174,27 +177,65 @@ const updateContextMenu = () => {
 
 //创建浏览窗口
 const createWindow = () => {
-    const mainWindow = new BrowserWindow(options);
-    if (isDevEnv) {
-        mainWindow.loadURL("http://localhost:7000/")
-        mainWindow.webContents.openDevTools();
-    } else {
-        mainWindow.loadFile('dist/index.html')
+    if (!mainWin) {
+        // 从 electron-store 中获取窗口大小和位置
+        const windowWidth = parseInt(store.get("mainWindowWidth") || 1050);
+        const windowHeight = parseInt(store.get("mainWindowHeight") || 660);
+        const windowX = parseInt(store.get("mainWindowX"));
+        const windowY = parseInt(store.get("mainWindowY"));
+
+        const mainWindow = new BrowserWindow({
+            ...options,
+            width: windowWidth,
+            height: windowHeight,
+            x: windowX,
+            y: windowY
+        });
+        if (isDevEnv) {
+            mainWindow.loadURL("http://localhost:7000/")
+            mainWindow.webContents.openDevTools();
+        } else {
+            mainWindow.loadFile('dist/index.html')
+        }
+
+        tray = new Tray(path.join(publicRoot, '/images/logo.png'));
+        tray.setToolTip('Less-Reader');
+
+        let contextMenu = generateContextMenu();
+        tray.setContextMenu(contextMenu);
+
+        tray.on('double-click', () => {
+            mainWindow.show();
+        });
+        mainWindow.once('ready-to-show', () => {
+            mainWindow.show()
+        })
+
+        // 监听窗口大小改变事件
+        mainWindow.on("resize", () => {
+            if (!mainWindow.isDestroyed()) {
+                let bounds = mainWindow.getBounds();
+                store.set({
+                    mainWindowWidth: bounds.width,
+                    mainWindowHeight: bounds.height,
+                });
+            }
+        });
+
+        // 监听窗口移动事件
+        mainWindow.on("move", () => {
+            if (!mainWindow.isDestroyed()) {
+                let bounds = mainWindow.getBounds();
+                store.set({
+                    mainWindowX: bounds.x,
+                    mainWindowY: bounds.y,
+                });
+            }
+        });
+        return mainWindow
     }
+    return mainWin;
 
-    tray = new Tray(path.join(publicRoot, '/images/logo.png'));
-    tray.setToolTip('Less-Reader');
-
-    let contextMenu = generateContextMenu();
-    tray.setContextMenu(contextMenu);
-
-    tray.on('double-click', () => {
-        mainWindow.show();
-    });
-    mainWindow.once('ready-to-show', () => {
-        mainWindow.show()
-    })
-    return mainWindow
 }
 
 const sendToRenderer = (channel, args) => {
@@ -242,10 +283,10 @@ ipcMain.on("open-book", (event, config) => {
         store.set({ url });
         const newReaderWindow = new BrowserWindow({
             ...readerOptions,
-            width: parseInt(store.get("windowWidth") || 1050),
-            height: parseInt(store.get("windowHeight") || 660),
-            x: parseInt(store.get("windowX")),
-            y: parseInt(store.get("windowY"))
+            width: parseInt(store.get("readerWindowWidth") || 1050),
+            height: parseInt(store.get("readerWindowHeight") || 660),
+            x: parseInt(store.get("readerWindowX")),
+            y: parseInt(store.get("readerWindowY"))
         });
         if (isDevEnv) {
             newReaderWindow.webContents.openDevTools();
@@ -257,10 +298,10 @@ ipcMain.on("open-book", (event, config) => {
             if (!newReaderWindow.isDestroyed()) {
                 let bounds = newReaderWindow.getBounds();
                 store.set({
-                    windowWidth: bounds.width,
-                    windowHeight: bounds.height,
-                    windowX: bounds.x,
-                    windowY: bounds.y,
+                    readerWindowWidth: bounds.width,
+                    readerWindowHeight: bounds.height,
+                    readerWindowX: bounds.x,
+                    readerWindowY: bounds.y,
                 });
             }
         });
@@ -269,10 +310,10 @@ ipcMain.on("open-book", (event, config) => {
             if (!newReaderWindow.isDestroyed()) {
                 let bounds = newReaderWindow.getBounds();
                 store.set({
-                    windowWidth: bounds.width,
-                    windowHeight: bounds.height,
-                    windowX: bounds.x,
-                    windowY: bounds.y,
+                    readerWindowWidth: bounds.width,
+                    readerWindowHeight: bounds.height,
+                    readerWindowX: bounds.x,
+                    readerWindowY: bounds.y,
                 });
                 // 从数组中移除关闭的窗口
                 readerWindows = readerWindows.filter((item) => item.window !== newReaderWindow);
@@ -304,7 +345,39 @@ ipcMain.on('close-reader-window', (event, bookid) => {
 });
 
 
+// 确保应用程序只有一个实例在运行
+// const gotTheLock = app.requestSingleInstanceLock();
 
-//启动应用
-startup()
+// if (!gotTheLock) {
+//     // 如果没有获取到锁，说明已经有一个实例在运行，退出当前实例
+//     if (mainWin) {
+//         console.log('尝试启动第二个实例，将焦点转移到第一个实例的窗口。');
+//         // 如果主窗口最小化，则恢复它
+//         if (mainWin.isMinimized()) {
+//             mainWin.restore();
+//         }
+//         // 将主窗口置于最前面并聚焦
+//         mainWin.show();
+//         mainWin.focus();
+//     }
+//     app.quit();
 
+// } else {
+//     console.log('没有实例运行');
+
+// }
+
+
+if (mainWin) {
+    console.log('如果当前窗口存在，将焦点转移到当前窗口。');
+    // 如果主窗口最小化，则恢复它
+    if (mainWin.isMinimized()) {
+        mainWin.restore();
+    }
+    // 将主窗口置于最前面并聚焦
+    mainWin.show();
+    mainWin.focus();
+} else {
+    // 启动应用
+    startup();
+}

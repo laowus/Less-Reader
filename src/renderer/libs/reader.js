@@ -403,6 +403,7 @@ export const open = async (bookObj, currentStyle) => {
     reader.renderAnnotation();
 }
 
+
 window.setStyle = (newStyle) => {
     style = {
         ...style,
