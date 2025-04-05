@@ -3,6 +3,8 @@
     "private": true,
     "version": "0.0.2",
     "main": "src/main/main.js",
+    "description": "Less Reader is a simple and efficient reader for less",
+    "license": "Apache License 2.0",
     "scripts": {
         "dev": "cross-env NODE_ENV=dev concurrently vite \"electron .\"",
         "dist": "cross-env NODE_ENV=prod vite build && electron-builder",
