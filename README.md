@@ -4,6 +4,11 @@
 
 支持格式: epub , mobi, azw3, (pdf, txt 暂不支持)
 
+### 联系:
+
+    有兴趣可以加入QQ群：616712461 (备注：Less Reader)
+    或者本人QQ:37156760 (备注：Less Reader) 交流共同进步
+
 ### 开发/测试环境
 
 -   Windows 10( 个人电脑只有 Windows 系统的,linux 苹果系统没有测试)
