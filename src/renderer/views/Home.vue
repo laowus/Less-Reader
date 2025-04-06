@@ -5,7 +5,6 @@ import BookUtil from '../utils/fileUtils/bookUtils';
 import { ElMessage } from 'element-plus';
 import BookListItem from '../components/BookListItem.vue';
 import StyleUtil from '../utils/readUtils/styleUtil.js'
-
 const { ipcRenderer } = window.require('electron');
 const booklist = ref([]);
 const selectedBooks = ref([]);
@@ -27,17 +26,51 @@ const handleMix = () => {
     ipcRenderer.send('window-min');
 }
 
-//上传
-const getFiles = () => {
-    Promise.all(fileList.map(async (file) => {
-        await getMd5WithBrowser(file.raw);
-    })).then(() => {
-        console.log('getFiles');
+
+// 触发主进程的文件选择对话框
+const openFileDialog = async () => {
+    const fileInfos = await ipcRenderer.invoke('open-file-dialog');
+    if (fileInfos) {
+        for (const fileInfo of fileInfos) {
+            const { data, name, path } = fileInfo;
+            const blob = new Blob([data], { type: 'application/octet-stream' });
+            const file = new File([blob], name);
+            // 给 File 对象添加 path 属性
+            Object.defineProperty(file, 'path', {
+                value: path,
+                writable: false,
+                enumerable: true,
+                configurable: false
+            });
+            console.log('成功创建 File 对象:', file);
+            // 这里可以对创建好的 File 对象进行后续操作
+            await getMd5WithBrowser(file);
+        }
         loadContent(); // 所有文件处理完成后更新 bookList
-    }).catch((error) => {
-        console.error('处理文件时出错:', error);
-    });
-}
+    } else {
+        console.log('未选择文件或读取文件出错');
+    }
+};
+
+//上传
+// const getFiles = () => {
+//     Promise.all(fileList.map(async (file) => {
+//         const filePath = await getFilePath();
+//         if (filePath) {
+//             console.log('文件完整路径:', filePath);
+//             // 这里可以根据获取到的路径进行后续操作，比如读取文件等
+//             // 假设 getMd5WithBrowser 函数接受文件路径作为参数
+//             await getMd5WithBrowser(file);
+//         }
+//     })).then(() => {
+//         console.log('getFiles', fileList);
+//         loadContent(); // 所有文件处理完成后更新 bookList
+//     }).catch((error) => {
+//         console.error('处理文件时出错:', error);
+//     });
+// }
+
+
 //关闭上传弹窗
 const closeUpload = () => {
     filelistRef.value = [];
@@ -96,6 +129,7 @@ const getMd5WithBrowser = async (file) => {
 // 2. 不重复, 获取书籍信息,书名/作者/封面cover(封面cover为base64的字符串)等
 // 
 const handleBook = async (file, md5) => {
+    // 发送文件信息到主进程
     let extension = (file.name).split(".").reverse()[0].toLocaleLowerCase();
     let bookName = file.name.substr(0, file.name.length - extension.length - 1);
     let isRepeat = false;
@@ -103,8 +137,8 @@ const handleBook = async (file, md5) => {
         booklist.value.forEach((item) => {
             if (item.md5 === md5 && item.size === file.size) {
                 isRepeat = true;
+                console.log('<<' + bookName + '>> 已经存在!');
                 ElMessage.error('<<' + bookName + '>> 已经存在!');
-                return resolve();
             }
         });
     }
@@ -112,6 +146,7 @@ const handleBook = async (file, md5) => {
         try {
             const res = await BookUtil.generateBook(bookName, extension, md5, file.size, file.path || clickFilePath, file);
             if (res.success) {
+                console.log(res.book);
                 await handleAddBook(res.book);
             } else {
                 ElMessage.error('<<' + bookName + '>> 文件有问题, 导入失败!');
@@ -214,7 +249,7 @@ const setKeyword = () => {
             </div>
             <div class="drag-bar"></div>
             <div class="header-right">
-                <button class="btn-text-icon" @click="dialogFormVisible = true">
+                <button class="btn-text-icon" @click="openFileDialog">
                     <span class="iconfont icon-jia">
                     </span> 书籍
                 </button>

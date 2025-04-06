@@ -54,7 +54,8 @@
         ![Github snap 10.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/10.jpg)
         自定义主题。
         ![Github snap 11.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/11.jpg)
--   [x] 修复其他 bug。初始化窗口大小问题，放大缩回问题。
+-   [x] 升级了 electron 版本，最新版本, 由于新版本不支持在渲染进程获取文件 File 对象的 path(文件路径),
+        所以在主进程打开选择文件,然后把文件信息传递给渲染进程,再进行文件其他操作.。
 
 ### For 开发者
 
