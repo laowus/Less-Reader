@@ -190,7 +190,6 @@ body {
 }
 
 #grid-cell {
-    border-radius: 20px;
     overflow: hidden;
     width: 100%;
     height: 100%;
