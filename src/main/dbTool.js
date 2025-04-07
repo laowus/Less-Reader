@@ -182,7 +182,6 @@ const updateBook = (book, event) => {
         book.id
     ], function (err) {
         if (err) {
-            console.error('Failed to update book:', err.message);
             event.reply('db-update-book-response', { success: false, error: err.message });
         } else {
             event.reply('db-update-book-response', { success: true, id: this.lastID });

@@ -1,10 +1,10 @@
-const { app, BrowserWindow, ipcMain, Menu, shell, Tray, } = require('electron')
+const { app, BrowserWindow, ipcMain, Menu, shell, Tray, dialog } = require('electron')
 const { isWinOS, isDevEnv, APP_ICON } = require('./env')
 const path = require('path')
 const Store = require("electron-store");
 const store = new Store();
 const { initDatabase } = require('./dbTool')
-
+const fs = require('fs');
 let resourcesRoot = path.resolve(app.getAppPath());
 let publicRoot = path.join(__dirname, '../../public')
 
@@ -99,6 +99,7 @@ const init = () => {
         sendToRenderer('app-quit')
     })
 }
+
 
 ipcMain.on('window-min', event => {
     const webContent = event.sender;
@@ -271,6 +272,36 @@ const createWindow = () => {
     return mainWin;
 
 }
+
+
+// 监听渲染进程打开文件选择对话框的请求
+ipcMain.handle('open-file-dialog', async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog(mainWin, {
+        properties: ['openFile', 'multiSelections'],
+        filters: [
+            { name: 'E-Books', extensions: ['epub', 'mobi', 'azw3'] },
+            { name: 'All Files', extensions: ['*'] }
+        ]
+    });
+    if (!canceled) {
+        const fileInfos = [];
+        for (const filePath of filePaths) {
+            try {
+                const fileData = await fs.promises.readFile(filePath);
+                const fileName = path.basename(filePath);
+                fileInfos.push({
+                    data: fileData,
+                    name: fileName,
+                    path: filePath // 添加文件路径
+                });
+            } catch (error) {
+                console.error('读取文件出错:', error);
+            }
+        }
+        return fileInfos;
+    }
+    return null;
+});
 
 const sendToRenderer = (channel, args) => {
     try {
