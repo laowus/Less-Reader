@@ -45,6 +45,8 @@
 ![Github snap 3.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/3.jpg)
 ![Github snap 4.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/4.jpg)
 ![Github snap 5.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/5.jpg)
+![Github snap 6.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/6.jpg)
+![Github snap 7.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/7.jpg)
 
 ### TODO
 
