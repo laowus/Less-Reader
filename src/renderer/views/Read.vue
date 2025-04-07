@@ -172,9 +172,9 @@ body {
 }
 
 
-.reader-page {
-    border-radius: 20px;
-}
+/* .reader-page {
+     border-radius: 20px;
+} */
 
 .reader-container {
     height: 100dvh;

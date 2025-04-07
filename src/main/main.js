@@ -26,7 +26,7 @@ let options = {
     width: 1050,
     height: 660,
     frame: false,
-    transparent: true,
+    // transparent: true,
     webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
@@ -37,7 +37,7 @@ let readerOptions = {
     width: 1050,
     height: 660,
     frame: false,
-    transparent: true,
+    // transparent: true,
     webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
@@ -58,7 +58,6 @@ if (!singleInstance) {
 }
 
 const initWindowBounds = (isMain, win) => {
-
     if (isMain) {
         store.get('mainWindowWidth') || store.set('mainWindowWidth', win.getSize()[0]);
         store.get('mainWindowHeight') || store.set('mainWindowHeight', win.getSize()[1]);
@@ -70,7 +69,6 @@ const initWindowBounds = (isMain, win) => {
         store.get('readerWindowX') || store.set('readerWindowX', win.getPosition()[0]);
         store.get('readerWindowY') || store.set('readerWindowY', win.getPosition()[1]);
     }
-
 }
 
 const init = () => {
