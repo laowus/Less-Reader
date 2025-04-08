@@ -1,6 +1,10 @@
 {
     "name": "less-reader",
     "private": true,
+    "author": {
+        "name": "HXL",
+        "email": "pjhxl@qq.com"
+    },
     "version": "0.0.4",
     "main": "src/main/main.js",
     "description": "Less Reader is a simple and efficient reader for less",
