@@ -40,13 +40,14 @@
 
 ### 预览图
 
-![Github snap 1.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/1.jpg)
-![Github snap 2.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/2.jpg)
-![Github snap 3.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/3.jpg)
-![Github snap 4.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/4.jpg)
-![Github snap 5.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/5.jpg)
-![Github snap 6.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/6.jpg)
-![Github snap 7.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/7.jpg)
+![Github snap 1.png](https://github.com/laowus/Less-Reader/blob/main/snapshot/1.png)
+![Github snap 2.png](https://github.com/laowus/Less-Reader/blob/main/snapshot/2.png)
+![Github snap 3.png](https://github.com/laowus/Less-Reader/blob/main/snapshot/3.png)
+![Github snap 4.png](https://github.com/laowus/Less-Reader/blob/main/snapshot/4.png)
+![Github snap 5.png](https://github.com/laowus/Less-Reader/blob/main/snapshot/5.png)
+![Github snap 6.png](https://github.com/laowus/Less-Reader/blob/main/snapshot/6.png)
+![Github snap 7.png](https://github.com/laowus/Less-Reader/blob/main/snapshot/7.png)
+![Github snap 8.png](https://github.com/laowus/Less-Reader/blob/main/snapshot/8.png)
 
 ### TODO
 
