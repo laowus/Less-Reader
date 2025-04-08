@@ -232,7 +232,8 @@ EventBus.on('updateLeftbarStyle', () => {
 
 #toc-view a,
 #toc-view span {
-    display: block;
+    display: flex;
+    align-items: center;
     border-radius: 6px;
     padding: 4px;
     margin: 4px 0;
@@ -255,9 +256,9 @@ EventBus.on('updateLeftbarStyle', () => {
 }
 
 #toc-view svg {
-    margin-inline-start: -22px;
-    padding-inline-start: 2px;
-    padding-inline-end: 6px;
+    margin-inline-start: -18px;
+    /* padding-inline-start: 2px;
+    padding-inline-end: 6px; */
     fill: CanvasText;
     cursor: default;
     transition: transform .2s ease;
@@ -274,6 +275,7 @@ EventBus.on('updateLeftbarStyle', () => {
 }
 
 #toc-view [aria-expanded="false"] svg {
+    margin-top: 1px;
     transform: rotate(-90deg);
 }
 
