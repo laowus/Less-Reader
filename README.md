@@ -68,7 +68,7 @@
 -   [x] v.0.0.3 添加了 license 协议
 -   [x] v.0.0.4
         1、优化书籍目录展开和收起。添加了箭头，显示更清楚。<br>
-        ![Github snap 12.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/12.jpg)
+        ![Github snap 12.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/12.jpg)<br>
         2、去除窗口圆角。（同背景色的窗口无法区分，所以去掉了）<br>
         ![Github snap 13.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/13.jpg)
 
