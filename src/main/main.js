@@ -167,6 +167,7 @@ const generateContextMenu = () => {
                 mainWin.show();
             },
         },
+        { type: 'separator' }, // 添加分隔线
         {
             label: '正在阅读',
             icon: path.join(publicRoot, '/images/app.png'),
@@ -181,11 +182,12 @@ const generateContextMenu = () => {
                 };
             }) : [
                 {
-                    label: '暂无阅读窗口',
+                    label: '暂无阅读',
                     enabled: false
                 }
             ]
         },
+        { type: 'separator' }, // 添加分隔线
         {
             label: '退出',
             icon: path.join(publicRoot, '/images/quit.png'),
@@ -229,17 +231,14 @@ const createWindow = () => {
 
         tray = new Tray(path.join(publicRoot, '/images/logo.png'));
         tray.setToolTip('Less-Reader');
-
         let contextMenu = generateContextMenu();
         tray.setContextMenu(contextMenu);
-
         tray.on('double-click', () => {
             mainWindow.show();
         });
         mainWindow.once('ready-to-show', () => {
             mainWindow.show()
         })
-
         // 监听窗口大小改变事件
         mainWindow.on("resize", () => {
             if (!mainWindow.isDestroyed()) {
@@ -254,7 +253,6 @@ const createWindow = () => {
                 }
             }
         });
-
         // 监听窗口移动事件
         mainWindow.on("move", () => {
             if (!mainWindow.isDestroyed()) {
@@ -267,13 +265,10 @@ const createWindow = () => {
                 }
             }
         });
-
         return mainWindow
     }
     return mainWin;
-
 }
-
 
 // 监听渲染进程打开文件选择对话框的请求
 ipcMain.handle('open-file-dialog', async () => {

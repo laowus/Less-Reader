@@ -6,6 +6,20 @@
   "description": "icon集合",
   "glyphs": [
     {
+      "icon_id": "5792169",
+      "name": "收缩",
+      "font_class": "shousuo",
+      "unicode": "e630",
+      "unicode_decimal": 58928
+    },
+    {
+      "icon_id": "7822938",
+      "name": "收缩",
+      "font_class": "shousuo-copy",
+      "unicode": "e618",
+      "unicode_decimal": 58904
+    },
+    {
       "icon_id": "160247",
       "name": "refresh",
       "font_class": "shuaxin",

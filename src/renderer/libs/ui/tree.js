@@ -3,11 +3,15 @@ const createSVGElement = tag =>
 
 const createExpanderIcon = () => {
     const svg = createSVGElement('svg')
-    svg.setAttribute('viewBox', '0 0 13 10')
-    svg.setAttribute('width', '13')
-    svg.setAttribute('height', '13')
+    // 设置 viewBox 和尺寸
+    svg.setAttribute('viewBox', '0 0 20 20')
+    svg.setAttribute('width', '30')
+    svg.setAttribute('height', '15')
+    svg.style.fill = 'black'; // 设置填充颜色为黑色，方便查看
+    svg.style.transformOrigin = 'center'; // 设置旋转中心
     const polygon = createSVGElement('polygon')
-    polygon.setAttribute('points', '2 1, 12 1, 7 9')
+    // 设置多边形的点来形成向右的箭头形状
+    polygon.setAttribute('points', '4 4, 10 16, 16 4');
     svg.append(polygon)
     return svg
 }
@@ -20,7 +24,7 @@ const createTOCItemElement = (list, map, onclick) => {
         a.innerText = label
         a.setAttribute('role', 'treeitem')
         a.tabIndex = -1
-        a.style.paddingInlineStart = `${(depth + 1) * 24}px`
+        a.style.paddingInlineStart = `${(depth + 1) * 18}px`
         list.push(a)
         if (href) {
             if (!map.has(href)) map.set(href, a)
