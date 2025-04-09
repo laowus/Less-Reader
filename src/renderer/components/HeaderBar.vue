@@ -42,9 +42,6 @@ watch(() => props.currentBook, (newBook) => {
             <button class="tooltip" :title="props.leftbarShow ? '关闭侧边栏' : '打开侧边栏'" @click="setLeftbarShow(!props.leftbarShow)">
                 <span class="iconfont" :class="props.leftbarShow ? 'icon-a-cebianlanfenleizhedie' : 'icon-a-fenleizhediecebianlan'"></span>
             </button>
-            <button class="tooltip" data-tip="书签">
-                <span class="iconfont icon-tianjiashuqian"></span>
-            </button>
         </div>
         <div class="chapter-title"> </div>
         <div class="header-bar-right">

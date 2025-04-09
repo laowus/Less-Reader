@@ -227,7 +227,6 @@ class Reader {
         this.bookObj = bookObj
         this.view = document.createElement('foliate-view')
         $('.foliate-viewer').append(this.view)
-        //document.body.append(this.view)
         await this.view.open(bookObj.path)
         this.view.addEventListener('load', this.#onLoad.bind(this))
         this.view.addEventListener('relocate', this.#onRelocate.bind(this))
@@ -249,6 +248,7 @@ class Reader {
         Promise.resolve(book.getCover?.())?.then(blob =>
             blob ? $('#side-bar-cover').src = URL.createObjectURL(blob) : null)
         const toc = book.toc
+        console.log(toc)
         if (toc) {
             this.#tocView = createTOCView(toc, href => {
                 this.view.goTo(href).catch(e => console.error(e))
@@ -352,6 +352,7 @@ class Reader {
     #onLoad(e) {
         const { doc, index } = e.detail
         doc.addEventListener('pointerup', () => {
+            console.log("e.detail", e.detail)
             const chapter = doc.title;
             const sel = doc.getSelection()
             const range = getSelectionRange(sel)

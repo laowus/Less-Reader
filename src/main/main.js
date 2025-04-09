@@ -26,8 +26,6 @@ let options = {
     width: 1050,
     height: 660,
     frame: false,
-    transparent: true,
-    hasShadow: true, // 显示阴影（在某些平台可能无效）
     webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
@@ -38,7 +36,6 @@ let readerOptions = {
     width: 1050,
     height: 660,
     frame: false,
-    // transparent: true,
     webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,

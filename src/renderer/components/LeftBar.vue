@@ -112,7 +112,7 @@ EventBus.on('updateLeftbarStyle', () => {
                                 <div id="note-time">
                                     {{ note.updateTime }}
                                 </div>
-                                <div class="iconfont-btn" @click="deleteNote(note)">
+                                <div class="btn-icon" @click="deleteNote(note)">
                                     <span class="iconfont icon-shanchu"></span>
                                 </div>
                             </div>
@@ -188,13 +188,14 @@ EventBus.on('updateLeftbarStyle', () => {
 }
 
 .iconfont-btn {
-    margin-right: 1rem;
-    width: 2rem;
+    width: calc(100% / 3);
     min-height: 2rem;
     height: 2rem;
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+    overflow: hidden;
 }
 
 .iconfont-btn:hover,
@@ -316,8 +317,9 @@ EventBus.on('updateLeftbarStyle', () => {
     height: 2.5rem;
     border-top: 1px solid var(--bbc);
     align-items: center;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    gap: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 #noteList {
@@ -353,8 +355,9 @@ EventBus.on('updateLeftbarStyle', () => {
 
 .delete-button-container {
     display: flex;
+    flex-direction: row;
+    gap: 5px;
     justify-content: space-between;
-    align-items: center;
     font-size: 0.5rem;
 }
 
