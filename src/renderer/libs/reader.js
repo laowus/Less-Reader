@@ -210,6 +210,12 @@ const notesRefresh = (bookId) => {
     });
 };
 
+
+const getRootNode = (currentNode, nodeList) => {
+
+}
+
+
 class Reader {
     bookId
     #tocView
