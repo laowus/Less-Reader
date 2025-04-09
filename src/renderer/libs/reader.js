@@ -210,9 +210,23 @@ const notesRefresh = (bookId) => {
     });
 };
 
-
-const getRootNode = (currentNode, nodeList) => {
-
+function findParentById(tocList, id) {
+    for (let item of tocList) {
+        if (item.id === id) {
+            return item;
+        } else if (item.subitems) {
+            for (let subitem of item.subitems) {
+                if (subitem.id === id) {
+                    return item;
+                }
+                const foundInSub = findParentById(item.subitems, id);
+                if (foundInSub) {
+                    return foundInSub;
+                }
+            }
+        }
+    }
+    return null;
 }
 
 
@@ -225,6 +239,8 @@ class Reader {
     bookmarks
     view
     bookObj
+    tocList
+    rootToc
     constructor() {
     }
     //async open(file, bookId, cfi) 
@@ -254,7 +270,7 @@ class Reader {
         Promise.resolve(book.getCover?.())?.then(blob =>
             blob ? $('#side-bar-cover').src = URL.createObjectURL(blob) : null)
         const toc = book.toc
-        console.log(toc)
+        this.tocList = toc
         if (toc) {
             this.#tocView = createTOCView(toc, href => {
                 this.view.goTo(href).catch(e => console.error(e))
@@ -374,6 +390,11 @@ class Reader {
     //
     #onRelocate({ detail }) {
         const { cfi, fraction, location, tocItem, pageItem, chapterLocation } = detail
+        console.log("detail", tocItem)
+        if (tocItem && this.tocList) {
+            this.rootToc = findParentById(this.tocList, tocItem.id);
+        }
+        console.log("this.rootToc", this.rootToc)
         const percent = percentFormat.format(fraction)
         const loc = pageItem
             ? `Page ${pageItem.label}`

@@ -136,8 +136,6 @@ const getBookByKey = (bookId, event) => {
             console.error(err.message);
             event.reply('db-get-book-response', { success: false });
         } else {
-            console.log('getbookId:', bookId);
-            console.log('Data selgetBookByKey:', rows);
             event.reply('db-get-book-response', { success: true, data: rows });
         }
     });
