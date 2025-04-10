@@ -209,27 +209,6 @@ const notesRefresh = (bookId) => {
         ipcRenderer.send('db-get-notes', bookId);
     });
 };
-
-function findParentById(tocList, id) {
-    for (let item of tocList) {
-        if (item.id === id) {
-            return item;
-        } else if (item.subitems) {
-            for (let subitem of item.subitems) {
-                if (subitem.id === id) {
-                    return item;
-                }
-                const foundInSub = findParentById(item.subitems, id);
-                if (foundInSub) {
-                    return foundInSub;
-                }
-            }
-        }
-    }
-    return null;
-}
-
-
 class Reader {
     bookId
     #tocView
@@ -237,6 +216,7 @@ class Reader {
     annotationsByValue = new Map()
     #footnoteHandler = new FootnoteHandler()
     bookmarks
+    notes
     view
     bookObj
     tocList
@@ -306,10 +286,10 @@ class Reader {
     async renderAnnotation() {
         try {
             // 直接调用 notesRefresh 并等待结果
-            this.bookmarks = await notesRefresh(this.bookId);
-            if (Array.isArray(this.bookmarks)) {
-                for (const bookmark of this.bookmarks) {
-                    const { cfi: value, type, color, note } = bookmark;
+            this.notes = await notesRefresh(this.bookId);
+            if (Array.isArray(this.notes)) {
+                for (const _note of this.notes) {
+                    const { cfi: value, type, color, note } = _note;
                     const annotation = {
                         value,
                         type,
@@ -319,7 +299,7 @@ class Reader {
                     this.addAnnotation(annotation);
                 }
             } else {
-                console.error('notesRefresh 返回的结果不是数组:', this.bookmarks);
+                console.error('notesRefresh 返回的结果不是数组:', this.notes);
             }
         } catch (error) {
             console.error('获取 notes 出错:', error);
@@ -374,7 +354,6 @@ class Reader {
     #onLoad(e) {
         const { doc, index } = e.detail
         doc.addEventListener('pointerup', () => {
-            console.log("e.detail", e.detail)
             const chapter = doc.title;
             const sel = doc.getSelection()
             const range = getSelectionRange(sel)
@@ -389,12 +368,8 @@ class Reader {
     }
     //
     #onRelocate({ detail }) {
-        const { cfi, fraction, location, tocItem, pageItem, chapterLocation } = detail
-        console.log("detail", tocItem)
-        if (tocItem && this.tocList) {
-            this.rootToc = findParentById(this.tocList, tocItem.id);
-        }
-        console.log("this.rootToc", this.rootToc)
+        const { cfi, fraction, location, tocItem, pageItem } = detail
+        console.log("onRelocate", detail)
         const percent = percentFormat.format(fraction)
         const loc = pageItem
             ? `Page ${pageItem.label}`
@@ -430,7 +405,6 @@ export const open = async (bookObj, currentStyle) => {
     await reader.open(bookObj);
     reader.renderAnnotation();
 }
-
 
 window.setStyle = (newStyle) => {
     style = {

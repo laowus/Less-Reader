@@ -12,8 +12,6 @@ const props = defineProps({
 const headerBook = ref({});
 
 const handleClose = () => {
-    console.log('handleClose', headerBook.value);
-
     if (Tts.isSpeaking) {
         Tts.stop();
     }
@@ -35,12 +33,21 @@ watch(() => props.currentBook, (newBook) => {
     headerBook.value = newBook;
     console.log('Current book has changed:', newBook);
 }, { deep: true });
+
+const addBookMark = () => {
+    //获取当前cfi
+
+
+}
 </script>
 <template>
     <div class="header-bar">
         <div class="header-bar-left">
             <button class="tooltip" :title="props.leftbarShow ? '关闭侧边栏' : '打开侧边栏'" @click="setLeftbarShow(!props.leftbarShow)">
                 <span class="iconfont" :class="props.leftbarShow ? 'icon-a-cebianlanfenleizhedie' : 'icon-a-fenleizhediecebianlan'"></span>
+            </button>
+            <button class="tooltip" data-tip="书签" @click="addBookMark">
+                <span class="iconfont icon-tianjiashuqian"></span>
             </button>
         </div>
         <div class="chapter-title"> </div>

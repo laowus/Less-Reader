@@ -58,6 +58,18 @@ const createTable = () => {
         }
         console.log('Table tb_notes created.');
     });
+    db.run(`
+       CREATE TABLE tb_bookmarks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            bookId INTEGER,
+            cfi TEXT,
+            txt TEXT
+        )`, (err) => {
+        if (err) {
+            console.error(err.message);
+        }
+        console.log('Table tb_bookmarks created.');
+    });
 }
 
 const initDatabase = () => {
@@ -207,11 +219,8 @@ const insertNote = (note, event) => {
             console.error(err.message);
             event.reply('db-insert-note-response', { success: false, error: err.message });
         } else if (row) {
-            console.log('记录已经存在，更新记录');
-            console.log('Note already exists in the database. Updating the note.', row);
             updateNote(note, row.id, event);
         } else {
-            console.log('记录不存在，插入新记录');
             db.run(`INSERT INTO tb_notes (bookId, color, note, type, cfi,chapter,createTime,updateTime) 
                 VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
                 [note.bookId, note.color, note.note, note.type, note.cfi, note.chapter],
@@ -230,7 +239,6 @@ const insertNote = (note, event) => {
 }
 
 const updateNote = (note, noteId, event) => {
-    console.log('updateNote:', note, noteId);
     db.run(`UPDATE tb_notes 
         SET color = ?, 
             type = ?,

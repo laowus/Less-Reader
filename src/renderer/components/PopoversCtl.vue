@@ -35,7 +35,6 @@ const hideCommonCtxMenu = () => {
     commonCtxMenuShow.value = false;
 }
 
-// annotation, pos
 const showAllMenu = (note) => {
     console.log("showAllMenu", note);
     new Promise((resolve, reject) => {
@@ -93,7 +92,6 @@ const addNote = () => {
         if (res.success) {
             console.log(res.id);
             currentNote.value = res.data;
-            console.log("增加后的当前note", currentNote.value);
             updateLeftbarNotes();
             window.addAnnotation(currentNote.value);
         } else {
@@ -105,7 +103,6 @@ const addNote = () => {
     ipcRenderer.once('db-updateNote-response', (event, res) => {
         if (res.success) {
             currentNote.value = res.data;
-            console.log("修改后的当前note", currentNote.value);
             updateLeftbarNotes();
             window.addAnnotation(currentNote.value);
         } else {
