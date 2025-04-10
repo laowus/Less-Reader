@@ -221,6 +221,7 @@ class Reader {
     bookObj
     tocList
     rootToc
+    currentChapter
     constructor() {
     }
     //async open(file, bookId, cfi) 
@@ -354,7 +355,6 @@ class Reader {
     #onLoad(e) {
         const { doc, index } = e.detail
         doc.addEventListener('pointerup', () => {
-            const chapter = doc.title;
             const sel = doc.getSelection()
             const range = getSelectionRange(sel)
             if (!range) return
@@ -363,13 +363,14 @@ class Reader {
             const cfi = this.view.getCFI(index, range);
             const lang = getLang(range.commonAncestorContainer)
             const text = sel.toString()
-            onSelectionEnd({ index, range, lang, cfi, pos, text, chapter })
+
+            onSelectionEnd({ index, range, lang, cfi, pos, text, chapter: this.currentChapter })
         })
     }
     //
     #onRelocate({ detail }) {
         const { cfi, fraction, location, tocItem, pageItem } = detail
-        console.log("onRelocate", detail)
+        this.currentChapter = tocItem?.label || this.bookObj.name;
         const percent = percentFormat.format(fraction)
         const loc = pageItem
             ? `Page ${pageItem.label}`
@@ -379,11 +380,11 @@ class Reader {
         slider.value = fraction
         slider.title = `${percent} · ${loc}`
         currentPercent.innerText = percent
-        if (tocItem?.label) $('.chapter-title').innerText = tocItem?.label
+        if (tocItem?.label) $('.chapter-title').innerText = this.currentChapter
         else $('.chapter-title').innerText = this.bookObj.name
         if (tocItem?.href) this.#tocView?.setCurrentHref?.(tocItem.href)
         //保存到当前阅读记录到localstorage中
-        EventBus.emit('updateBook', { id: this.bookId, currentChapter: tocItem?.label, readingPercentage: percent, lastReadPosition: cfi });
+        EventBus.emit('updateBook', { id: this.bookId, currentChapter: this.currentChapter, readingPercentage: percent, lastReadPosition: cfi });
         this.view.renderer.updatePageNumber(style.fontColor)
         //页面更新重新读取
         if (Tts.synth?.speaking) {

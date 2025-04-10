@@ -107,7 +107,7 @@ const addBookMark = () => {
     z-index: 20;
     flex-direction: row;
     gap: 0.5rem;
-    background-color: var(--bg);
+    background-color: var(--bbc);
     justify-content: flex-start;
 }
 

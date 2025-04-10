@@ -203,13 +203,13 @@ body {
 
 /* 设置滚动条轨道 */
 ::-webkit-scrollbar-track {
-    background: var(--fc);
+    background: var(--bbc);
     /* 滚动条轨道背景颜色 */
 }
 
 /* 设置滚动条滑块 */
 ::-webkit-scrollbar-thumb {
-    background: var(--bbc);
+    background: var(--fc);
     /* 滚动条滑块背景颜色 */
     border-radius: 4px;
     /* 滚动条滑块圆角 */
