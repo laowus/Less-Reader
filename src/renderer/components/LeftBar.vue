@@ -219,8 +219,7 @@ EventBus.on('updateLeftbarStyle', () => {
 }
 
 #toc-view {
-    font-size: 14px;
-    padding: .5rem;
+    padding: 0.5rem;
     overflow-y: auto;
 }
 
@@ -233,19 +232,15 @@ EventBus.on('updateLeftbarStyle', () => {
 
 #toc-view a,
 #toc-view span {
-    display: flex;
-    align-items: center;
+    display: block;
     border-radius: 6px;
-    padding: 4px;
-    margin: 4px 0;
-    position: relative;
-    padding-left: 24px;
+    padding: 8px;
+    margin: 2px 0;
 }
 
 #toc-view a {
     color: CanvasText;
     text-decoration: none;
-    color: var(--fc);
 }
 
 #toc-view a:hover {
@@ -257,13 +252,13 @@ EventBus.on('updateLeftbarStyle', () => {
 }
 
 #toc-view svg {
-    margin-inline-start: -18px;
-    /* padding-inline-start: 2px;
-    padding-inline-end: 6px; */
+    margin-inline-start: -24px;
+    padding-inline-start: 5px;
+    padding-inline-end: 6px;
     fill: CanvasText;
     cursor: default;
-    transition: transform .2s ease;
-    opacity: .5;
+    transition: transform 0.2s ease;
+    opacity: 0.5;
 }
 
 #toc-view svg:hover {
@@ -276,7 +271,6 @@ EventBus.on('updateLeftbarStyle', () => {
 }
 
 #toc-view [aria-expanded="false"] svg {
-    margin-top: 1px;
     transform: rotate(-90deg);
 }
 

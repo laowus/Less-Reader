@@ -18,6 +18,7 @@ const currentNote = ref({});
 const selectionRef = reactive({});
 const highlightRef = ref(null);
 const showCommonCtxMenu = (selection) => {
+    console.log("selection", selection);
     selectionRef.value = selection;
     commonCtxMenuShow.value = true;
     let { x, y } = selection.pos.point;
