@@ -2,7 +2,7 @@
 
 一款基于 Electron + Vue 3 开发的电子书阅读器。
 
-支持格式: epub , mobi, azw3, (pdf, txt 暂不支持)
+支持格式: epub , mobi, azw3, txt, fb2
 
 ### 联系:
 
