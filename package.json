@@ -5,7 +5,7 @@
         "name": "HXL",
         "email": "pjhxl@qq.com"
     },
-    "version": "0.0.4",
+    "version": "0.0.5",
     "main": "src/main/main.js",
     "description": "Less Reader is a simple and efficient reader for less",
     "license": "Apache License 2.0",
@@ -17,8 +17,10 @@
     },
     "dependencies": {
         "@element-plus/icons-vue": "^2.3.1",
+        "chardet": "^2.1.0",
         "electron-store": "^8.0.1",
         "element-plus": "^2.9.1",
+        "epub-gen": "^0.1.0",
         "iconv-lite": "^0.6.3",
         "localforage": "^1.10.0",
         "mitt": "^3.0.0",
@@ -26,8 +28,7 @@
         "tinycolor2": "^1.6.0",
         "vue": "^3.2.25",
         "vue-router": "^4.0.14",
-        "vue3-lazyload": "^0.3.6",
-        "epub-gen": "^0.1.0"
+        "vue3-lazyload": "^0.3.6"
     },
     "devDependencies": {
         "@vitejs/plugin-vue": "^4.2.3",

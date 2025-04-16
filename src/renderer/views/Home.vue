@@ -12,7 +12,6 @@ const filelistRef = ref([]);
 const dialogFormVisible = ref(false);
 const confirmVisible = ref(false);
 const $ = document.querySelector.bind(document)
-let fileList = [];
 let clickFilePath = "";
 const currentStyle = ref(StyleUtil.getStyle())
 const keyword = ref("");
@@ -26,11 +25,12 @@ const handleMix = () => {
     ipcRenderer.send('window-min');
 }
 
-
 // 触发主进程的文件选择对话框
 const openFileDialog = async () => {
+    //返回选择的文件信息数组,包含文件的data,name,path
     const fileInfos = await ipcRenderer.invoke('open-file-dialog');
     if (fileInfos) {
+        console.log('选择的文件信息:', fileInfos);
         for (const fileInfo of fileInfos) {
             const { data, name, path } = fileInfo;
             const blob = new Blob([data], { type: 'application/octet-stream' });
@@ -51,38 +51,6 @@ const openFileDialog = async () => {
         console.log('未选择文件或读取文件出错');
     }
 };
-
-//上传
-// const getFiles = () => {
-//     Promise.all(fileList.map(async (file) => {
-//         const filePath = await getFilePath();
-//         if (filePath) {
-//             console.log('文件完整路径:', filePath);
-//             // 这里可以根据获取到的路径进行后续操作，比如读取文件等
-//             // 假设 getMd5WithBrowser 函数接受文件路径作为参数
-//             await getMd5WithBrowser(file);
-//         }
-//     })).then(() => {
-//         console.log('getFiles', fileList);
-//         loadContent(); // 所有文件处理完成后更新 bookList
-//     }).catch((error) => {
-//         console.error('处理文件时出错:', error);
-//     });
-// }
-
-
-//关闭上传弹窗
-const closeUpload = () => {
-    filelistRef.value = [];
-    dialogFormVisible.value = false;
-}
-const handleChange = (file, uploadFiles) => {
-    fileList = uploadFiles;
-}
-
-const handleRemove = (file, uploadFiles) => {
-    fileList = uploadFiles;
-}
 
 //删除选中的书籍
 const delSelectBooks = () => {
@@ -213,35 +181,7 @@ const setKeyword = () => {
 </script>
 <template>
     <div class="main-container" :style="{ '--bbc': currentStyle.btnBgColor, '--bg': currentStyle.backgroundColor, '--fc': currentStyle.fontColor }">
-        <el-dialog
-            v-model="dialogFormVisible" title="导入书籍" width="500" draggable>
-            <el-upload
-                class="upload-demo" drag action="#" accept=".epub,.mobi,.azw3"
-                :auto-upload="false" :on-remove="handleRemove" :on-change="handleChange"
-                :file-list="filelistRef" multiple>
-                <el-icon class="el-icon--upload">
-                    <upload-filled />
-                </el-icon>
-                <div class="el-upload__text">
-                    将文件拖到此处，或<em>点击上传</em>
-                </div>
-                <template #tip>
-                    <div class="el-upload__tip">
-                        格式 : epub / mobi / azw3
-                    </div>
-                </template>
-            </el-upload>
-            <template #footer>
-                <div class="dialog-footer">
-                    <el-button @click="closeUpload">
-                        取消
-                    </el-button>
-                    <el-button type="primary" @click="getFiles">
-                        确认
-                    </el-button>
-                </div>
-            </template>
-        </el-dialog>
+
         <div class="header">
             <div class="header-left">
                 <input type="text" class="header-search-box" placeholder="搜索我的书库">

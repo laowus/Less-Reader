@@ -1,5 +1,7 @@
 const { app, BrowserWindow, ipcMain, Menu, shell, Tray, dialog } = require('electron')
 const { isWinOS, isDevEnv, APP_ICON } = require('./env')
+// 引入 Txt2Epub 类
+const { convertTxtToEpub } = require('./txt2epub.js');
 const path = require('path')
 const Store = require("electron-store");
 const store = new Store();
@@ -267,28 +269,70 @@ const createWindow = () => {
     return mainWin;
 }
 
+const processSingleFile = async (filePath) => {
+    let fileData;
+    let fileName = path.basename(filePath);
+    if (fileName.endsWith('.txt')) {
+        const epubFilePath = path.join(path.dirname(filePath), `${path.basename(filePath, '.txt')}.epub`);
+        try {
+            // 使用 .then() 处理 convertTxtToEpub 的结果
+            await convertTxtToEpub(filePath, epubFilePath)
+                .then(async (resolvedEpubPath) => {
+                    console.log(`成功将 ${filePath} 转换为 ${resolvedEpubPath}`);
+                    // 读取转换后的 epub 文件
+                    fileData = await fs.promises.readFile(epubFilePath);
+                    fileName = path.basename(epubFilePath);
+                    filePath = epubFilePath;
+                })
+                .catch((convertError) => {
+                    console.error(`将 ${filePath} 转换为 EPUB 时出错:`, convertError);
+                    throw convertError;
+                });
+
+        } catch (convertError) {
+            console.error(`将 ${filePath} 转换为 EPUB 时出错:`, convertError);
+            // 转换失败，仍然读取原 txt 文件
+            //fileData = await fs.promises.readFile(filePath);
+        }
+    } else {
+        // 非 txt 文件，直接读取
+        try {
+            fileData = await fs.promises.readFile(filePath);
+        } catch (readError) {
+            console.error(`读取文件 ${filePath} 时出错:`, readError);
+            throw readError;
+        }
+    }
+    return {
+        data: fileData,
+        name: fileName,
+        path: filePath
+    };
+};
+
 // 监听渲染进程打开文件选择对话框的请求
 ipcMain.handle('open-file-dialog', async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog(mainWin, {
         properties: ['openFile', 'multiSelections'],
         filters: [
-            { name: 'E-Books', extensions: ['epub', 'mobi', 'azw3'] },
+            { name: 'E-Books', extensions: ['epub', 'mobi', 'azw3', 'txt'] },
             { name: 'All Files', extensions: ['*'] }
         ]
     });
     if (!canceled) {
         const fileInfos = [];
-        for (const filePath of filePaths) {
+        for (let filePath of filePaths) {
             try {
-                const fileData = await fs.promises.readFile(filePath);
-                const fileName = path.basename(filePath);
-                fileInfos.push({
-                    data: fileData,
-                    name: fileName,
-                    path: filePath // 添加文件路径
-                });
+                const fileInfo = await processSingleFile(filePath);
+                if (fileInfo) {
+                    console.log(`成功获取文件信息: ${fileInfo.name}`);
+                    // 将文件信息插入到 fileInfos 数组中
+                    fileInfos.push(fileInfo);
+                } else {
+                    console.warn(`未获取到文件 ${filePath} 的有效信息，跳过插入`);
+                }
             } catch (error) {
-                console.error('读取文件出错:', error);
+                console.error(`处理文件 ${filePath} 时出错:`, error);
             }
         }
         return fileInfos;
