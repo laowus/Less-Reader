@@ -20,6 +20,33 @@ const dbHandle = require('./ipcHandlers/dbHandle');
 
 let readerWindows = [];
 
+// Create a log file path
+const logFilePath = path.join(app.getPath('userData'), 'app.log');
+
+// Redirect console.log
+const originalLog = console.log;
+console.log = function (...args) {
+    originalLog.apply(console, args);
+    const logMessage = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ') + '\n';
+    fs.appendFile(logFilePath, logMessage, (err) => {
+        if (err) {
+            originalLog('Failed to write log:', err);
+        }
+    });
+};
+
+// Redirect console.error
+const originalError = console.error;
+console.error = function (...args) {
+    originalError.apply(console, args);
+    const logMessage = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ') + '\n';
+    fs.appendFile(logFilePath, logMessage, (err) => {
+        if (err) {
+            originalError('Failed to write log:', err);
+        }
+    });
+};
+
 fileHandle();
 dbHandle();
 
@@ -273,9 +300,9 @@ const createWindow = () => {
 const processSingleFile = async (filePath) => {
     let fileData;
     let fileName = path.basename(filePath);
-    console.log(`正在处理文件: ${filePath}`);
     if (fileName.endsWith('.txt')) {
-        console.log(`检测到文件 ${filePath} 是 TXT 文件`);
+        // 处理 txt 文件，将其转换为 epub
+        console.log(`正在处理 ${filePath} 为 EPUB 文件...`);
         const epubFilePath = path.join(path.dirname(filePath), `${path.basename(filePath, '.txt')}.epub`);
         try {
             // 使用 .then() 处理 convertTxtToEpub 的结果
@@ -294,8 +321,6 @@ const processSingleFile = async (filePath) => {
 
         } catch (convertError) {
             console.error(`将 ${filePath} 转换为 EPUB 时出错:`, convertError);
-            // 转换失败，仍然读取原 txt 文件
-            //fileData = await fs.promises.readFile(filePath);
         }
     } else {
         // 非 txt 文件，直接读取
