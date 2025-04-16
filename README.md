@@ -71,6 +71,8 @@
         ![Github snap 12.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/12.jpg)<br>
         2、去除窗口圆角。（同背景色的窗口无法区分，所以去掉了）<br>
         ![Github snap 13.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/13.jpg)
+-   [x] v.0.0.5
+        1、增加读取 txt 文件: 把 txt 文件转成 epub,再读入<br>
 
 ### For 开发者
 
