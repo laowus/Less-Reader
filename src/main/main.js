@@ -225,7 +225,8 @@ const createWindow = () => {
             mainWindow.loadURL("http://localhost:7000/")
             mainWindow.webContents.openDevTools();
         } else {
-            mainWindow.loadFile('dist/index.html')
+            mainWindow.loadFile('dist/index.html');
+            mainWindow.webContents.openDevTools();
         }
 
         tray = new Tray(path.join(publicRoot, '/images/logo.png'));
@@ -272,7 +273,9 @@ const createWindow = () => {
 const processSingleFile = async (filePath) => {
     let fileData;
     let fileName = path.basename(filePath);
+    console.log(`正在处理文件: ${filePath}`);
     if (fileName.endsWith('.txt')) {
+        console.log(`检测到文件 ${filePath} 是 TXT 文件`);
         const epubFilePath = path.join(path.dirname(filePath), `${path.basename(filePath, '.txt')}.epub`);
         try {
             // 使用 .then() 处理 convertTxtToEpub 的结果

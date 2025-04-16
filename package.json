@@ -13,7 +13,8 @@
         "dev": "cross-env NODE_ENV=dev concurrently vite \"electron .\"",
         "dist": "cross-env NODE_ENV=prod vite build && electron-builder",
         "build": "cross-env NODE_ENV=prod vite build",
-        "pack": "cross-env NODE_ENV=prod electron-builder"
+        "pack": "cross-env NODE_ENV=prod electron-builder",
+        "prod": "cross-env NODE_ENV=prod electron ."
     },
     "dependencies": {
         "@element-plus/icons-vue": "^2.3.1",

@@ -118,8 +118,16 @@ const convertTxtToEpub = (txtFilePath, epubFilePath) => {
                     tocTitle: '主目录'
                 };
 
-                await new Epub(options, epubFilePath).promise;
-                console.log('EPUB 文件生成成功！');
+                try {
+                    // ...已有代码...
+                    console.log('开始转换 TXT 文件为 EPUB 文件');
+                    await new Epub(options, epubFilePath).promise;
+                    console.log('EPUB 文件生成成功');
+                } catch (err) {
+                    console.error('转换过程中出现错误:', err);
+                    throw err;
+                }
+
             }
         } catch (err) {
             console.error('转换过程中出错:', err);

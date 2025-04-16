@@ -63,15 +63,15 @@
         自定义主题。<br>
         ![Github snap 11.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/11.jpg)
 
--   [x] v.0.0.3 升级了 electron 版本，最新版本, 由于新版本不支持在渲染进程获取文件 File 对象的 path(文件路径),
+-   [x] v.0.0.3 <br>升级了 electron 版本，最新版本, 由于新版本不支持在渲染进程获取文件 File 对象的 path(文件路径),
         所以在主进程打开选择文件,然后把文件信息传递给渲染进程,再进行文件其他操作。
--   [x] v.0.0.3 添加了 license 协议
--   [x] v.0.0.4
+-   [x] v.0.0.3 <br> 添加了 license 协议
+-   [x] v.0.0.4<br>
         1、优化书籍目录展开和收起。添加了箭头，显示更清楚。<br>
         ![Github snap 12.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/12.jpg)<br>
         2、去除窗口圆角。（同背景色的窗口无法区分，所以去掉了）<br>
         ![Github snap 13.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/13.jpg)
--   [x] v.0.0.5
+-   [x] v.0.0.5<br>
         1、增加读取 txt 文件: 把 txt 文件转成 epub,再读入<br>
 
 ### For 开发者
