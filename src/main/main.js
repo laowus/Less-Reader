@@ -253,7 +253,6 @@ const createWindow = () => {
             mainWindow.webContents.openDevTools();
         } else {
             mainWindow.loadFile('dist/index.html');
-            mainWindow.webContents.openDevTools();
         }
 
         tray = new Tray(path.join(publicRoot, '/images/logo.png'));
