@@ -1,4 +1,4 @@
-const JSZip = require('jszip');
+const { createEpub } = require('./createEpub');
 const fs = require('fs/promises');
 const iconv = require('iconv-lite');
 const chardet = require('chardet');
@@ -96,119 +96,41 @@ const getChapters = (content, title) => {
  * @param {string} epubFilePath - 输出 EPUB 文件的路径。
  * @returns {Promise<void>} 一个 Promise，在转换完成时解析。
  */
-const convertTxtToEpub = async (txtFilePath, epubFilePath) => {
-    try {
-        const { author, title } = setEpubInfo(txtFilePath);
-        console.log(`Author: ${author}`, `Title: ${title}`);
-        // 检测文件编码
-        const encoding = await detectEncoding(txtFilePath);
-        console.log(`检测到文件编码为: ${encoding}`);
-        // 读取 TXT 文件内容
-        const txtContent = await readTxtFile(txtFilePath, encoding);
-        const chapters = getChapters(txtContent, title);
-        console.log(chapters);
-
-        // Initialize JSZip
-        const zip = new JSZip();
-        // Add mimetype file
-        zip.file("mimetype", "application/epub+zip", { compression: "STORE" });
-
-        // Add META-INF/container.xml
-        zip.folder("META-INF").file("container.xml", `
-            <?xml version="1.0" encoding="UTF-8"?>
-            <container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0">
-                <rootfiles>
-                <rootfile full-path="content.opf" media-type="application/oebps-package+xml"/>
-                </rootfiles>
-            </container>`.trim());
-        const navPoints = chapters.map(
-            (chapter, index) => {
-                const id = `chapter${index + 1}`;
-                const playOrder = index + 2; // 封页的 playOrder 为 1
-                return (`
-                <navPoint id="navPoint-${id}" playOrder="${playOrder}">
-                  <navLabel>
-                    <text>${chapter.title}</text>
-                  </navLabel>
-                  <content src="./OEBPS/${id}.xhtml" />
-                </navPoint>
-              `).trim();
-            }).join("\n");
-
-        //目录页面
-        zip.folder("").file("toc.ncx", `
-            <?xml version="1.0" encoding="UTF-8"?>
-            <ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
-                <head>
-                <meta name="dtb:uid" content="book-id" />
-                <meta name="dtb:depth" content="1" />
-                <meta name="dtb:totalPageCount" content="0" />
-                <meta name="dtb:maxPageNumber" content="0" />
-                </head>
-                <docTitle>
-                <text>${title}</text>
-                </docTitle>
-                <docAuthor>
-                <text>${author}</text>
-                </docAuthor>
-                <navMap>
-                ${navPoints}
-                </navMap>
-            </ncx>`.trim());
-        // Add OEBPS/content.opf
-        const manifest = chapters.map((_, index) => `
-        <item id="chap${index + 1}" href="OEBPS/chapter${index + 1}.xhtml" media-type="application/xhtml+xml"/>
-    `).join("\n").trim();
-        let spine = chapters.map((_, index) => `
-        <itemref idref="chap${index + 1}"/>`
-        ).join("\n").trim();
-        //生成内容页面
-        chapters.forEach((chapter, index) => {
-            zip.folder("OEBPS").file(`chapter${index + 1}.xhtml`, `
-                <?xml version="1.0" encoding="UTF-8"?>
-                <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-                <html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
-                  <head>
-                    <title>${chapter.title}</title>
-                    <link rel="stylesheet" type="text/css" href="../style.css"/>
-                  </head>
-                  <body>
-                  <h1>${chapter.title}</h1>
-                  ${chapter.content}
-                  </body>
-                </html>
-              `.trim());
-        });
-        const tocManifest = `<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>`;
-        zip.folder("").file("content.opf", `
-            <?xml version="1.0" encoding="UTF-8"?>
-            <package xmlns="http://www.idpf.org/2007/opf" unique-identifier="book-id" version="2.0">
-              <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
-                <dc:title>${title}</dc:title>
-                <dc:language>zh</dc:language>
-                <dc:creator>${author}</dc:creator>
-                <dc:identifier id="book-id">${new Date().getTime()}</dc:identifier>
-              </metadata>
-              <manifest>
-                ${manifest}
-                ${tocManifest}
-              </manifest>
-              <spine toc="ncx">
-                ${spine}
-              </spine>
-            </package>
-          `.trim());
-
-        const epubContent = await zip.generateAsync({ type: 'nodebuffer' });
-        await fs.writeFile(epubFilePath, epubContent);
-
-        console.log('EPUB 文件生成成功');
-    } catch (err) {
-        console.error('转换过程中出现错误:', err);
-        throw err;
-    }
+const convertTxtToEpub = (txtFilePath, epubFilePath) => {
+    return new Promise((resolve, reject) => {
+        try {
+            const { author, title } = setEpubInfo(txtFilePath);
+            console.log(`Author: ${author}`, `Title: ${title}`);
+            // 检测文件编码
+            detectEncoding(txtFilePath)
+                .then((encoding) => {
+                    console.log(`检测到文件编码为: ${encoding}`);
+                    // 读取 TXT 文件内容
+                    return readTxtFile(txtFilePath, encoding);
+                })
+                .then((txtContent) => {
+                    const chapters = getChapters(txtContent, title);
+                    console.log(chapters);
+                    // 创建 EPUB 文件
+                    return createEpub(chapters, { author, title });
+                })
+                .then((epubContent) => {
+                    // 将 EPUB 文件写入磁盘
+                    return fs.writeFile(epubFilePath, epubContent);
+                })
+                .then(() => {
+                    resolve();
+                })
+                .catch((err) => {
+                    console.error('转换过程中出现错误:', err);
+                    reject(err);
+                });
+        } catch (err) {
+            console.error('转换过程中出现错误:', err);
+            reject(err);
+        }
+    });
 };
-
 
 module.exports = {
     convertTxtToEpub
