@@ -25,6 +25,28 @@ const handleMix = () => {
     ipcRenderer.send('window-min');
 }
 
+const getExtension = (fileName) => {
+    const lastDotIndex = fileName.lastIndexOf('.');
+    if (lastDotIndex === -1) {
+        return ''; // 如果没有扩展名，返回空字符串
+    } else {
+        return fileName.substring(lastDotIndex + 1).toLowerCase(); // 返回扩展名并转换为小写
+    }
+}
+//application/epub+zip 
+//application/pdf
+const bookType = (fileName) => {
+    const extension = getExtension(fileName);
+    console.log('extension', extension);
+    if (extension === 'epub') {
+        return 'application/epub+zip';
+    } else if (extension === 'pdf') {
+        return 'application/pdf';
+    } else {
+        return 'application/octet-stream'; // 其他类型的文件
+    }
+}
+
 // 触发主进程的文件选择对话框
 const openFileDialog = async () => {
     //返回选择的文件信息数组,包含文件的data,name,path
@@ -33,8 +55,10 @@ const openFileDialog = async () => {
         console.log('选择的文件信息:', fileInfos);
         for (const fileInfo of fileInfos) {
             const { data, name, path } = fileInfo;
-            const blob = new Blob([data], { type: 'application/octet-stream' });
-            const file = new File([blob], name);
+            const type = bookType(name); // 获取文件的 MIME 类型
+            const blob = new Blob([data], { type });
+            // 在创建 File 对象时指定 type 属性
+            const file = new File([blob], name, { type });
             // 给 File 对象添加 path 属性
             Object.defineProperty(file, 'path', {
                 value: path,
@@ -42,6 +66,7 @@ const openFileDialog = async () => {
                 enumerable: true,
                 configurable: false
             });
+
             console.log('成功创建 File 对象:', file);
             // 这里可以对创建好的 File 对象进行后续操作
             await getMd5WithBrowser(file);

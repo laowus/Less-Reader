@@ -82,6 +82,7 @@ class BookUtil {
                 console.log("makeBook", file);
                 const book = await makeBook(file);
                 meta = book.metadata;
+                console.log("book.metadata", meta);
                 [name, author, description, publisher, coverString] = [
                     meta.title || bookName, meta.author || "Unknown author",
                     meta.description || "", meta.publisher || "", meta.cover || ""

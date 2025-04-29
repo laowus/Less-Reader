@@ -342,7 +342,7 @@ ipcMain.handle('open-file-dialog', async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog(mainWin, {
         properties: ['openFile', 'multiSelections'],
         filters: [
-            { name: 'E-Books', extensions: ['epub', 'mobi', 'azw3', 'txt'] },
+            { name: 'E-Books', extensions: ['epub', 'mobi', 'azw3', 'txt', 'pdf'] },
             { name: 'All Files', extensions: ['*'] }
         ]
     });
