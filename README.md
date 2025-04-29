@@ -73,6 +73,8 @@
         ![Github snap 13.jpg](https://github.com/laowus/Less-Reader/blob/main/snapshot/13.jpg)
 -   [x] v.0.0.5<br>
         1、增加读取 txt 文件: 把 txt 文件转成 epub,再读入<br>
+-   [x] v.0.0.6<br>
+        1、增加读取 pdf 文件<br>
 
 ### For 开发者
 
