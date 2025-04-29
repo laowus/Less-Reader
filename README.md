@@ -2,7 +2,7 @@
 
 一款基于 Electron + Vue 3 开发的电子书阅读器。
 
-支持格式: epub , mobi, azw3, txt, fb2
+支持格式: EPUB、MOBI、AZW3、FB2、PDF、TXT
 
 ### 联系:
 
@@ -18,7 +18,7 @@
 
 ### 功能特性
 
--   支持主流电子书格式：EPUB、MOBI、AZW3、FB2 ( PDF, TXT 暂不支持)
+-   支持主流电子书格式：EPUB、MOBI、AZW3、FB2、PDF、TXT
 -   解析文件的来自开源软件: [foliate-js](https://github.com/foliate/foliate-js)
 -   完美解析，确保最佳阅读体验，界面设计来源: [readest](https://github.com/readest/readest)
 -   功能参考:
