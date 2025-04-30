@@ -16,10 +16,11 @@ export default class StyleUtil {
      * hyphenate 是否自动连字符
     */
     static getStyle() {
+        //backgroundColor: '#ffffff', fontColor: '#171717', btnBgColor: '#cccccc'
         const defaultStyle = {
             fontSize: 14, fontWeight: 400, lineHeight: 1.7, letterSpacing: 2.0, wordSpacing: 2.5, textIndent: 2,
             paragraphSpacing: 1.0, justify: true, hyphenate: true, writingMode: "horizontal-tb",
-            fontColor: '#5b4636', backgroundColor: '#f1e8d0', fontFamily: "Microsoft YaHei", btnBgColor: '#dac281'
+            fontColor: '#171717', backgroundColor: '#ffffff', fontFamily: "Microsoft YaHei", btnBgColor: '#cccccc'
         };
         let json = localStorage.getItem("style");
         return JSON.parse(json) || defaultStyle;
