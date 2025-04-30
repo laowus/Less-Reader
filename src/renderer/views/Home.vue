@@ -47,35 +47,6 @@ const bookType = (fileName) => {
     }
 }
 
-// 触发主进程的文件选择对话框
-const openFileDialog = async () => {
-    //返回选择的文件信息数组,包含文件的data,name,path
-    const fileInfos = await ipcRenderer.invoke('open-file-dialog');
-    if (fileInfos) {
-        console.log('选择的文件信息:', fileInfos);
-        for (const fileInfo of fileInfos) {
-            const { data, name, path } = fileInfo;
-            const type = bookType(name); // 获取文件的 MIME 类型
-            const blob = new Blob([data], { type });
-            // 在创建 File 对象时指定 type 属性
-            const file = new File([blob], name, { type });
-            // 给 File 对象添加 path 属性
-            Object.defineProperty(file, 'path', {
-                value: path,
-                writable: false,
-                enumerable: true,
-                configurable: false
-            });
-
-            console.log('成功创建 File 对象:', file);
-            // 这里可以对创建好的 File 对象进行后续操作
-            await getMd5WithBrowser(file);
-        }
-        loadContent(); // 所有文件处理完成后更新 bookList
-    } else {
-        console.log('未选择文件或读取文件出错');
-    }
-};
 
 //删除选中的书籍
 const delSelectBooks = () => {
@@ -256,8 +227,6 @@ const addFiles = async (files) => {
     loadContent();
 }
 
-
-
 const initDrag = () => {
     const dropTarget = $('#drop-target')
     dropTarget.addEventListener('drop', dropHandler)
@@ -272,7 +241,6 @@ const inputAddFile = (e) => {
     });
     $('#file-button').addEventListener('click', () => $('#file-input').click())
 }
-
 
 onMounted(() => {
     inputAddFile()
@@ -295,8 +263,8 @@ const setKeyword = () => {
             </div>
             <div class="drag-bar"></div>
             <div class="header-right">
-                <input type="file" id="file-input" hidden>
-                <button class="btn-text-icon" @click="openFileDialog" id="file-button">
+                <input type="file" id="file-input" hidden accept=".epub,.pdf,.txt,.mobi,.azw3">
+                <button class="btn-text-icon" id="file-button">
                     <span class="iconfont icon-jia">
                     </span> 书籍
                 </button>

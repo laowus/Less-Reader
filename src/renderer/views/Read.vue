@@ -22,7 +22,8 @@ const currentStyle = ref(StyleUtil.getStyle())
 onMounted(() => {
     ipcRenderer.once('db-get-book-response', (event, items) => {
         currentBook.value = items.data[0];
-        if (currentBook.value.path) open(currentBook.value, currentStyle.value).catch(e => console.error(e))
+        console.log(currentBook.value);
+        if (currentBook.value.path) open(currentBook.value, currentStyle.value).catch(e => console.error(e));
     });
     ipcRenderer.send('db-get-book', bookId);
 
@@ -49,7 +50,6 @@ EventBus.on('set-theme', () => {
     currentStyle.value = StyleUtil.getStyle();
     console.log(currentStyle.value);
 });
-
 </script>
 <template>
     <PopoversCtl :bookId="bookId"></PopoversCtl>
@@ -68,7 +68,6 @@ EventBus.on('set-theme', () => {
             <ReadDialog v-show="readDialogShow" />
         </div>
     </div>
-
 </template>
 <style>
 .btn-icon {

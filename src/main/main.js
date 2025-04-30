@@ -20,33 +20,6 @@ const dbHandle = require('./ipcHandlers/dbHandle');
 
 let readerWindows = [];
 
-// Create a log file path
-const logFilePath = path.join(app.getPath('userData'), 'app.log');
-
-// Redirect console.log
-const originalLog = console.log;
-console.log = function (...args) {
-    originalLog.apply(console, args);
-    const logMessage = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ') + '\n';
-    fs.appendFile(logFilePath, logMessage, (err) => {
-        if (err) {
-            originalLog('Failed to write log:', err);
-        }
-    });
-};
-
-// Redirect console.error
-const originalError = console.error;
-console.error = function (...args) {
-    originalError.apply(console, args);
-    const logMessage = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ') + '\n';
-    fs.appendFile(logFilePath, logMessage, (err) => {
-        if (err) {
-            originalError('Failed to write log:', err);
-        }
-    });
-};
-
 fileHandle();
 dbHandle();
 
@@ -296,46 +269,6 @@ const createWindow = () => {
     return mainWin;
 }
 
-const processSingleFile = async (filePath) => {
-    let fileData;
-    let fileName = path.basename(filePath);
-    if (fileName.endsWith('.txt')) {
-        // 处理 txt 文件，将其转换为 epub
-        console.log(`正在处理 ${filePath} 为 EPUB 文件...`);
-        const epubFilePath = path.join(path.dirname(filePath), `${path.basename(filePath, '.txt')}.epub`);
-        try {
-            // 使用 .then() 处理 convertTxtToEpub 的结果
-            await convertTxtToEpub(filePath, epubFilePath)
-                .then(async (resolvedEpubPath) => {
-                    console.log(`成功将 ${filePath} 转换为 ${resolvedEpubPath}`);
-                    // 读取转换后的 epub 文件
-                    fileData = await fs.promises.readFile(epubFilePath);
-                    fileName = path.basename(epubFilePath);
-                    filePath = epubFilePath;
-                })
-                .catch((convertError) => {
-                    console.error(`将 ${filePath} 转换为 EPUB 时出错:`, convertError);
-                    throw convertError;
-                });
-
-        } catch (convertError) {
-            console.error(`将 ${filePath} 转换为 EPUB 时出错:`, convertError);
-        }
-    } else {
-        // 非 txt 文件，直接读取
-        try {
-            fileData = await fs.promises.readFile(filePath);
-        } catch (readError) {
-            console.error(`读取文件 ${filePath} 时出错:`, readError);
-            throw readError;
-        }
-    }
-    return {
-        data: fileData,
-        name: fileName,
-        path: filePath
-    };
-};
 
 ipcMain.handle('txt-2-epub', async (event, txtPath, filePath) => {
     // 检查传入参数是否为空
@@ -364,35 +297,6 @@ ipcMain.handle('txt-2-epub', async (event, txtPath, filePath) => {
     }
 });
 
-// 监听渲染进程打开文件选择对话框的请求
-ipcMain.handle('open-file-dialog', async () => {
-    const { canceled, filePaths } = await dialog.showOpenDialog(mainWin, {
-        properties: ['openFile', 'multiSelections'],
-        filters: [
-            { name: 'E-Books', extensions: ['epub', 'mobi', 'azw3', 'txt', 'pdf'] },
-            { name: 'All Files', extensions: ['*'] }
-        ]
-    });
-    if (!canceled) {
-        const fileInfos = [];
-        for (let filePath of filePaths) {
-            try {
-                const fileInfo = await processSingleFile(filePath);
-                if (fileInfo) {
-                    console.log(`成功获取文件信息: ${fileInfo.name}`);
-                    // 将文件信息插入到 fileInfos 数组中
-                    fileInfos.push(fileInfo);
-                } else {
-                    console.warn(`未获取到文件 ${filePath} 的有效信息，跳过插入`);
-                }
-            } catch (error) {
-                console.error(`处理文件 ${filePath} 时出错:`, error);
-            }
-        }
-        return fileInfos;
-    }
-    return null;
-});
 
 const sendToRenderer = (channel, args) => {
     try {
