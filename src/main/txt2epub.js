@@ -119,7 +119,7 @@ const convertTxtToEpub = (txtFilePath, epubFilePath) => {
                     return fs.writeFile(epubFilePath, epubContent);
                 })
                 .then(() => {
-                    resolve();
+                    resolve(epubFilePath);
                 })
                 .catch((err) => {
                     console.error('转换过程中出现错误:', err);

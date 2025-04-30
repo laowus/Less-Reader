@@ -4,8 +4,8 @@ import { fetchMD5 } from '../utils/fileUtils/md5Util';
 import BookUtil from '../utils/fileUtils/bookUtils';
 import { ElMessage } from 'element-plus';
 import BookListItem from '../components/BookListItem.vue';
-import StyleUtil from '../utils/readUtils/styleUtil.js'
-const { ipcRenderer } = window.require('electron');
+import StyleUtil from '../utils/readUtils/styleUtil.js';
+const { ipcRenderer, webUtils } = window.require('electron');
 const booklist = ref([]);
 const selectedBooks = ref([]);
 const filelistRef = ref([]);
@@ -15,6 +15,7 @@ const $ = document.querySelector.bind(document)
 let clickFilePath = "";
 const currentStyle = ref(StyleUtil.getStyle())
 const keyword = ref("");
+const bookTypes = ['epub', 'pdf', 'txt', 'mobi', 'azw3'];
 const handleClose = () => {
     ipcRenderer.send('window-close');
 }
@@ -33,8 +34,7 @@ const getExtension = (fileName) => {
         return fileName.substring(lastDotIndex + 1).toLowerCase(); // 返回扩展名并转换为小写
     }
 }
-//application/epub+zip 
-//application/pdf
+
 const bookType = (fileName) => {
     const extension = getExtension(fileName);
     console.log('extension', extension);
@@ -194,7 +194,89 @@ const loadContent = () => {
         currentStyle.value = StyleUtil.getStyle();
     });
 }
+
+//拖动文件到页面时，会触发drop事件
+const dragOverHandler = e => e.preventDefault()
+const dropHandler = async (e) => {
+    e.preventDefault()
+    const files = e.dataTransfer.files;
+    addFiles(files);
+}
+
+const addFiles = async (files) => {
+    if (files.length > 0) {
+        for (let i = 0; i < files.length; i++) {
+            let newFile = files[i];
+            let filePath = webUtils.getPathForFile(files[i]);
+            const fileExtension = filePath.split('.').pop().toLowerCase();
+            // 假如是Txt 转换成 epub文件
+            if (bookTypes.includes(fileExtension)) {
+                if (fileExtension === 'txt') {
+                    //如果是txt文件, 转换成epub文件 
+                    const txtPath = filePath;
+                    filePath = filePath.replace('.txt', '.epub');
+                    const res = await ipcRenderer.invoke('txt-2-epub', txtPath, filePath);
+                    console.log(res);
+                    if (res.success) {
+                        // 给新的 File 对象添加 path 属性
+                        const fileInfo = res.fileInfo;
+                        const { data, name, path } = fileInfo;
+                        const type = bookType(name); // 获取文件的 MIME 类型
+                        const blob = new Blob([data], { type });
+                        // 在创建 File 对象时指定 type 属性
+                        const file = new File([blob], name, { type });
+                        // 给 File 对象添加 path 属性
+                        Object.defineProperty(file, 'path', {
+                            value: path,
+                            writable: false,
+                            enumerable: true,
+                            configurable: false
+                        });
+                        await getMd5WithBrowser(file);
+                    } else {
+                        ElMessage.error(' <<' + newFile.name + '>> 文件转换失败!');
+                        continue;
+                    }
+                } else {
+                    // 给新的 File 对象添加 path 属性
+                    Object.defineProperty(newFile, 'path', {
+                        value: filePath,
+                        writable: false,
+                        enumerable: true,
+                        configurable: false
+                    });
+                    await getMd5WithBrowser(newFile);
+                }
+            } else {
+                ElMessage.error(' <<' + newFile.name + '>> 格式错误!');
+                continue;
+            }
+        }
+    }
+    loadContent();
+}
+
+
+
+const initDrag = () => {
+    const dropTarget = $('#drop-target')
+    dropTarget.addEventListener('drop', dropHandler)
+    dropTarget.addEventListener('dragover', dragOverHandler)
+}
+
+const inputAddFile = (e) => {
+    $('#file-input').addEventListener('change', e => {
+        const files = e.target.files;
+        addFiles(files);
+        $('#file-input').value = '';
+    });
+    $('#file-button').addEventListener('click', () => $('#file-input').click())
+}
+
+
 onMounted(() => {
+    inputAddFile()
+    initDrag();
     loadContent();
 });
 
@@ -206,7 +288,6 @@ const setKeyword = () => {
 </script>
 <template>
     <div class="main-container" :style="{ '--bbc': currentStyle.btnBgColor, '--bg': currentStyle.backgroundColor, '--fc': currentStyle.fontColor }">
-
         <div class="header">
             <div class="header-left">
                 <input type="text" class="header-search-box" placeholder="搜索我的书库">
@@ -214,7 +295,8 @@ const setKeyword = () => {
             </div>
             <div class="drag-bar"></div>
             <div class="header-right">
-                <button class="btn-text-icon" @click="openFileDialog">
+                <input type="file" id="file-input" hidden>
+                <button class="btn-text-icon" @click="openFileDialog" id="file-button">
                     <span class="iconfont icon-jia">
                     </span> 书籍
                 </button>
@@ -256,12 +338,39 @@ const setKeyword = () => {
                 </button>
             </div>
         </div>
-        <div class="book-list-container">
+        <div class="book-list-container" id="drop-target">
             <BookListItem v-for="item in booklist" :book="item" :isSelected="selectedBooks.indexOf(item) > -1" :key="item.key" :selectedBooks="selectedBooks" :selectChangedFn="selectBook" />
         </div>
     </div>
 </template>
 <style>
+#drop-target {
+    position: relative;
+    /* 确保伪元素定位基于该元素 */
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+
+#drop-target::before {
+    content: "将【txt、mobi、epub、pdf】文件\A拖到此处， 可直接导入书籍";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* 使文字居中显示 */
+    color: rgba(0, 0, 0, 0.2);
+    /* 文字颜色，可按需调整 */
+    font-size: 20px;
+    /* 文字大小，可按需调整 */
+    pointer-events: none;
+    /* 避免影响拖放操作 */
+    white-space: pre-wrap;
+    /* 让换行符生效 */
+    text-align: center;
+    /* 文字居中 */
+}
+
 .btns-tool {
     display: flex;
     flex-direction: row;

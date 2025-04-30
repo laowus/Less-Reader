@@ -337,6 +337,33 @@ const processSingleFile = async (filePath) => {
     };
 };
 
+ipcMain.handle('txt-2-epub', async (event, txtPath, filePath) => {
+    // 检查传入参数是否为空
+    if (!txtPath || !filePath) {
+        console.error('txtPath 或 filePath 参数为空');
+        return { success: false, message: '参数为空' };
+    }
+    try {
+        // 调用转换函数
+        const resolvedEpubPath = await convertTxtToEpub(txtPath, filePath);
+        console.log(`成功将 ${txtPath} 转换为 ${resolvedEpubPath}`);
+        // 读取转换后的 epub 文件
+        const fileData = await fs.promises.readFile(filePath);
+        const fileName = path.basename(filePath);
+        return {
+            success: true,
+            fileInfo: {
+                data: fileData,
+                name: fileName,
+                path: filePath
+            }
+        };
+    } catch (convertError) {
+        console.error(`将 ${txtPath} 转换为 EPUB 时出错:`, convertError);
+        return { success: false, message: convertError.message };
+    }
+});
+
 // 监听渲染进程打开文件选择对话框的请求
 ipcMain.handle('open-file-dialog', async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog(mainWin, {
