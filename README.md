@@ -34,9 +34,7 @@
 -   使用 sqlite 用作数据保存。
     （Windows 环境）数据保存位置：C:\Users\*用户名*\AppData\Roaming\less-reader
     注：*用户名\* 为你的电脑用户名
--   因为 sqlite 要使用，编译测试要安装 先安装 vs2019 + python10+
-    我在这里花了挺多时间, 现在已经成功了。
-    可以参考：https://blog.csdn.net/qq_34907249/article/details/120254151
+
 
 ### 预览图
 
