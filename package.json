@@ -1,62 +1,62 @@
 {
-    "name": "less-reader",
-    "private": true,
-    "author": {
-        "name": "HXL",
-        "email": "pjhxl@qq.com"
+  "name": "less-reader",
+  "private": true,
+  "author": {
+    "name": "HXL",
+    "email": "pjhxl@qq.com"
+  },
+  "version": "0.0.8",
+  "main": "src/main/main.js",
+  "description": "Less Reader is a simple and efficient reader for less",
+  "license": "Apache License 2.0",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=dev concurrently vite \"electron .\"",
+    "dist": "cross-env NODE_ENV=prod vite build && electron-builder",
+    "build": "cross-env NODE_ENV=prod vite build",
+    "pack": "cross-env NODE_ENV=prod electron-builder",
+    "prod": "cross-env NODE_ENV=prod electron ."
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
+    "chardet": "^2.1.0",
+    "electron-store": "^8.0.1",
+    "element-plus": "^2.9.1",
+    "jszip": "^3.10.1",
+    "localforage": "^1.10.0",
+    "mitt": "^3.0.0",
+    "sqlite3": "^5.1.7",
+    "tinycolor2": "^1.6.0",
+    "vue": "^3.2.25",
+    "vue-router": "^4.0.14",
+    "vue3-lazyload": "^0.3.6"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.2.3",
+    "concurrently": "^7.1.0",
+    "cross-env": "^7.0.3",
+    "electron": "^35.1.4",
+    "electron-builder": "^26.0.12",
+    "jschardet": "^3.1.4",
+    "spark-md5": "^3.0.1",
+    "vite": "^4.4.0",
+    "vite-plugin-top-level-await": "^1.5.0",
+    "wait-on": "^6.0.1"
+  },
+  "build": {
+    "appId": "xyz.hxl.less-reader",
+    "productName": "Less Reader 简阅",
+    "copyright": "Copyright © HXL2024",
+    "directories": {
+      "output": "output"
     },
-    "version": "0.0.7",
-    "main": "src/main/main.js",
-    "description": "Less Reader is a simple and efficient reader for less",
-    "license": "Apache License 2.0",
-    "scripts": {
-        "dev": "cross-env NODE_ENV=dev concurrently vite \"electron .\"",
-        "dist": "cross-env NODE_ENV=prod vite build && electron-builder",
-        "build": "cross-env NODE_ENV=prod vite build",
-        "pack": "cross-env NODE_ENV=prod electron-builder",
-        "prod": "cross-env NODE_ENV=prod electron ."
+    "win": {
+      "icon": "dist/favicon.ico"
     },
-    "dependencies": {
-        "@element-plus/icons-vue": "^2.3.1",
-        "chardet": "^2.1.0",
-        "electron-store": "^8.0.1",
-        "element-plus": "^2.9.1",
-        "jszip": "^3.10.1",
-        "localforage": "^1.10.0",
-        "mitt": "^3.0.0",
-        "sqlite3": "^5.1.7",
-        "tinycolor2": "^1.6.0",
-        "vue": "^3.2.25",
-        "vue-router": "^4.0.14",
-        "vue3-lazyload": "^0.3.6"
-    },
-    "devDependencies": {
-        "@vitejs/plugin-vue": "^4.2.3",
-        "concurrently": "^7.1.0",
-        "cross-env": "^7.0.3",
-        "electron": "^35.1.4",
-        "electron-builder": "^26.0.12",
-        "jschardet": "^3.1.4",
-        "spark-md5": "^3.0.1",
-        "vite": "^4.4.0",
-        "vite-plugin-top-level-await": "^1.5.0",
-        "wait-on": "^6.0.1"
-    },
-    "build": {
-        "appId": "xyz.hxl.less-reader",
-        "productName": "Less Reader 简阅",
-        "copyright": "Copyright © HXL2024",
-        "directories": {
-            "output": "output"
-        },
-        "win": {
-            "icon": "dist/favicon.ico"
-        },
-        "nsis": {
-            "oneClick": false,
-            "allowToChangeInstallationDirectory": true,
-            "perMachine": true,
-            "deleteAppDataOnUninstall": true
-        }
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": true,
+      "deleteAppDataOnUninstall": true
     }
+  }
 }

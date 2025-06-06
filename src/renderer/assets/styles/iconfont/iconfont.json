@@ -6,6 +6,27 @@
   "description": "icon集合",
   "glyphs": [
     {
+      "icon_id": "21967989",
+      "name": "一行一列",
+      "font_class": "yihangyilie",
+      "unicode": "e62d",
+      "unicode_decimal": 58925
+    },
+    {
+      "icon_id": "28027718",
+      "name": "一列布局",
+      "font_class": "yiliebuju",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "6672631",
+      "name": "两列",
+      "font_class": "lianglie",
+      "unicode": "e68c",
+      "unicode_decimal": 59020
+    },
+    {
       "icon_id": "5792169",
       "name": "收缩",
       "font_class": "shousuo",
